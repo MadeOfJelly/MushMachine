@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.2)
+project(framework CXX)
+
+add_subdirectory(engine)
+add_subdirectory(logger)
+add_subdirectory(resource_manager)
+add_subdirectory(common_components)
+add_subdirectory(std_utils)
+add_subdirectory(screen_director)
+add_subdirectory(filesystem)
+add_subdirectory(simple_scene)
+
+if(NOT MM_HEADLESS)
+	add_subdirectory(sdl_service)
+	add_subdirectory(simple_sdl_renderer)
+	add_subdirectory(opengl_renderer)
+	add_subdirectory(opengl_primitives)
+	add_subdirectory(input)
+	add_subdirectory(sound)
+	add_subdirectory(imgui)
+	add_subdirectory(tilemap)
+endif()
+

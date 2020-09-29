@@ -1,0 +1,80 @@
+{ "columns":11,
+ "image":"wall_concrete-1_se_0.2.png",
+ "imageheight":160,
+ "imagewidth":352,
+ "margin":0,
+ "name":"wall_concrete-1_se_0.2",
+ "spacing":0,
+ "terrains":[
+        {
+         "name":"solid",
+         "tile":34
+        }],
+ "tilecount":55,
+ "tiledversion":"1.2.3",
+ "tileheight":32,
+ "tiles":[
+        {
+         "id":1,
+         "terrain":[0, 0, 0, -1]
+        }, 
+        {
+         "id":2,
+         "terrain":[0, 0, -1, 0]
+        }, 
+        {
+         "id":12,
+         "terrain":[0, -1, 0, 0]
+        }, 
+        {
+         "id":13,
+         "terrain":[-1, 0, 0, 0]
+        }, 
+        {
+         "id":19,
+         "terrain":[-1, 0, 0, -1]
+        }, 
+        {
+         "id":20,
+         "terrain":[0, -1, -1, 0]
+        }, 
+        {
+         "id":22,
+         "terrain":[-1, -1, -1, 0]
+        }, 
+        {
+         "id":23,
+         "terrain":[-1, -1, 0, 0]
+        }, 
+        {
+         "id":24,
+         "terrain":[-1, -1, 0, -1]
+        }, 
+        {
+         "id":33,
+         "terrain":[-1, 0, -1, 0]
+        }, 
+        {
+         "id":34,
+         "terrain":[0, 0, 0, 0]
+        }, 
+        {
+         "id":35,
+         "terrain":[0, -1, 0, -1]
+        }, 
+        {
+         "id":44,
+         "terrain":[-1, 0, -1, -1]
+        }, 
+        {
+         "id":45,
+         "terrain":[0, 0, -1, -1]
+        }, 
+        {
+         "id":46,
+         "terrain":[0, -1, -1, -1]
+        }],
+ "tilewidth":32,
+ "type":"tileset",
+ "version":1.2
+}

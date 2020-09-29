@@ -1,0 +1,39 @@
+[submodule "external/entt"]
+	path = external/entt
+	url = https://github.com/skypjack/entt.git
+	shallow = true
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
+	shallow = true
+[submodule "external/googletest"]
+	path = external/googletest
+	url = https://github.com/google/googletest.git
+[submodule "external/IconFontCppHeaders"]
+	path = external/IconFontCppHeaders
+	url = https://github.com/juliettef/IconFontCppHeaders.git
+[submodule "external/imgui/imgui"]
+	path = external/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+	shallow = true
+[submodule "external/ImGuiColorTextEdit"]
+	path = external/ImGuiColorTextEdit
+	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
+[submodule "external/physfs"]
+	path = external/physfs
+	url = https://github.com/Green-Sky/physfs.git
+	shallow = true
+[submodule "external/soloud/soloud"]
+	path = external/soloud/soloud
+	url = https://github.com/jarikomppa/soloud.git
+[submodule "external/spdlog"]
+	path = external/spdlog
+	url = https://github.com/gabime/spdlog.git
+	shallow = true
+[submodule "external/stb/stb"]
+	path = external/stb/stb
+	url = https://github.com/nothings/stb.git
+[submodule "external/tracy/tracy"]
+	path = external/tracy/tracy
+	url = https://github.com/wolfpld/tracy.git
+	shallow = true

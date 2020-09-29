@@ -1,0 +1,27 @@
+#pragma once
+
+#include <string_view>
+
+namespace MM::std_utils {
+
+// src : https://marcoarena.wordpress.com/2017/01/03/string_view-odi-et-amo/
+inline std::vector<std::string_view> split(std::string_view str, const char* delims) {
+	std::vector<std::string_view> ret;
+
+	std::string_view::size_type start = 0;
+	auto pos = str.find_first_of(delims, start);
+	while (pos != std::string_view::npos) {
+		if (pos != start) {
+			ret.push_back(str.substr(start, pos - start));
+		}
+		start = pos + 1;
+		pos = str.find_first_of(delims, start);
+	}
+	if (start < str.length())
+		ret.push_back(str.substr(start, str.length() - start));
+
+	return ret;
+}
+
+} // MM::std_utils
+
