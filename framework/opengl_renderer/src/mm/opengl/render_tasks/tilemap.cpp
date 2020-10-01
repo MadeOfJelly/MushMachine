@@ -84,6 +84,8 @@ void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	MM::OpenGL::Camera3D& cam = scene.ctx<MM::OpenGL::Camera3D>();
 	auto vp = cam.getViewProjection();
 
+	_shader->setUniform3f("_ambient_color", ambient_color);
+
 	auto view = scene.view<MM::Components::Transform2D, OpenGL::TilemapRenderable>();
 	view.each([&](auto, MM::Components::Transform2D& t, OpenGL::TilemapRenderable& tilemap) {
 		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(tilemap.z + 500.f));
@@ -169,6 +171,7 @@ R"(
 uniform sampler2D _tex0;
 
 //in vec4 _color;
+uniform vec3 _ambient_color;
 in vec2 _tex_pos;
 
 out vec4 _out_color;
@@ -180,11 +183,8 @@ void main() {
 		discard;
 	}
 
-	//gl_FragColor = tmp_col;
-	_out_color = tmp_col;
-	//gl_FragColor = texture(_tex0, _tex_pos);
-	//gl_FragColor = texture(_tex0, _tex_pos) * _color;
-	//gl_FragColor = vec4(_tex_pos.x, _tex_pos.y, 0, 1);
+	//_out_color = tmp_col;
+	_out_color = vec4(tmp_col.rgb * _ambient_color, tmp_col.a);
 }
 )")
 }

@@ -4,7 +4,7 @@
 #include <mm/services/opengl_renderer.hpp>
 
 //#include <glm/fwd.hpp>
-#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 
 // fwd
 namespace MM::OpenGL {
@@ -32,6 +32,8 @@ namespace MM::OpenGL::RenderTasks {
 			const char* fragmentPath = "shader/tilemap_render_task/frag.glsl";
 
 			std::string target_fbo = "display";
+
+			glm::vec3 ambient_color {1.f, 1.f, 1.f};
 
 		private:
 			void setupShaderFiles(void);
