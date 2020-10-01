@@ -44,6 +44,10 @@ MIT you bet
 
 ## Source Structure
 
+- framework (where most of the code lives)
+- systems (some prepackaged [ecs-systems](docs/terminology.md) )
+- screens (some prepackaged [`MM::Screen`s](docs/terminology.md) )
+
 ## Libraries Used
 - [EnTT](https://github.com/skypjack/entt)
 - [glad](https://github.com/Dav1dde/glad)
