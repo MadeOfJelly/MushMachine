@@ -1,3 +1,5 @@
+#include "mm/opengl/render_tasks/clear.hpp"
+#include "mm/opengl/render_tasks/copy_to_fb.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -20,6 +22,7 @@
 #include <mm/systems/simple_velocity_system2d.hpp>
 
 #include <mm/opengl/fbo_builder.hpp>
+#include <mm/opengl/texture_loader.hpp>
 
 #include <imgui/imgui.h>
 
@@ -51,28 +54,56 @@ TEST(blur_render_task, it) {
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
 
-	rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleRect>(engine).target_fbo = "game_view";
+	//rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleRect>(engine).target_fbo = "game_view";
 
-	MM::OpenGL::RenderTasks::SimpleRect* bsrr_rend_ptr = &rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleRect>(engine);
-	bsrr_rend_ptr->target_fbo = "blur_in";
+	rs.addRenderTask<MM::OpenGL::RenderTasks::Clear>(engine).target_fbo = "blur_io";
 
-	MM::OpenGL::RenderTasks::Blur* blur_rend_ptr = &rs.addRenderTask<MM::OpenGL::RenderTasks::Blur>(engine);
-	blur_rend_ptr->target_fbo = "display";
+	MM::OpenGL::RenderTasks::SimpleRect& bsrr_rend = rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleRect>(engine);
+	bsrr_rend.target_fbo = "blur_io";
+
+	MM::OpenGL::RenderTasks::Blur& blur_rend = rs.addRenderTask<MM::OpenGL::RenderTasks::Blur>(engine);
+	blur_rend.io_tex = "blur_io";
+	blur_rend.temp_tex = "blur_temp";
+	blur_rend.io_fbo = "blur_io";
+	blur_rend.temp_fbo = "blur_temp";
+
+	// render to display
+	auto& ctfb = rs.addRenderTask<MM::OpenGL::RenderTasks::CopyToFB>(engine);
+	ctfb.src_tex = "blur_io";
+	ctfb.target_fbo = "display";
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 
+	auto [w, h] = sdl_ss.getWindowSize();
+	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
+	{ // setup textures
+		rm_t.load<MM::OpenGL::TextureLoaderEmpty>(
+			"blur_io",
+			GL_RGB,
+			w, h,
+			GL_RGB, GL_UNSIGNED_BYTE
+		);
 
-	{
-		auto [w, h] = sdl_ss.getWindowSize();
+		rm_t.load<MM::OpenGL::TextureLoaderEmpty>(
+			"blur_temp",
+			GL_RGB,
+			w, h,
+			GL_RGB, GL_UNSIGNED_BYTE
+		);
+	}
 
-		rs.targets["game_view"] = MM::OpenGL::FBOBuilder::start()
-			.attachTexture(MM::OpenGL::Texture::createEmpty(GL_RGB, w, h, GL_RGB, GL_UNSIGNED_BYTE))
+
+	{ // setup fbo s
+		//rs.targets["game_view"] = MM::OpenGL::FBOBuilder::start()
+			//.attachTexture(MM::OpenGL::Texture::createEmpty(GL_RGB, w, h, GL_RGB, GL_UNSIGNED_BYTE))
+			//.finish();
+		rs.targets["blur_io"] = MM::OpenGL::FBOBuilder::start()
+			.attachTexture(rm_t.get("blur_io"_hs))
+			.setResize(true)
 			.finish();
-		rs.targets["blur_in"] = MM::OpenGL::FBOBuilder::start()
-			.attachTexture(MM::OpenGL::Texture::createEmpty(GL_RGB, w, h, GL_RGB, GL_UNSIGNED_BYTE))
-			.finish();
-		rs.targets["blur_out"] = MM::OpenGL::FBOBuilder::start()
-			.attachTexture(MM::OpenGL::Texture::createEmpty(GL_RGB, w, h, GL_RGB, GL_UNSIGNED_BYTE))
+		rs.targets["blur_temp"] = MM::OpenGL::FBOBuilder::start()
+			.attachTexture(rm_t.get("blur_temp"_hs))
+			.setResize(true)
 			.finish();
 	}
 
@@ -103,7 +134,7 @@ TEST(blur_render_task, it) {
 
 	engine.addUpdate(
 		[&](MM::Engine&) {
-			ImGui::ColorEdit4("rect_col", &bsrr_rend_ptr->default_color[0]);
+			ImGui::ColorEdit4("rect_col", &bsrr_rend.default_color[0]);
 		}
 	);
 

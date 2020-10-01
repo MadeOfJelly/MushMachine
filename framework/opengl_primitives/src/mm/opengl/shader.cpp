@@ -108,7 +108,7 @@ uint32_t Shader::compile(uint32_t type, const std::string& source) {
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 		char* msg = (char*) alloca(length * sizeof(char));
 		glGetShaderInfoLog(id, length, &length, msg);
-		LOG_ERROR("failed to compile {} Shader: {}", type == GL_VERTEX_SHADER ? "vertex" : "fragment", msg);
+		LOG_ERROR("failed to compile {} Shader: {}\n  source: {}", type == GL_VERTEX_SHADER ? "vertex" : "fragment", msg, source);
 		return 0;
 	}
 

@@ -107,6 +107,8 @@ target_link_libraries(blur_render_task_test
 	simple_scene
 	simple_rect_render_task
 	blur_render_task
+	copy_to_fb_render_task
+	clear_render_task
 	imgui_service
 	imgui_render_task
 
