@@ -26,12 +26,12 @@ namespace MM::Services {
 			virtual ::MM::Scene& getScene(void) = 0;
 
 			// enques a new Scene to be put in place
-			virtual void changeScene(std::unique_ptr<::MM::Scene> new_scene) = 0;
+			virtual void changeScene(std::unique_ptr<::MM::Scene>&& new_scene) = 0;
 
 			// sets the new Scene to be provided.
 			// dont use, except for when you know what you are doing!
 			// be carefull of that one (lol)
-			virtual void changeSceneNow(std::unique_ptr<::MM::Scene> new_scene) = 0;
+			virtual void changeSceneNow(std::unique_ptr<::MM::Scene>&& new_scene) = 0;
 
 			// adds a System to current Scene.
 			// default impl. will use getScene() !

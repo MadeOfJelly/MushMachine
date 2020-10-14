@@ -25,10 +25,10 @@ namespace MM::Services {
 		public:
 			Scene& getScene(void) override { return *_scene; }
 
-			void changeScene(std::unique_ptr<Scene> new_scene) override;
+			void changeScene(std::unique_ptr<Scene>&& new_scene) override;
 
 			// be carefull of that one
-			void changeSceneNow(std::unique_ptr<Scene> new_scene) override;
+			void changeSceneNow(std::unique_ptr<Scene>&& new_scene) override;
 	};
 
 } // MM::Services

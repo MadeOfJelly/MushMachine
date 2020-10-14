@@ -72,7 +72,7 @@ void SimpleSceneService::changeSceneFixedUpdate(Engine& engine) {
 	}
 }
 
-void SimpleSceneService::changeScene(std::unique_ptr<Scene> new_scene) {
+void SimpleSceneService::changeScene(std::unique_ptr<Scene>&& new_scene) {
 	if (_next_scene) {
 		LOG_SSS("warn: already next scene enqueued! overwriting...");
 	}
@@ -85,7 +85,7 @@ void SimpleSceneService::changeScene(std::unique_ptr<Scene> new_scene) {
 	//}
 }
 
-void SimpleSceneService::changeSceneNow(std::unique_ptr<Scene> new_scene) {
+void SimpleSceneService::changeSceneNow(std::unique_ptr<Scene>&& new_scene) {
 	_scene = std::move(new_scene);
 	//_scene->set<MM::Engine*>(&engine); // make engine accessible from scene
 
