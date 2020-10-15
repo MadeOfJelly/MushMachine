@@ -43,6 +43,7 @@ class FilesystemService : public Service {
 			const bool try_mount_base = true,
 			const std::vector<std::tuple<std::string, std::string, bool>>& try_mount_list = {}
 		);
+		FilesystemService(FilesystemService&) = delete; // hui
 
 		~FilesystemService(void);
 
