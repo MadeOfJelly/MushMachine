@@ -73,6 +73,7 @@ void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+	glDisable(GL_BLEND);
 
 	_shader->bind();
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
@@ -176,15 +177,40 @@ in vec2 _tex_pos;
 
 out vec4 _out_color;
 
+
+bool should_discard(vec2 screen_pos, float alpha) {
+	const int dither[8 * 8] = int[8 * 8](
+		 0, 32,  8, 40,  2, 34, 10, 42,
+		48, 16, 56, 24, 50, 18, 58, 26,
+		12, 44,  4, 36, 14, 46,  6, 38,
+		60, 28, 52, 20, 62, 30, 54, 22,
+		 3, 35, 11, 43,  1, 33,  9, 41,
+		51, 19, 59, 27, 49, 17, 57, 25,
+		15, 47,  7, 39, 13, 45,  5, 37,
+		63, 31, 55, 23, 61, 29, 53, 21
+	);
+
+	int mat_value = dither[int(screen_pos.x)%8 + 8 * (int(screen_pos.y)%8)];
+	float n_mat_value = float(mat_value) * (1.0/64.0);
+
+	return n_mat_value < 1.0 - alpha;
+
+	//return mix(n_mat_value, 1.0, alpha) < 0.5;
+	//return n_mat_value * alpha < 0.5;
+	//return alpha == 0.0;
+}
+
 void main() {
 	vec4 tmp_col = texture(_tex0, _tex_pos);
 
-	if (tmp_col.a == 0.0) {
+	//if (tmp_col.a == 0.0) {
+	if (should_discard(gl_FragCoord.xy, tmp_col.a)) {
 		discard;
 	}
 
 	//_out_color = tmp_col;
-	_out_color = vec4(tmp_col.rgb * _ambient_color, tmp_col.a);
+	//_out_color = vec4(tmp_col.rgb * _ambient_color, tmp_col.a);
+	_out_color = vec4(tmp_col.rgb * _ambient_color, 1.0);
 }
 )")
 }
