@@ -30,6 +30,7 @@ void TextureResourceManagerList(void) {
 }
 
 void TextureResourceManagerLoader(MM::Engine& engine) {
+	using namespace entt::literals;
 	auto& rm = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 	static MM::OpenGL::Texture::handle texture = rm.get("default"_hs);
 

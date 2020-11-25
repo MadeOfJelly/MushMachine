@@ -108,6 +108,8 @@ class ResourceManager {
 		}
 
 		handle_type get(const res_id_type id) const {
+			using namespace entt::literals;
+
 			auto it = _storage.find(id);
 			if (it == _storage.end()) {
 				if (id != "default"_hs) {

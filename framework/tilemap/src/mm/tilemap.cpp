@@ -210,6 +210,7 @@ bool Tilemap::parseTiled_Layers(MM::Engine& engine, MM::Scene& scene, nlohmann::
 }
 
 bool Tilemap::parseTiled_Tileset(MM::Engine& engine,  std::string_view src_path, nlohmann::json& jts, uint32_t first_g_id) {
+	using namespace entt::literals;
 	auto& fs = engine.getService<MM::Services::FilesystemService>();
 	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 

@@ -79,7 +79,7 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	auto view = scene.view<MM::Components::Transform2D>();
 
 	for (auto& e : view) {
-		auto& t = view.get(e);
+		auto& t = view.get<Components::Transform2D>(e);
 
 		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(t.position.y/10.f + 500.f));
 

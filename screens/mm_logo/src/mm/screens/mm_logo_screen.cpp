@@ -24,6 +24,7 @@ namespace MM::Screens {
 
 void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& screen,
 		const std::string next_screen, float anim_duration, float screen_duration) {
+	using namespace entt::literals;
 
 	screen.start_enable.push_back(engine.type<MM::Services::OpenGLRenderer>());
 	screen.start_enable.push_back(engine.type<MM::Services::SimpleSceneService>());

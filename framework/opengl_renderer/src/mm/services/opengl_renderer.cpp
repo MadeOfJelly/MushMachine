@@ -111,6 +111,7 @@ bool OpenGLRenderer::enable(Engine& engine) {
 	}
 
 	{ // default texures
+		using namespace entt::literals;
 		auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 		if (!rm_t.contains("default"_hs)) {
 			if (!rm_t.load<MM::OpenGL::TextureLoaderConstBuffer>("default", default_png, default_png_len)) {
