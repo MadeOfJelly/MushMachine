@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <functional>
+#include <string>
 
 #include <entt/entt.hpp>
 #include <imgui.h>
@@ -69,7 +70,6 @@ template <class EntityType>
 class EntityEditor {
 public:
 	using Registry = entt::basic_registry<EntityType>;
-	//using ComponentTypeID = ENTT_ID_TYPE;
 	using ComponentTypeID = entt::id_type;
 
 	struct ComponentInfo {
@@ -93,9 +93,8 @@ public:
 	template <class Component>
 	ComponentInfo& registerComponent(const ComponentInfo& component_info)
 	{
-		//auto index = entt::type_info<Component>::id();
 		auto index = entt::type_hash<Component>::value();
-		[[maybe_unused]] auto [it, insert_result] = component_infos.insert_or_assign(index, component_info);
+		auto [it, insert_result] = component_infos.insert_or_assign(index, component_info);
 		MM_IEEE_ASSERT(insert_result);
 		return std::get<ComponentInfo>(*it);
 	}
