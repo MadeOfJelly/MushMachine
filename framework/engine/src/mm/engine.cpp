@@ -1,5 +1,7 @@
 #include "./engine.hpp"
 
+#include <mm/update_strategies/default_strategy.hpp>
+
 #include <chrono>
 #include <algorithm>
 
@@ -16,76 +18,19 @@
 
 namespace MM {
 
-Engine::FunctionDataHandle Engine::addUpdate(std::function<void(Engine&)> function) {
-	if (!function) {
-		LOG_ERROR("could not add Update, empty function!");
-		return {};
-	}
-
-	FunctionDataHandle r = _update_functions.emplace_back(std::make_shared<FunctionDataType>(function));
-	_update_functions_modified = true;
-
-	return r;
-}
-
-Engine::FunctionDataHandle Engine::addFixedUpdate(std::function<void(Engine&)> function) {
-	if (!function) {
-		LOG_ERROR("could not add fixedUpdate, empty function!");
-		return {};
-	}
-
-	FunctionDataHandle r = _fixed_update_functions.emplace_back(std::make_shared<FunctionDataType>(function));
-	_fixed_update_functions_modified = true;
-
-	return r;
-}
-
-void Engine::removeUpdate(FunctionDataHandle handle) {
-	if (handle.expired()) {
-		LOG_ERROR("could not remove Update, invalid handle!");
-		return;
-	}
-
-	auto lock = handle.lock();
-	auto it = std::find(_update_functions.begin(), _update_functions.end(), lock);
-	if (it != _update_functions.end()) {
-		_update_functions.erase(it);
-	} else {
-		LOG_ERROR("could not remove Update, unknown handle!");
-	}
-}
-
-void Engine::removeFixedUpdate(FunctionDataHandle handle) {
-	if (handle.expired()) {
-		LOG_ERROR("could not remove fixedUpdate, invalid handle!");
-		return;
-	}
-
-	auto lock = handle.lock();
-	auto it = std::find(_fixed_update_functions.begin(), _fixed_update_functions.end(), lock);
-	if (it != _fixed_update_functions.end()) {
-		_fixed_update_functions.erase(it);
-	} else {
-		LOG_ERROR("could not remove fixedUpdate, unknown handle!");
-	}
-}
-
-void Engine::addFixedDefer(std::function<void(Engine&)> function) {
-	_fixed_defered.emplace_back(function);
-}
-
-void Engine::traverseUpdateFunctions(std::vector<std::shared_ptr<FunctionDataType>>& list) {
-	for (auto& entry : list) {
-		entry->f(*this);
-	}
-}
-
-Engine::Engine(float f_delta_time) : _fixed_delta_time(f_delta_time) {
+void Engine::setup(void) {
 	if (!MM::Logger::initialized) {
 		MM::Logger::init();
 	}
 
 	MM::Logger::initSectionLogger("Engine");
+}
+
+Engine::Engine(void) {
+	setup();
+
+	_update_strategy = std::make_unique<MM::UpdateStrategies::SingleThreadedDefault>();
+	LOG_INFO("defaulting to SingleThreadedDefault UpdateStrategy");
 }
 
 Engine::~Engine(void) {
@@ -107,73 +52,60 @@ void Engine::cleanup(void) {
 
 	_service_enable_order.clear();
 
-	_update_functions.clear();
-	_fixed_update_functions.clear();
+	_update_strategy.reset();
 
 	spdlog::get("Engine")->flush();
 }
 
 void Engine::update(void) {
 	FrameMarkStart("update")
-	if (_update_functions_modified) {
-		ZoneScopedN("MM::Engine::update::sort_update_functions")
-		std::sort(_update_functions.begin(), _update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
-		_update_functions_modified = false;
-	}
+	//if (_update_functions_modified) {
+		//ZoneScopedN("MM::Engine::update::sort_update_functions")
+		//std::sort(_update_functions.begin(), _update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
+		//_update_functions_modified = false;
+	//}
 
-	{
-		ZoneScopedN("MM::Engine::update::traverseUpdateFunctions")
-		traverseUpdateFunctions(_update_functions);
-	}
+	//{
+		//ZoneScopedN("MM::Engine::update::traverseUpdateFunctions")
+		//traverseUpdateFunctions(_update_functions);
+	//}
+
+	_update_strategy->doUpdate(*this);
 
 	FrameMarkEnd("update")
 }
 
-void Engine::fixedUpdate(void) {
-	FrameMarkStart("fixedUpdate")
-	if (_fixed_update_functions_modified) {
-		ZoneScopedN("MM::Engine::fixedUpdate::sort_update_functions")
+//void Engine::fixedUpdate(void) {
+	//FrameMarkStart("fixedUpdate")
+	////if (_fixed_update_functions_modified) {
+		////ZoneScopedN("MM::Engine::fixedUpdate::sort_update_functions")
 
-		std::sort(_fixed_update_functions.begin(), _fixed_update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
-		_fixed_update_functions_modified = false;
-	}
+		////std::sort(_fixed_update_functions.begin(), _fixed_update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
+		////_fixed_update_functions_modified = false;
+	////}
 
-	{
-		ZoneScopedN("MM::Engine::fixedUpdate::traverseUpdateFunctions")
-		traverseUpdateFunctions(_fixed_update_functions);
-	}
+	////{
+		////ZoneScopedN("MM::Engine::fixedUpdate::traverseUpdateFunctions")
+		////traverseUpdateFunctions(_fixed_update_functions);
+	////}
 
-	if (!_fixed_defered.empty()) {
-		ZoneScopedN("MM::Engine::fixedUpdate::defered")
-		for (auto& fn : _fixed_defered) {
-			fn(*this);
-		}
+	////if (!_fixed_defered.empty()) {
+		////ZoneScopedN("MM::Engine::fixedUpdate::defered")
+		////for (auto& fn : _fixed_defered) {
+			////fn(*this);
+		////}
 
-		_fixed_defered.clear();
-	}
+		////_fixed_defered.clear();
+	////}
 
-	FrameMarkEnd("fixedUpdate")
-}
+	//FrameMarkEnd("fixedUpdate")
+//}
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 
 static void emscripten_update(void* arg) {
-	using clock = std::chrono::high_resolution_clock;
-	static long long int accumulator = 0;
-	static auto now = clock::now();
-
 	auto* e = (MM::Engine*)arg;
-
-	auto newNow = clock::now();
-	auto deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(newNow - now);
-	now = newNow;
-	accumulator += deltaTime.count();
-	auto dt = e->getFixedDeltaTime() * 1'000'000'000.0f;
-	while (accumulator >= dt) {
-		accumulator -= dt;
-		e->fixedUpdate();
-	}
 
 	e->update();
 }
@@ -183,30 +115,9 @@ void Engine::run(void) {
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop_arg(emscripten_update, this, 0, 1);
 #else
-	using clock = std::chrono::high_resolution_clock;
 
 	_is_running = true;
-	long long int accumulator = 0;
-	auto now = clock::now();
 	while (_is_running) {
-		auto newNow = clock::now();
-		auto deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(newNow - now);
-		now = newNow;
-		accumulator += deltaTime.count();
-		auto dt = _fixed_delta_time * 1'000'000'000.0f;
-
-
-		size_t continuous_counter = 0;
-		while (accumulator >= dt) {
-			continuous_counter++;
-			accumulator -= static_cast<long long int>(dt);
-			fixedUpdate();
-		}
-
-		if (continuous_counter > 2) {
-			LOG_WARN("had {} contiguous fixedUpdates!", std::to_string(continuous_counter));
-		}
-
 		update();
 	}
 #endif
@@ -224,7 +135,12 @@ bool Engine::enableService(service_family::family_type s_t) {
 		}
 
 		_service_enable_order.emplace_back(s_t); // TODO: make sure
-		return ss_entry->first = ss_entry->second.get()->enable(*this);
+
+		ss_entry->first = ss_entry->second.get()->enable(*this);
+
+		_update_strategy->enableService(s_t); // after service::enable()
+
+		return ss_entry->first;
 	}
 
 	// not found
@@ -236,7 +152,11 @@ void Engine::disableService(service_family::family_type s_t) {
 	if (_services.count(s_t)) {
 		auto* s_entry = _services[s_t].get();
 		if (s_entry->first) {
+
+			_update_strategy->disableService(s_t);
+
 			s_entry->first = false;
+
 			s_entry->second.get()->disable(*this);
 			//_service_enable_order.emplace_back(service_family::type<T>);
 			auto it = std::find(_service_enable_order.begin(), _service_enable_order.end(), s_t);
@@ -257,7 +177,6 @@ bool Engine::provide(service_family::family_type I, service_family::family_type 
 
 	return true;
 }
-
 
 } // MM
 

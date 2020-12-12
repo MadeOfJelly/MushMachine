@@ -1,84 +1,123 @@
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <mm/engine.hpp>
 
+//class MyUpdateStrategy : public MM::UpdateStrategy::UpdateStrategy {
+	//public:
+		//virtual ~MyUpdateStrategy(void) {}
+
+		//// return nullptr on error
+		//[[nodiscard]] MM::UpdateStrategy::FunctionDataHandle addUpdate(std::function<void(MM::Engine&)> fn) override {
+		//}
+
+		//[[nodiscard]] MM::UpdateStrategy::FunctionDataHandle addFixedUpdate(std::function<void(MM::Engine&)> fn) override {
+		//}
+
+		//// knows which one
+		//void removeUpdate(MM::UpdateStrategy::FunctionDataHandle handle) override {
+		//}
+
+		//// dont use, if you are not using it to modify the engine.
+		//// you usualy dont need to use this, if you think you need to use this, you probably dont.
+		//void addFixedDefered(std::function<void(MM::Engine&)> function) override {
+		//}
+
+		////virtual std::future addAsync(std::function<void(Engine&)> function) = 0;
+
+		//void doUpdate(MM::Engine& engine) override {
+		//}
+
+		//void doFixedUpdate(MM::Engine& engine) override {
+		//}
+
+//};
+
+class MyEngine : public MM::Engine {
+	public:
+		MyEngine(void) : MM::Engine(std::make_unique<MyUpdateStrategy>()) {
+		}
+};
+
 TEST(engine_fixed_update, empty_add_rm) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	auto test_fun = [](auto&) {};
 
-	auto handle = engine.addFixedUpdate(test_fun);
+	auto handle = engine.getUpdateStrategy().addFixedUpdate(test_fun);
 	ASSERT_NE(handle.lock(), nullptr);
 
-	handle.lock()->priority = 1;
+	//handle.lock()->priority = 1;
 
-	engine.removeFixedUpdate(handle);
+	engine.getUpdateStrategy().removeUpdate(handle);
 }
 
 TEST(engine_update, empty_add_rm) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	auto test_fun = [](auto&) {};
 
-	auto handle = engine.addUpdate(test_fun);
+	auto handle = engine.getUpdateStrategy().addUpdate(test_fun);
 	ASSERT_NE(handle.lock(), nullptr);
 
-	handle.lock()->priority = 1;
+	//handle.lock()->priority = 1;
 
-	engine.removeUpdate(handle);
+	engine.getUpdateStrategy().removeUpdate(handle);
 }
 
 TEST(engine_fixed_update, empty_run) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	auto test_fun = [](auto&) {};
 
-	auto handle = engine.addFixedUpdate(test_fun);
+	auto handle = engine.getUpdateStrategy().addFixedUpdate(test_fun);
 	ASSERT_NE(handle.lock(), nullptr);
 
-	handle.lock()->priority = 1;
+	//handle.lock()->priority = 1;
 
 	engine.fixedUpdate(); // single update
 
-	engine.removeFixedUpdate(handle);
+	engine.getUpdateStrategy().removeUpdate(handle);
 }
 
 TEST(engine_update, empty_run) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	auto test_fun = [](auto&) {};
 
-	auto handle = engine.addUpdate(test_fun);
+	auto handle = engine.getUpdateStrategy().addUpdate(test_fun);
 	ASSERT_NE(handle.lock(), nullptr);
 
-	handle.lock()->priority = 1;
+	//handle.lock()->priority = 1;
 
 	engine.update();
 
-	engine.removeUpdate(handle);
+	engine.getUpdateStrategy().removeUpdate(handle);
 }
 
 TEST(engine_fixed_update, test_run) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	bool run = false;
 
 	auto test_fun = [&run](auto&) { run = true; };
 
-	auto handle = engine.addFixedUpdate(test_fun);
+	auto handle = engine.getUpdateStrategy().addFixedUpdate(test_fun);
 	ASSERT_NE(handle.lock(), nullptr);
 
-	handle.lock()->priority = 1;
+	//handle.lock()->priority = 1;
 
 	ASSERT_FALSE(run);
 	engine.fixedUpdate(); // single update
 	ASSERT_TRUE(run);
 
-	engine.removeFixedUpdate(handle);
+	engine.getUpdateStrategy().removeUpdate(handle);
 }
 
+#if 0
+
 TEST(engine_update, test_run) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	bool run = false;
 
@@ -97,7 +136,7 @@ TEST(engine_update, test_run) {
 }
 
 TEST(engine_fixed_update, test_order_run) {
-	MM::Engine engine;
+	MyEngine engine;
 
 	bool run1 = false;
 	bool run2 = false;
@@ -228,3 +267,4 @@ TEST(engine_update, test_order_rev_run) {
 	engine.removeUpdate(handle2);
 }
 
+#endif

@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <mm/engine.hpp>
 
 TEST(engine_run, test_run) {
-	MM::Engine engine;
+	MM::Engine engine{std::make_unique};
 
 	bool run = false;
 
