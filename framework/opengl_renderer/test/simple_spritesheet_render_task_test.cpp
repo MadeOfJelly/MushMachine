@@ -20,6 +20,8 @@
 #include <physfs.h>
 #include "res/textures.zip.h"
 
+using namespace entt::literals;
+
 TEST(simple_spritesheet_render_task, it) {
 	MM::Engine engine;
 

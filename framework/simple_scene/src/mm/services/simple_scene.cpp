@@ -29,6 +29,7 @@ void SimpleSceneService::disable(Engine&) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSceneService::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"SimpleSceneService::scene_tick"_hs,

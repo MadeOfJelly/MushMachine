@@ -203,6 +203,7 @@ namespace MM::Services {
 	}
 
 	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiSceneToolsService::registerUpdates(void) {
+	using namespace entt::literals;
 		return {
 			{
 				"ImGuiSceneToolsService::render"_hs,

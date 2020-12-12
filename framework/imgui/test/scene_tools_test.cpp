@@ -16,6 +16,8 @@
 
 static char* argv0;
 
+using namespace entt::literals;
+
 TEST(imgui_scene_tools, it) {
 	MM::Engine engine;
 

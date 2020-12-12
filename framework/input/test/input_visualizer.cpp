@@ -47,6 +47,7 @@ class InputVisualizer : public MM::Services::Service {
 		}
 
 		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+			using namespace entt::literals;
 			return {
 				{
 					"InputVisualizer::render"_hs,

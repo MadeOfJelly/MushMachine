@@ -26,6 +26,7 @@ void ScreenDirector::disable(MM::Engine&) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> ScreenDirector::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"ScreenDirector::update"_hs,

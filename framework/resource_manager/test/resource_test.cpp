@@ -4,6 +4,8 @@
 
 #include <entt/resource/cache.hpp>
 
+using namespace entt::literals; // :D
+
 // disable, this just tests entt and not MM
 #if 0
 TEST(EngineResourceManagerTest, entt_cache) {

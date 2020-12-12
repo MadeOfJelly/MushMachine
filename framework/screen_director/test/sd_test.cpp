@@ -140,11 +140,11 @@ TEST(SceneDirectorSimple, online) {
 		auto& screen_1 = sd.screens["screen_1"];
 		screen_1.start_disable.push_back(engine.type<TestService2>());
 		screen_1.start_enable.push_back(engine.type<TestService1>());
-		screen_1.start_fn = [](MM::Engine& engine) {
+		screen_1.start_fn = [](MM::Engine& e) {
 			std::cout << "now in screen_1\n";
 
 			// and queue next screen immediately (for the purpose of this test)
-			engine.tryService<MM::Services::ScreenDirector>()->queueChangeScreenTo("screen_2");
+			e.tryService<MM::Services::ScreenDirector>()->queueChangeScreenTo("screen_2");
 		};
 		screen_1.end_fn = [](auto&) {
 			std::cout << "exiting screen_1\n";
@@ -156,11 +156,11 @@ TEST(SceneDirectorSimple, online) {
 		auto& screen_2 = sd.screens["screen_2"];
 		screen_2.start_disable.push_back(engine.type<TestService1>());
 		screen_2.start_enable.push_back(engine.type<TestService2>());
-		screen_2.start_fn = [](MM::Engine& engine) {
+		screen_2.start_fn = [](MM::Engine& e) {
 			std::cout << "now in screen_2\n";
 
 			// and queue next screen immediately (for the purpose of this test)
-			engine.tryService<MM::Services::ScreenDirector>()->queueChangeScreenTo("screen_end");
+			e.tryService<MM::Services::ScreenDirector>()->queueChangeScreenTo("screen_end");
 		};
 		screen_2.end_fn = [](auto&) {
 			std::cout << "exiting screen_2\n";
@@ -170,8 +170,8 @@ TEST(SceneDirectorSimple, online) {
 	// id end, quits the engine
 	{
 		auto& screen_end = sd.screens["screen_end"];
-		screen_end.start_fn = [](MM::Engine& engine) {
-			engine.stop();
+		screen_end.start_fn = [](MM::Engine& e) {
+			e.stop();
 		};
 	}
 

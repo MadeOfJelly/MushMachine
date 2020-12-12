@@ -61,6 +61,7 @@ SDLService::~SDLService(void) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> SDLService::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"SDLService::events"_hs,

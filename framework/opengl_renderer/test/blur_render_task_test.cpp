@@ -28,6 +28,8 @@
 
 #include <random>
 
+using namespace entt::literals;
+
 const char* argv0;
 
 TEST(blur_render_task, it) {

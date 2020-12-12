@@ -17,6 +17,8 @@
 // inlining zip
 #include "res/erik_gun_fx_1.zip.h"
 
+using namespace entt::literals;
+
 extern char* argv0;
 
 TEST(soloud_fs_loader, basic) {

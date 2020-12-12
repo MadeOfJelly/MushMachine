@@ -11,6 +11,8 @@
 using ::testing::Return;
 using ::testing::_;
 
+using namespace entt::literals;
+
 class MockUpdateStrategy : public MM::UpdateStrategies::UpdateStrategy {
 	public:
 		MOCK_METHOD(

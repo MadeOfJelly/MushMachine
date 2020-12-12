@@ -11,6 +11,8 @@
 using ::testing::Return;
 using ::testing::_;
 
+using namespace entt::literals;
+
 class MockService : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "MockService"; }

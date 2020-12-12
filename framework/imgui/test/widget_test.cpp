@@ -18,6 +18,8 @@
 
 const char* argv0;
 
+using namespace entt::literals;
+
 TEST(imgui_widgets, basic) {
 	MM::Engine engine;
 

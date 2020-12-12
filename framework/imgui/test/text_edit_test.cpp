@@ -22,6 +22,7 @@
 
 static char* argv0;
 
+using namespace entt::literals;
 
 class TemplateUpdateMainService : public MM::Services::Service {
 	std::function<void(MM::Engine&)> _fn;

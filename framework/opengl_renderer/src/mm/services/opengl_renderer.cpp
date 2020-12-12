@@ -33,6 +33,8 @@
 
 namespace MM::Services {
 
+using namespace entt::literals;
+
 OpenGLRenderer::OpenGLRenderer(void) {
 	MM::Logger::initSectionLogger("OpenGL");
 	MM::Logger::initSectionLogger("OpenGLRenderer");
@@ -71,8 +73,8 @@ bool OpenGLRenderer::enable(Engine& engine) {
 	_sdl_event_handle = sdl_s.addEventHandler([this, &engine](const SDL_Event& e) -> bool {
 		if (e.type == SDL_WINDOWEVENT) {
 			if (e.window.event == SDL_WINDOWEVENT_RESIZED || e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-				auto& sdl_s = engine.getService<MM::Services::SDLService>();
-				auto new_window_size = sdl_s.getWindowSize();
+				auto& sdl = engine.getService<MM::Services::SDLService>();
+				auto new_window_size = sdl.getWindowSize();
 				glViewport(0, 0, new_window_size.first, new_window_size.second);
 
 				// TODO: recreate fbos, dirvers seem to have problems otherwise
@@ -111,7 +113,6 @@ bool OpenGLRenderer::enable(Engine& engine) {
 	}
 
 	{ // default texures
-		using namespace entt::literals;
 		auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 		if (!rm_t.contains("default"_hs)) {
 			if (!rm_t.load<MM::OpenGL::TextureLoaderConstBuffer>("default", default_png, default_png_len)) {

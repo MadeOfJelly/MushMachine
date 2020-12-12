@@ -23,6 +23,8 @@ namespace MM::Services {
 
 		private:
 			void imgui_new_frame(Engine& engine);
+
+			bool handle_sdl_event(const SDL_Event& e);
 	};
 
 } // namespace MM::Services

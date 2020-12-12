@@ -106,6 +106,7 @@ void InputService::disable(Engine& engine) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> InputService::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"InputService::update"_hs,

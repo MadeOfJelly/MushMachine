@@ -20,6 +20,8 @@
 #include <physfs.h>
 #include "res/textures.zip.h"
 
+using namespace entt::literals;
+
 const char* argv0;
 
 TEST(batched_spritesheet_render_task, it) {

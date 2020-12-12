@@ -17,6 +17,8 @@
 
 #include <mm/opengl/texture_loader.hpp>
 
+using namespace entt::literals;
+
 TEST(tilemap_render_task_test, it) {
 	MM::Engine engine;
 

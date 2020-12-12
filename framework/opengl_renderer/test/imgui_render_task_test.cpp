@@ -12,6 +12,8 @@
 
 #include <imgui/imgui.h>
 
+using namespace entt::literals;
+
 TEST(imgui_render_task, demowindow) {
 	MM::Engine engine;
 

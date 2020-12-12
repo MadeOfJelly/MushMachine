@@ -58,6 +58,7 @@ void SimpleSDLRendererService::disable(Engine&) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSDLRendererService::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"SimpleSDLRendererService::render"_hs,

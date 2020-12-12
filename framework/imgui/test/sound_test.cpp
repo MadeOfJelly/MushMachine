@@ -27,6 +27,8 @@
 
 const char* argv0;
 
+using namespace entt::literals;
+
 class ImGuiSpeechy : public MM::Services::Service {
 	private:
 		SoLoud::Speech speech;

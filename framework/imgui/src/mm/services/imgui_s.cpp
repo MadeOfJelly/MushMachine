@@ -65,44 +65,9 @@ bool ImGuiService::enable(Engine& engine) {
 #endif
 	}
 
-	// TODO: register event handle
-	_event_handle = sdl_ss.addEventHandler([](const SDL_Event& e) {
-		if (!ImGui_ImplSDL2_ProcessEvent(&e)) {
-			return false; // if the event was not relevant to imgui anyway
-		}
-
-		auto& io = ImGui::GetIO();
-		// keyboard
-		if ((
-				e.type == SDL_KEYDOWN ||
-				e.type == SDL_KEYUP ||
-				e.type == SDL_TEXTEDITING ||
-				e.type == SDL_TEXTINPUT
-			)
-			&& io.WantCaptureKeyboard) {
-			return true;
-		}
-		// mouse
-		if ((
-				e.type == SDL_MOUSEMOTION ||
-				e.type == SDL_MOUSEBUTTONUP ||
-				e.type == SDL_MOUSEBUTTONDOWN ||
-				e.type == SDL_MOUSEWHEEL // ????
-			)
-			&& io.WantCaptureMouse) {
-			return true;
-		}
-		//// controller ???
-		//if ((
-				//e.type == SDL_CONTROLLERBUTTONUP ||
-				//e.type == SDL_CONTROLLERBUTTONDOWN
-			//)[>
-			//&& io.WantCaptureKeyboard*/) {
-			//return false;
-		//}
-
-		return false;
-	});
+	_event_handle = sdl_ss.addEventHandler(
+		[this](const SDL_Event& e) { return handle_sdl_event(e); }
+	);
 
 	return true;
 }
@@ -121,6 +86,7 @@ void ImGuiService::disable(Engine& engine) {
 }
 
 std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiService::registerUpdates(void) {
+	using namespace entt::literals;
 	return {
 		{
 			"ImGuiService::new_frame"_hs,
@@ -142,6 +108,44 @@ void ImGuiService::imgui_new_frame(Engine& engine) {
 
 	ImGui_ImplSDL2_NewFrame(engine.getService<MM::Services::SDLService>().win);
 	ImGui::NewFrame();
+}
+
+bool ImGuiService::handle_sdl_event(const SDL_Event& e) {
+	if (!ImGui_ImplSDL2_ProcessEvent(&e)) {
+		return false; // if the event was not relevant to imgui anyway
+	}
+
+	auto& io = ImGui::GetIO();
+	// keyboard
+	if ((
+			e.type == SDL_KEYDOWN ||
+			e.type == SDL_KEYUP ||
+			e.type == SDL_TEXTEDITING ||
+			e.type == SDL_TEXTINPUT
+		)
+		&& io.WantCaptureKeyboard) {
+		return true;
+	}
+	// mouse
+	if ((
+			e.type == SDL_MOUSEMOTION ||
+			e.type == SDL_MOUSEBUTTONUP ||
+			e.type == SDL_MOUSEBUTTONDOWN ||
+			e.type == SDL_MOUSEWHEEL // ????
+		)
+		&& io.WantCaptureMouse) {
+		return true;
+	}
+	//// controller ???
+	//if ((
+			//e.type == SDL_CONTROLLERBUTTONUP ||
+			//e.type == SDL_CONTROLLERBUTTONDOWN
+		//)[>
+		//&& io.WantCaptureKeyboard*/) {
+		//return false;
+	//}
+
+	return false;
 }
 
 } // namespace MM::Services

@@ -94,9 +94,9 @@ public:
 	ComponentInfo& registerComponent(const ComponentInfo& component_info)
 	{
 		auto index = entt::type_hash<Component>::value();
-		auto [it, insert_result] = component_infos.insert_or_assign(index, component_info);
-		MM_IEEE_ASSERT(insert_result);
-		return std::get<ComponentInfo>(*it);
+		auto insert_info = component_infos.insert_or_assign(index, component_info);
+		MM_IEEE_ASSERT(insert_info.second);
+		return std::get<ComponentInfo>(*insert_info.first);
 	}
 
 	template <class Component>

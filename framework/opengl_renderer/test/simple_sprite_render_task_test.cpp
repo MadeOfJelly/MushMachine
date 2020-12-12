@@ -19,6 +19,8 @@
 
 #include <random>
 
+using namespace entt::literals;
+
 const char* argv0;
 
 TEST(simple_sprite_render_task, it) {
