@@ -21,14 +21,15 @@ namespace MM::Services {
 
 			std::vector<std::function<void(SimpleSDLRendererService&, Engine&)>> processors;
 
-		private:
-			Engine::FunctionDataHandle _render_handle;
 
 		public:
 			bool enable(Engine& engine) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "SimpleSDLServiceSystem"; };
+
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
 
 		private:
 			void render(Engine& engine);

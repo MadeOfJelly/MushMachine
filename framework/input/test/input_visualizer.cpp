@@ -1,7 +1,4 @@
 #include <gtest/gtest.h>
-
-#include <mm/engine.hpp>
-
 #include <mm/services/input_service.hpp>
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
@@ -10,7 +7,7 @@
 
 #include <mm/opengl/render_tasks/imgui.hpp>
 
-#include <mm/imgui/fps_overlay.hpp>
+#include <entt/core/hashed_string.hpp>
 
 #include <imgui/imgui.h>
 
@@ -18,10 +15,11 @@
 class InputVisualizer : public MM::Services::Service {
 	private:
 		MM::Input::PlayerID _player_id;
-		MM::Engine::FunctionDataHandle _render_handle;
 		MM::Services::SDLService::EventHandlerHandle _event_handle = nullptr;
 
 	public:
+		const char* name(void) override { return "InputVisualizer"; }
+
 		bool enable(MM::Engine& engine) override {
 			_player_id = UINT16_MAX;
 
@@ -42,18 +40,25 @@ class InputVisualizer : public MM::Services::Service {
 				}
 			}
 
-			_render_handle = engine.addUpdate([this](MM::Engine& e){ this->renderImGui(e); });
-
 			return true;
 		}
 
-		void disable(MM::Engine& engine) override {
-			if (!_render_handle.expired()) {
-				engine.removeUpdate(_render_handle);
-				_render_handle.reset();
-			}
-
+		void disable(MM::Engine&) override {
 		}
+
+		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+			return {
+				{
+					"InputVisualizer::render"_hs,
+					"InputVisualizer::render",
+					[this](MM::Engine& e){ this->renderImGui(e); },
+					MM::UpdateStrategies::update_phase_t::MAIN,
+					true,
+					{ "InputService::update"_hs }
+				}
+			};
+		}
+
 
 	private:
 		void renderImGui(MM::Engine& engine) {
@@ -146,16 +151,7 @@ TEST(input_service, input_visualizer) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 
-	{
-		MM::ImGuiSimpleFPSOverlay fps_overlay;
-
-		engine.addUpdate([&](MM::Engine&) {
-				fps_overlay.renderImGui();
-			}
-		);
-
-		engine.run();
-	}
+	engine.run();
 
 	sdl_ss.destroyWindow();
 }

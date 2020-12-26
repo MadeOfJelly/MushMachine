@@ -32,7 +32,6 @@ namespace MM::Services {
 
 			std::vector<MM::FileTextEditor> _text_editor_list;
 
-			Engine::FunctionDataHandle _render_handle;
 			MM::Services::SDLService::EventHandlerHandle _event_handle = nullptr;
 
 		private:
@@ -47,6 +46,9 @@ namespace MM::Services {
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "ImGuiSceneToolsService"; }
+
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
 	};
 
 } // namespace MM::Services

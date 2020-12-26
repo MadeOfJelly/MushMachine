@@ -1,8 +1,10 @@
 #include "./simple_scene.hpp"
+#include "spdlog/fmt/bundled/core.h"
 
 //#include "../systems_container.hpp"
 
 #include <entt/entity/registry.hpp>
+
 
 #include <tracy/Tracy.hpp>
 
@@ -18,50 +20,61 @@ bool SimpleSceneService::enable(Engine& engine) {
 		_scene->set<MM::Engine*>(&engine);
 	}
 
-	{
-		_f_update_handle = engine.addFixedUpdate([this](Engine& e) { this->sceneFixedUpdate(e); });
-		if (_f_update_handle.expired()) {
-			return false;
-		}
-
-		auto tmp_lock = _f_update_handle.lock();
-		tmp_lock->priority = 0;
-	}
-
-	{
-		_f_update_changer_handle = engine.addFixedUpdate([this](Engine& e) { this->changeSceneFixedUpdate(e); });
-		if (_f_update_changer_handle.expired()) {
-			return false;
-		}
-
-		auto tmp_lock = _f_update_changer_handle.lock();
-		tmp_lock->priority = -100;
-	}
+	resetTime();
 
 	return true;
 }
 
-void SimpleSceneService::disable(Engine& engine) {
-	if (!_f_update_handle.expired()) {
-		engine.removeFixedUpdate(_f_update_handle);
-		_f_update_handle.reset();
-	}
-
-	if (!_f_update_changer_handle.expired()) {
-		engine.removeFixedUpdate(_f_update_changer_handle);
-		_f_update_changer_handle.reset();
-	}
+void SimpleSceneService::disable(Engine&) {
 }
 
-void SimpleSceneService::sceneFixedUpdate(Engine& engine) {
+std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSceneService::registerUpdates(void) {
+	return {
+		{
+			"SimpleSceneService::scene_tick"_hs,
+			"SimpleSceneService::scene_tick",
+			[this](Engine& e) { this->sceneFixedUpdate(e); },
+			UpdateStrategies::update_phase_t::MAIN,
+			true,
+			{} // no dependencies"
+		},
+		{
+			"SimpleSceneService::scene_change"_hs,
+			"SimpleSceneService::scene_change",
+			[this](Engine& e) { this->changeSceneFixedUpdate(e); },
+			UpdateStrategies::update_phase_t::MAIN,
+			true,
+			{"SimpleSceneService::scene_update"_hs} // first update, than change????
+		}
+	};
+}
+
+void SimpleSceneService::sceneFixedUpdate(Engine&) {
 	ZoneScoped;
-	const auto f_delta = engine.getFixedDeltaTime();
 
-	::MM::EachSystemInScene(*_scene, [&](::MM::Scene& s, ::MM::System& fn) {
-		fn(s, f_delta);
-	});
+	auto newNow = clock::now();
+	auto deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(newNow - _last_time);
+	_last_time = newNow;
+	_accumulator += deltaTime.count();
+	const double dt = f_delta * 1'000'000'000.0;
 
-	TracyPlot("MM::Services::SimpleSceneService::_scene.alive", (int64_t)_scene->alive());
+	size_t continuous_counter = 0;
+
+	// TODO: this is just cancer
+	while (_accumulator >= static_cast<decltype(_accumulator)>(dt)){
+		_accumulator -= static_cast<decltype(_accumulator)>(dt);
+		continuous_counter++;
+
+		::MM::EachSystemInScene(*_scene, [&](::MM::Scene& s, ::MM::System& fn) {
+			fn(s, f_delta * delta_factor);
+		});
+
+		TracyPlot("MM::Services::SimpleSceneService::_scene.alive", (int64_t)_scene->alive());
+	}
+
+	if (continuous_counter > 2) {
+		LOG_SSS(fmt::format("had {} contiguous scene ticks!", continuous_counter));
+	}
 }
 
 void SimpleSceneService::changeSceneFixedUpdate(Engine& engine) {
@@ -93,6 +106,12 @@ void SimpleSceneService::changeSceneNow(std::unique_ptr<Scene>&& new_scene) {
 	//if (!_scene->try_ctx<MM::simple_scene::SystemsContainer>()) {
 		//_scene->set<MM::simple_scene::SystemsContainer>();
 	//}
+}
+
+
+void SimpleSceneService::resetTime(void) {
+	_last_time = clock::now();
+	_accumulator = 0;
 }
 
 } // MM::Services

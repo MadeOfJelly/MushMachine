@@ -1,3 +1,4 @@
+#include <functional>
 #include <gtest/gtest.h>
 
 #include <mm/resource_manager.hpp>
@@ -20,6 +21,25 @@
 #include <mm/services/scene_tools.hpp>
 
 static char* argv0;
+
+
+class TemplateUpdateMainService : public MM::Services::Service {
+	std::function<void(MM::Engine&)> _fn;
+	public:
+		explicit TemplateUpdateMainService(std::function<void(MM::Engine&)> fn) : _fn(fn) {}
+
+		const char* name(void) override { return "TemplateUpdateMainService"; }
+		bool enable(MM::Engine&) override { return true; }
+		void disable(MM::Engine&) override {}
+
+		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+			return {{
+				"TemplateUpdateMainService::fn"_hs,
+				"TemplateUpdateMainService::fn",
+				_fn
+			}};
+		}
+};
 
 TEST(imgui_text_edit, it) {
 	MM::Engine engine;
@@ -50,17 +70,11 @@ TEST(imgui_text_edit, it) {
 
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSceneToolsService>());
 
-	MM::ImGuiSimpleFPSOverlay fps_overlay;
-	engine.addUpdate([&](MM::Engine&) {
-			fps_overlay.renderImGui();
-		}
-	);
-
-	MM::FileTextEditor fte{engine};
-	engine.addUpdate([&](MM::Engine&) {
-			fte.renderImGui();
-		}
-	);
+	engine.addService<TemplateUpdateMainService>([](MM::Engine& e) {
+		static MM::FileTextEditor fte{e};
+		fte.renderImGui();
+	});
+	ASSERT_TRUE(engine.enableService<TemplateUpdateMainService>());
 
 	engine.run();
 
@@ -98,26 +112,16 @@ TEST(imgui_text_edit, shader) {
 
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSceneToolsService>());
 
-	MM::ImGuiSimpleFPSOverlay fps_overlay;
-	engine.addUpdate([&](MM::Engine&) {
-			fps_overlay.renderImGui();
-		}
-	);
-
 	//auto& rc = engine.getScene().ctx<MM::OpenGL::RenderController>();
 	//rc.registerRenderer<MM::OpenGL::Renderers::QuadRenderer>();
 
 	MM::FileTextEditor fte{engine};
-	engine.addUpdate([&](MM::Engine&) {
-			fte.renderImGui();
-		}
-	);
-
 	MM::FileShaderEditor fse{engine};
-	engine.addUpdate([&](MM::Engine&) {
-			fse.renderImGui();
-		}
-	);
+	engine.addService<TemplateUpdateMainService>([&](MM::Engine&) {
+		fte.renderImGui();
+		fse.renderImGui();
+	});
+	ASSERT_TRUE(engine.enableService<TemplateUpdateMainService>());
 
 	fte.open("shader/quad_renderer/vert.glsl");
 	fse.open("shader/quad_renderer/frag.glsl");

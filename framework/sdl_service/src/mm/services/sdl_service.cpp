@@ -1,5 +1,7 @@
 #include "./sdl_service.hpp"
 
+#include <entt/core/hashed_string.hpp>
+
 #include <tracy/Tracy.hpp>
 
 #ifdef MM_OPENGL_3_GLES
@@ -58,37 +60,23 @@ SDLService::~SDLService(void) {
 	SDL_Quit();
 }
 
-bool SDLService::enable(Engine& engine) {
+std::vector<UpdateStrategies::UpdateCreationInfo> SDLService::registerUpdates(void) {
+	return {
+		{
+			"SDLService::events"_hs,
+			"SDLService::events",
+			[this](Engine& e) { this->processEvents(e); },
+			UpdateStrategies::update_phase_t::PRE
+		}
+	};
+}
+
+bool SDLService::enable(Engine&) {
 	bool succ = true;
-	_func_handle = engine.addUpdate([this](Engine& e) { this->processEvents(e); });
-	if (!_func_handle.expired()) {
-		auto tmp_lock = _func_handle.lock();
-		tmp_lock->priority = 100; // before the calls before the scene
-		tmp_lock->name = "sdl events";
-	} else {
-		succ = false;
-	}
-
-	_f_func_handle = engine.addFixedUpdate([this](Engine& e) { this->processEvents(e); });
-	if (!_f_func_handle.expired()) {
-		auto tmp_lock = _f_func_handle.lock();
-		tmp_lock->priority = 100; // before the calls before the scene
-		tmp_lock->name = "sdl events";
-	} else {
-		succ = false;
-	}
-
 	return succ;
 }
 
-void SDLService::disable(Engine& engine) {
-	// remove update hooks
-	if (!_func_handle.expired())
-		engine.removeUpdate(_func_handle);
-
-	if (!_f_func_handle.expired())
-		engine.removeFixedUpdate(_f_func_handle);
-
+void SDLService::disable(Engine&) {
 	// destroy stuff
 	if (gl_context) {
 		SDL_GL_DeleteContext(gl_context);

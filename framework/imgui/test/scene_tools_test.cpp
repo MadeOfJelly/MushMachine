@@ -12,8 +12,6 @@
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
 
-#include <mm/imgui/fps_overlay.hpp>
-
 #include <mm/services/scene_tools.hpp>
 
 static char* argv0;
@@ -39,6 +37,7 @@ TEST(imgui_scene_tools, it) {
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
 
 	engine.addService<MM::Services::ImGuiSceneToolsService>();
+	engine.getUpdateStrategy().depend("ImGuiSceneToolsService::render"_hs, "SimpleSceneService::scene_tick"_hs);
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
@@ -49,16 +48,7 @@ TEST(imgui_scene_tools, it) {
 
 	//InitializeYojimbo();
 
-	{
-		MM::ImGuiSimpleFPSOverlay fps_overlay;
-
-		engine.addUpdate([&](MM::Engine&) {
-				fps_overlay.renderImGui();
-			}
-		);
-
-		engine.run();
-	}
+	engine.run();
 
 
 	// TODO: clear asset manager

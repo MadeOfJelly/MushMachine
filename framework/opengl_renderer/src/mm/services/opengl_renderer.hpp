@@ -28,7 +28,6 @@ namespace MM::Services {
 			}
 
 		private:
-			Engine::FunctionDataHandle _render_handle;
 			SDLService::EventHandlerHandle _sdl_event_handle = nullptr;
 
 		public:
@@ -36,6 +35,9 @@ namespace MM::Services {
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "OpenGLRendererService"; }
+
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
 
 		private:
 			void render(Engine& engine);

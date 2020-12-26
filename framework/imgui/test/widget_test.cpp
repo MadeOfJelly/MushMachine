@@ -2,6 +2,8 @@
 
 #include <mm/engine.hpp>
 
+#include <entt/core/hashed_string.hpp>
+
 // services
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
@@ -15,35 +17,6 @@
 #include <mm/imgui/widgets/knob.hpp>
 
 const char* argv0;
-
-//class ImGuiSpeechy {
-	//private:
-		//SoLoud::Speech speech;
-		//SoLoud::Sfxr sfxr;
-
-	//public:
-		//ImGuiSpeechy(void) {
-			//speech.setText("Test text. 1. 2. 3.");
-			//sfxr.loadPreset(SoLoud::Sfxr::COIN, 0);
-		//}
-
-		//void renderImGui(MM::Engine& engine) {
-			//if (ImGui::Begin("Inputs")) {
-				//auto& sound = *engine.tryGetService<MM::Services::SoundService>();
-
-				//if (ImGui::Button("play sfx")) {
-					//sound.engine.play(sfxr);
-				//}
-
-				////ImGui::Text("Active Voice Count: %d", sound.engine.getActiveVoiceCount());
-				//if (ImGui::Button("Read")) {
-					//sound.engine.play(speech);
-				//}
-			//}
-			//ImGui::End();
-
-		//}
-//};
 
 TEST(imgui_widgets, basic) {
 	MM::Engine engine;
@@ -64,23 +37,35 @@ TEST(imgui_widgets, basic) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 
-	{
-		//ImGuiSpeechy speechy;
+	class TestWindow : public MM::Services::Service {
+		public:
+			const char* name(void) override { return "TestWindow"; }
+			bool enable(MM::Engine&) override { return true; }
+			void disable(MM::Engine&) override {}
 
-		engine.addUpdate([&](MM::Engine&) {
-			if (ImGui::Begin("test window")) {
+			std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+				return {{
+					"testwindow"_hs,
+					"testwindow",
+					[](MM::Engine&) {
+						if (ImGui::Begin("test window")) {
 
-				static float knob_test = 0.f;
-				MM::ImGuiWidgets::KnobFloat("knob1", &knob_test, 0.f, 1.f);
-				ImGui::SameLine();
-				MM::ImGuiWidgets::KnobFloat("knob2", &knob_test, 0.f, 1.f, 0.f, false);
+							static float knob_test = 0.f;
+							MM::ImGuiWidgets::KnobFloat("knob1", &knob_test, 0.f, 1.f);
+							ImGui::SameLine();
+							MM::ImGuiWidgets::KnobFloat("knob2", &knob_test, 0.f, 1.f, 0.f, false);
 
+						}
+						ImGui::End();
+					}
+				}};
 			}
-			ImGui::End();
-		});
+	};
 
-		engine.run();
-	}
+	engine.addService<TestWindow>();
+	ASSERT_TRUE(engine.enableService<TestWindow>());
+
+	engine.run();
 
 	sdl_ss.destroyWindow();
 }

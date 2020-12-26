@@ -179,8 +179,6 @@ namespace MM::Services {
 			_entity_editor.registerComponent<MM::Components::OpenGL::Texture>("Texture");
 		}
 
-		_render_handle = engine.addUpdate([this](Engine& e){ this->renderImGui(e); });
-
 		auto* sdl_ss = engine.tryService<MM::Services::SDLService>();
 		if (sdl_ss) {
 			_event_handle = sdl_ss->addEventHandler([this](const SDL_Event& e) -> bool {
@@ -197,11 +195,6 @@ namespace MM::Services {
 	}
 
 	void ImGuiSceneToolsService::disable(Engine& engine) {
-		if (!_render_handle.expired()) {
-			engine.removeUpdate(_render_handle);
-			_render_handle.reset();
-		}
-
 		if (_event_handle) {
 			auto* sdl_ss = engine.tryService<MM::Services::SDLService>();
 			sdl_ss->removeEventHandler(_event_handle);
@@ -209,5 +202,14 @@ namespace MM::Services {
 		}
 	}
 
+	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiSceneToolsService::registerUpdates(void) {
+		return {
+			{
+				"ImGuiSceneToolsService::render"_hs,
+				"ImGuiSceneToolsService::render",
+				[this](Engine& e){ renderImGui(e); }
+			}
+		};
+	}
 } // namespace MM::Services
 

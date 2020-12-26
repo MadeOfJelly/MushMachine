@@ -10,6 +10,7 @@
 #include <mm/opengl/texture_loader.hpp>
 #include "../opengl/res/default_texture.h" // data
 #include "../opengl/res/errig_texture.h" // data
+#include "mm/update_strategies/update_strategy.hpp"
 
 #include <tracy/Tracy.hpp>
 #ifndef MM_OPENGL_3_GLES
@@ -65,18 +66,6 @@ bool OpenGLRenderer::enable(Engine& engine) {
 		targets["display"].reset(new OpenGL::FrameBufferObject);
 		targets["display"]->_fboID = 0;
 		targets["display"]->_resize = false; // its done for us
-	}
-
-	_render_handle = engine.addUpdate([this](Engine& e){ this->render(e); });
-	if (_render_handle.expired()) {
-		LOG_ERROR("couldn't add update function!");
-		return false;
-	}
-
-	{
-		auto tmp_lock = _render_handle.lock();
-		tmp_lock->priority = -10;
-		tmp_lock->name = "render";
 	}
 
 	_sdl_event_handle = sdl_s.addEventHandler([this, &engine](const SDL_Event& e) -> bool {
@@ -138,18 +127,24 @@ bool OpenGLRenderer::enable(Engine& engine) {
 	return true;
 }
 
-void OpenGLRenderer::disable(Engine& engine) {
-	if (!_render_handle.expired()) {
-		engine.removeUpdate(_render_handle);
-		_render_handle.reset();
-	}
-
+void OpenGLRenderer::disable(Engine&) {
 	// TODO: do we need this??
 	targets.clear();
 	render_tasks.clear();
 
 	// TODO: reallly?
 	MM::ResourceManager<MM::OpenGL::Texture>::ref().clear();
+}
+
+std::vector<UpdateStrategies::UpdateCreationInfo> OpenGLRenderer::registerUpdates(void) {
+	return {
+		{
+			"OpenGLRenderer::render"_hs,
+			"OpenGLRenderer::render",
+			[this](Engine& e){ this->render(e); },
+			UpdateStrategies::update_phase_t::POST
+		}
+	};
 }
 
 void OpenGLRenderer::render(Engine& engine) {

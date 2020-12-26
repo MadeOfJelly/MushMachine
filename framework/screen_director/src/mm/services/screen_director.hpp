@@ -15,6 +15,8 @@ class ScreenDirector : public Service {
 		bool enable(MM::Engine&) override;
 		void disable(MM::Engine&) override;
 
+		std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
 	public:
 		struct Screen {
 			// lists of services relevant for this screen, disable and enable are called when its changed to
@@ -47,7 +49,6 @@ class ScreenDirector : public Service {
 		std::string queued_screen_id = "";
 
 	private:
-		MM::Engine::FunctionDataHandle _update_handle;
 		void update(MM::Engine& engine);
 
 	private:

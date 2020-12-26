@@ -1,3 +1,4 @@
+#include "mm/services/service.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -6,6 +7,8 @@
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/services/imgui_s.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
+
+#include <entt/core/hashed_string.hpp>
 
 #include <imgui/imgui.h>
 
@@ -22,18 +25,25 @@ TEST(imgui_render_task, demowindow) {
 	engine.addService<MM::Services::ImGuiService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
 
+	class ImGuiDemoWindowService : public MM::Services::Service {
+		public:
+			const char* name(void) override { return "ImGuiDemoWindowService"; }
+			bool enable(MM::Engine&) override { return true; }
+			void disable(MM::Engine&) override {}
+
+			std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+				return {{
+					"ImGuiDemoWindow"_hs,
+					"ImGuiDemoWindow",
+					[](MM::Engine&) { ImGui::ShowDemoWindow(); }
+				}};
+			}
+
+	};
+	engine.addService<ImGuiDemoWindowService>();
+	ASSERT_TRUE(engine.enableService<ImGuiDemoWindowService>());
+
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
-
-	auto handle = engine.addUpdate([](MM::Engine&) {
-			ImGui::ShowDemoWindow();
-		}
-	);
-
-	{
-		auto tmp_lock = handle.lock();
-		tmp_lock->priority = 0;
-		tmp_lock->name = "imgui demo window";
-	}
 
 	engine.run();
 }

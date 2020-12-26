@@ -1,5 +1,7 @@
 #include "./screen_director.hpp"
 
+#include <entt/core/hashed_string.hpp>
+
 #include <tracy/Tracy.hpp>
 
 #include <mm/logger.hpp>
@@ -7,17 +9,6 @@
 namespace MM::Services {
 
 bool ScreenDirector::enable(MM::Engine& engine) {
-	if (!_update_handle.expired())
-		return false;
-
-	{
-		_update_handle = engine.addFixedUpdate([this](Engine& e) { this->update(e); });
-		auto tmp_lock = _update_handle.lock();
-		tmp_lock->priority = -100; // post everything ?
-		tmp_lock->name = "ScreenDirector::update";
-	}
-
-
 	// start initial screen
 	if (!queued_screen_id.empty()) {
 		auto next_screen_id = queued_screen_id;
@@ -31,15 +22,24 @@ bool ScreenDirector::enable(MM::Engine& engine) {
 	return true;
 }
 
-void ScreenDirector::disable(MM::Engine& engine) {
-	engine.removeFixedUpdate(_update_handle);
-	_update_handle.reset();
+void ScreenDirector::disable(MM::Engine&) {
+}
+
+std::vector<UpdateStrategies::UpdateCreationInfo> ScreenDirector::registerUpdates(void) {
+	return {
+		{
+			"ScreenDirector::update"_hs,
+			"ScreenDirector::update",
+			[this](Engine& engine) { update(engine); },
+			UpdateStrategies::update_phase_t::POST
+		}
+	};
 }
 
 void ScreenDirector::update(MM::Engine& engine) {
 	if (curr_screen_id != queued_screen_id) {
-		engine.addFixedDefer([this](MM::Engine& engine) {
-			changeScreenTo(engine, queued_screen_id);
+		engine.getUpdateStrategy().addDefered([this](MM::Engine& e) {
+			changeScreenTo(e, queued_screen_id);
 		});
 	}
 }

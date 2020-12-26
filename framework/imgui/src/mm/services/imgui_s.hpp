@@ -12,13 +12,14 @@ namespace MM::Services {
 			MM::Services::SDLService::EventHandlerHandle _event_handle = nullptr;
 
 			// new frame needs to start AFTER the events have been processed (and obv bf rendt)
-			MM::Engine::FunctionDataHandle _new_frame_handle;
 
 		public:
 			bool enable(Engine& engine) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "ImGuiService"; }
+
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		private:
 			void imgui_new_frame(Engine& engine);

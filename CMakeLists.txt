@@ -32,8 +32,8 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL
 		-Wall -Wextra # Reasonable and standard
 		-Wpedantic # Warn if non-standard C++ is used
 		-Wunused # Warn on anything being unused
-		-Wconversion # Warn on type conversions that may lose data
-		-Wsign-conversion # Warn on sign conversions
+		#-Wconversion # Warn on type conversions that may lose data
+		#-Wsign-conversion # Warn on sign conversions
 		-Wshadow # Warn if a variable declaration shadows one from a parent context
 	)
 

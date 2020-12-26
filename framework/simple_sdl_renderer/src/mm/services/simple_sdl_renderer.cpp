@@ -1,4 +1,7 @@
 #include "simple_sdl_renderer.hpp"
+#include "mm/update_strategies/update_strategy.hpp"
+
+#include <entt/core/hashed_string.hpp>
 
 #include <mm/logger.hpp>
 #define LOG_CRIT(...)		__LOG_CRIT(	"SimpleSDLRenderer", __VA_ARGS__)
@@ -7,7 +10,6 @@
 #define LOG_INFO(...)		__LOG_INFO(	"SimpleSDLRenderer", __VA_ARGS__)
 #define LOG_DEBUG(...)		__LOG_DEBUG("SimpleSDLRenderer", __VA_ARGS__)
 #define LOG_TRACE(...)		__LOG_TRACE("SimpleSDLRenderer", __VA_ARGS__)
-
 
 namespace MM::Services {
 
@@ -42,23 +44,28 @@ bool SimpleSDLRendererService::enable(Engine& engine) {
 		return false;
 	}
 
-	_render_handle = engine.addUpdate([this](Engine& e){ this->render(e); });
-
 	targets["display"].reset(renderer, 800, 600);
 
 	return true;
 }
 
-void SimpleSDLRendererService::disable(Engine& engine) {
-	if (!_render_handle.expired()) {
-		engine.removeUpdate(_render_handle);
-	}
-
+void SimpleSDLRendererService::disable(Engine&) {
 	processors.clear();
 
 	targets.clear();
 
 	SDL_DestroyRenderer(renderer);
+}
+
+std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSDLRendererService::registerUpdates(void) {
+	return {
+		{
+			"SimpleSDLRendererService::render"_hs,
+			"SimpleSDLRendererService::render",
+			[this](Engine& e){ this->render(e); },
+			UpdateStrategies::update_phase_t::POST
+		}
+	};
 }
 
 void SimpleSDLRendererService::render(Engine& engine) {

@@ -5,14 +5,14 @@
 #include <entt/entity/registry.hpp>
 
 TEST(simple_scene, add_en_dis) {
-	MM::Engine e;
+	MM::Engine engine;
 
-	e.addService<MM::Services::SimpleSceneService>();
+	engine.addService<MM::Services::SimpleSceneService>();
 
-	ASSERT_TRUE(e.enableService<MM::Services::SimpleSceneService>());
+	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
 
 	{
-		auto* sss = e.tryService<MM::Services::SimpleSceneService>();
+		auto* sss = engine.tryService<MM::Services::SimpleSceneService>();
 		ASSERT_NE(sss, nullptr);
 
 		auto& s = sss->getScene();
@@ -20,19 +20,19 @@ TEST(simple_scene, add_en_dis) {
 		ASSERT_TRUE(s.valid(e));
 	}
 
-	e.disableService<MM::Services::SimpleSceneService>();
+	engine.disableService<MM::Services::SimpleSceneService>();
 }
 
 TEST(simple_scene, add_en_dis_provide) {
-	MM::Engine e;
+	MM::Engine engine;
 
-	e.addService<MM::Services::SimpleSceneService>();
-	e.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	engine.addService<MM::Services::SimpleSceneService>();
+	engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
 
-	ASSERT_TRUE(e.enableService<MM::Services::SimpleSceneService>());
+	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
 
 	{
-		auto* ssi = e.tryService<MM::Services::SceneServiceInterface>();
+		auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
 		ASSERT_NE(ssi, nullptr);
 
 		auto& s = ssi->getScene();
@@ -40,7 +40,7 @@ TEST(simple_scene, add_en_dis_provide) {
 		ASSERT_TRUE(s.valid(e));
 	}
 
-	e.disableService<MM::Services::SimpleSceneService>();
+	engine.disableService<MM::Services::SimpleSceneService>();
 }
 
 TEST(simple_scene, change_scene) {
@@ -60,7 +60,9 @@ TEST(simple_scene, change_scene) {
 
 		ASSERT_TRUE(sss->getScene().valid(e));
 
-		engine.fixedUpdate();
+		//engine.fixedUpdate();
+		engine.getUpdateStrategy().addDefered([](MM::Engine& eng) {eng.stop();});
+		engine.run();
 
 		ASSERT_FALSE(sss->getScene().valid(e));
 	}

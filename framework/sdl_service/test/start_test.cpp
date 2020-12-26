@@ -103,9 +103,8 @@ TEST(sdl_service, event_handle_reg) {
 		ASSERT_EQ(SDL_PushEvent(&sdlevent), 1);
 	};
 
-	// register forge for fixedUpdate
-	auto event_forge_handle = engine.addFixedUpdate(event_forge_f);
-	ASSERT_NE(event_forge_handle.lock(), nullptr);
+	// register forge
+	engine.getUpdateStrategy().addDefered(event_forge_f);
 
 	// register sdl event handler to just stop the engine
 	auto* stop_event_hook_h = sdl_ss_ptr->addEventHandler([&engine](const SDL_Event&){ engine.stop(); return true; });

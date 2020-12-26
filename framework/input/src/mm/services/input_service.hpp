@@ -16,7 +16,7 @@ namespace MM::Services {
 
 	class InputService : public Service {
 		public:
-			// TDO: rework
+			// TODO: rework
 			enum input_action_t {
 				SPELL_WEAPON,
 				SPELL_1,
@@ -106,8 +106,6 @@ namespace MM::Services {
 
 		private:
 			SDLService::EventHandlerHandle _event_handle = nullptr;
-			MM::Engine::FunctionDataHandle _update_handle;
-
 
 		public:
 			bool enable(Engine& engine) override;
@@ -115,6 +113,10 @@ namespace MM::Services {
 
 			const char* name(void) override { return "InputService"; }
 
+			// you will likely want to make the scene depend on this
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
+		public:
 			// returns true if event was relevant
 			bool handleSDL_Event(const SDL_Event& e, MM::Engine& engine);
 

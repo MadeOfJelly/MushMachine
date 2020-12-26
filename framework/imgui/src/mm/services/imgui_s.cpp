@@ -3,6 +3,8 @@
 #include <imgui/imgui.h>
 #include <imgui_impl_sdl.h>
 
+#include <entt/core/hashed_string.hpp>
+
 #ifdef MM_OPENGL_3
 #include <imgui_impl_opengl3.h>
 #endif
@@ -102,20 +104,12 @@ bool ImGuiService::enable(Engine& engine) {
 		return false;
 	});
 
-	_new_frame_handle = engine.addUpdate([this](Engine& e) { this->imgui_new_frame(e); });
-	assert(!_new_frame_handle.expired());
-	auto tmp_lock = _new_frame_handle.lock();
-	tmp_lock->priority = 90; // after sdl events (100)
-	tmp_lock->name = "imgui new frame";
-
 	return true;
 }
 
 void ImGuiService::disable(Engine& engine) {
 	auto& sdl_ss = engine.getService<MM::Services::SDLService>();
 	sdl_ss.removeEventHandler(_event_handle);
-
-	engine.removeUpdate(_new_frame_handle);
 
 	ImGui::EndFrame(); // making sure, does not work????
 
@@ -124,6 +118,19 @@ void ImGuiService::disable(Engine& engine) {
 #endif
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+}
+
+std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiService::registerUpdates(void) {
+	return {
+		{
+			"ImGuiService::new_frame"_hs,
+			"ImGuiService::new_frame",
+			[this](Engine& e) { this->imgui_new_frame(e); },
+			UpdateStrategies::update_phase_t::PRE,
+			true,
+			{"SDLService::events"_hs}
+		}
+	};
 }
 
 void ImGuiService::imgui_new_frame(Engine& engine) {

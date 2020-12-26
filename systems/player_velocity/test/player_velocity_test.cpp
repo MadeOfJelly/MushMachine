@@ -11,7 +11,7 @@
 
 TEST(player_velocity, basic_run) {
 	float delta = 1/60.f;
-	MM::Engine engine(delta);
+	MM::Engine engine;
 
 	engine.addService<MM::Services::SDLService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::SDLService>());
@@ -19,7 +19,7 @@ TEST(player_velocity, basic_run) {
 	engine.addService<MM::Services::InputService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::InputService>());
 
-	engine.addService<MM::Services::SimpleSceneService>();
+	engine.addService<MM::Services::SimpleSceneService>(delta);
 	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
 
 	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
@@ -37,7 +37,8 @@ TEST(player_velocity, basic_run) {
 	//v.velocity = { 1.f, 1.f };
 	//v.rotation = 0.f;
 
-	engine.fixedUpdate();
+	engine.getUpdateStrategy().addDefered([](auto& e) { e.stop(); });
+	engine.run();
 
 	//ASSERT_EQ(t.position.x, 1.f * delta);
 	// TODO: TEST

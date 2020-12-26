@@ -2,6 +2,8 @@
 
 #include <mm/engine.hpp>
 
+#include <entt/core/hashed_string.hpp>
+
 // services
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
@@ -25,7 +27,7 @@
 
 const char* argv0;
 
-class ImGuiSpeechy {
+class ImGuiSpeechy : public MM::Services::Service {
 	private:
 		SoLoud::Speech speech;
 		SoLoud::Sfxr sfxr;
@@ -35,13 +37,34 @@ class ImGuiSpeechy {
 		SoLoud::LofiFilter lofi;
 
 	public:
-		explicit ImGuiSpeechy(SoLoud::Soloud& sound) {
+		const char* name(void) override { return "TestWindow"; }
+
+		bool enable(MM::Engine& engine) override {
+			auto& sound = engine.getService<MM::Services::SoundService>().engine;
+
 			speech.setText("Test text. 1. 2. 3.");
 			sfxr.loadPreset(SoLoud::Sfxr::COIN, 0);
 
 			sound.setGlobalFilter(0, &lofi);
 			sound.setGlobalFilter(1, &echo);
 			sound.setGlobalFilter(2, &freeverb);
+
+			return true;
+		}
+
+		void disable(MM::Engine&) override {}
+
+		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
+			return {{
+				"testwindow"_hs,
+				"testwindow",
+				[this](MM::Engine& engine) {
+					MM::ImGuiSoundInfo(engine);
+					MM::ImGuiSoundPref(engine);
+
+					renderImGui(engine);
+				}
+			}};
 		}
 
 		void renderImGui(MM::Engine& engine) {
@@ -129,19 +152,10 @@ TEST(imgui_sound, basic) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 
-	{
-		ImGuiSpeechy speechy(sound.engine);
+	engine.addService<ImGuiSpeechy>();
+	ASSERT_TRUE(engine.enableService<ImGuiSpeechy>());
 
-		engine.addUpdate([&](MM::Engine& engine) {
-				MM::ImGuiSoundInfo(engine);
-				MM::ImGuiSoundPref(engine);
-
-				speechy.renderImGui(engine);
-			}
-		);
-
-		engine.run();
-	}
+	engine.run();
 
 	sdl_ss.destroyWindow();
 }

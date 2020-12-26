@@ -22,14 +22,13 @@ namespace MM::Services {
 		private:
 			std::vector<std::unique_ptr<EventHandlerType>> _event_handler_list;
 
-			Engine::FunctionDataHandle _func_handle;
-			Engine::FunctionDataHandle _f_func_handle;
-
 		public:
 			SDLService(uint32_t sdl_init_flags = SDL_INIT_EVERYTHING);
 			~SDLService(void);
 
 		public:
+			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
+
 			bool enable(Engine& engine) override;
 			void disable(Engine& engine) override; // destroys windows and ass contexts
 

@@ -116,11 +116,11 @@ TEST(blur_render_task, it) {
 	for (int i = 0; i < 10; i++) {
 		auto e = scene.create();
 		auto& t = scene.emplace<MM::Components::Transform2D>(e);
-		t.position.x = i * 9.f - 40;
+		t.position.x = float(i) * 9.f - 40.f;
 		t.scale = {5,5};
 
 		auto& v = scene.emplace<MM::Components::Velocity2D>(e);
-		v.rotation = i * 0.3f;
+		v.rotation = float(i) * 0.3f;
 
 		if (mt() % 2) {
 			auto& col = scene.emplace<MM::Components::Color>(e);
@@ -131,12 +131,6 @@ TEST(blur_render_task, it) {
 		}
 
 	}
-
-	engine.addUpdate(
-		[&](MM::Engine&) {
-			ImGui::ColorEdit4("rect_col", &bsrr_rend.default_color[0]);
-		}
-	);
 
 	engine.run();
 }

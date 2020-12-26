@@ -1,23 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <mm/engine.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/engine_fwd.hpp>
 
 #include <entt/entity/registry.hpp>
 
 #include <mm/systems/simple_velocity_system2d.hpp>
 
 TEST(simple_velocity_2d, basic_run) {
-	float delta = 1/60.f;
-	MM::Engine engine(delta);
-
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
-
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(provide_ret);
-
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
+	MM::Scene scene;
 
 	// setup v system
 	MM::AddSystemToScene(scene, MM::Systems::SimpleVelocity);
@@ -31,8 +21,10 @@ TEST(simple_velocity_2d, basic_run) {
 	v.velocity = { 1.f, 1.f };
 	v.rotation = 0.f;
 
-	engine.fixedUpdate();
+	::MM::EachSystemInScene(scene, [&](::MM::Scene& s, ::MM::System& fn) {
+		fn(s, 1.f/60.f);
+	});
 
-	ASSERT_EQ(t.position.x, 1.f * delta);
+	ASSERT_EQ(t.position.x, 1.f * 1.f/60.f);
 }
 

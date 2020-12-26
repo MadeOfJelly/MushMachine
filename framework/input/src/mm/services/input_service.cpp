@@ -1,5 +1,7 @@
 #include "./input_service.hpp"
 
+#include <entt/core/hashed_string.hpp>
+
 #include <glm/common.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
@@ -88,24 +90,6 @@ bool InputService::enable(Engine& engine) {
 		return false;
 	}
 
-	_update_handle = engine.addFixedUpdate([this](MM::Engine&) {
-		for (size_t i = 0; i < 4; i++) {
-			if (!_player_active[i])
-				continue;
-
-			auto& p = _player[i];
-			if (p.is_controller) {
-			} else {
-				updateKPlayerDirs(p);
-			}
-		}
-	});
-	if (_update_handle.expired()) {
-		LOG_ERROR("couldnt register update handler!");
-		return false;
-	}
-	_update_handle.lock()->priority = 1; // scene is 0
-
 	return true;
 }
 
@@ -119,12 +103,27 @@ void InputService::disable(Engine& engine) {
 
 		sdl_ss->removeEventHandler(_event_handle);
 	}
+}
 
-	if (!_update_handle.expired()) {
-		engine.removeFixedUpdate(_update_handle);
-		_update_handle.reset();
-	}
+std::vector<UpdateStrategies::UpdateCreationInfo> InputService::registerUpdates(void) {
+	return {
+		{
+			"InputService::update"_hs,
+			"InputService::update",
+			[this](MM::Engine&) {
+				for (size_t i = 0; i < 4; i++) {
+					if (!_player_active[i])
+						continue;
 
+					auto& p = _player[i];
+					if (p.is_controller) {
+					} else {
+						updateKPlayerDirs(p);
+					}
+				}
+			}
+		}
+	};
 }
 
 bool InputService::handleSDL_Event(const SDL_Event& e, MM::Engine& engine) {
