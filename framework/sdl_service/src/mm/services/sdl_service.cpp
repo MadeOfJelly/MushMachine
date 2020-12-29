@@ -35,6 +35,16 @@ SDLService::SDLService(uint32_t sdl_init_flags) {
 
 	LOG_TRACE("constructing SDLService...");
 
+	SDL_LogSetOutputFunction(
+		+[](void*, int category, SDL_LogPriority priority, const char* message) {
+			spdlog::get("SDLService")->log(spdlog::level::level_enum(priority-1), "cat {}: {}", category, message);
+		},
+		nullptr
+	);
+
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+
+
 //#ifdef __EMSCRIPTEN__
 	//sdl_init_flags &= ~SDL_INIT_HAPTIC;
 //#endif
