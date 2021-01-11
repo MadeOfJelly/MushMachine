@@ -85,6 +85,9 @@ add_library(imgui_tools
 
 	./src/mm/services/scene_tools.hpp
 	./src/mm/services/scene_tools.cpp
+
+	./src/mm/services/engine_tools.hpp
+	./src/mm/services/engine_tools.cpp
 )
 
 target_include_directories(imgui_tools PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

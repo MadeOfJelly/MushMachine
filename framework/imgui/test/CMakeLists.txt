@@ -37,6 +37,25 @@ add_test(NAME imgui_scene_tools_test COMMAND imgui_scene_tools_test)
 
 ####################
 
+add_executable(imgui_engine_tools_test
+	engine_tools_test.cpp
+)
+
+target_include_directories(imgui_engine_tools_test PRIVATE ".")
+
+target_link_libraries(imgui_engine_tools_test
+	engine
+	opengl_renderer_s
+	imgui_service
+	imgui_render_task
+	imgui_tools
+	gtest_main
+)
+
+add_test(NAME imgui_engine_tools_test COMMAND imgui_engine_tools_test)
+
+####################
+
 add_executable(imgui_sound_test
 	sound_test.cpp
 )

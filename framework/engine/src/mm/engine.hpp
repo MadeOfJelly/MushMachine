@@ -18,7 +18,14 @@
 
 namespace MM {
 
+// fwd
+namespace Services {
+	class ImGuiEngineTools;
+}
+
 class Engine {
+	friend Services::ImGuiEngineTools;
+
 	private:
 		using service_family = entt::family<struct internal_service_family>;
 

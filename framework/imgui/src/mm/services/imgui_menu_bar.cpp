@@ -80,7 +80,7 @@ namespace MM::Services {
 			}
 
 
-			ImGui::Text("%.1fFPS", ImGui::GetIO().Framerate);
+			ImGui::Text("| %.1fFPS", ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
 	}
