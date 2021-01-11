@@ -100,6 +100,9 @@ target_link_libraries(imgui_tools
 ################## imgui_sound
 
 add_library(imgui_sound
+	./src/mm/services/sound_tools.hpp
+	./src/mm/services/sound_tools.cpp
+
 	./src/mm/imgui/sound_info.hpp
 	./src/mm/imgui/sound_pref.hpp
 

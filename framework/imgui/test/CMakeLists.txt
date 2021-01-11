@@ -67,7 +67,7 @@ target_link_libraries(imgui_sound_test
 	imgui_service
 	imgui_render_task
 	imgui_sound
-	#imgui_tools
+	imgui_tools
 	gtest_main
 )
 add_test(NAME imgui_sound_test COMMAND imgui_sound_test)

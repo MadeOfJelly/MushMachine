@@ -8,8 +8,8 @@
 
 namespace MM {
 
-	void ImGuiSoundInfo(Engine& engine) {
-		if (ImGui::Begin("Sound Info")) {
+	void ImGuiSoundInfo(Engine& engine, bool* show) {
+		if (ImGui::Begin("Sound Info", show)) {
 			auto& sound = engine.getService<MM::Services::SoundService>();
 
 			ImGui::Text("SoLoud v%d", sound.engine.getVersion());

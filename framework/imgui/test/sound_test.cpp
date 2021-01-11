@@ -10,8 +10,12 @@
 #include <mm/services/sound_service.hpp>
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/services/imgui_s.hpp>
+#include <mm/services/imgui_menu_bar.hpp>
+#include <mm/services/engine_tools.hpp>
 
 #include <mm/opengl/render_tasks/imgui.hpp>
+
+#include <mm/services/sound_tools.hpp>
 
 #include <mm/imgui/sound_info.hpp>
 #include <mm/imgui/sound_pref.hpp>
@@ -61,9 +65,6 @@ class ImGuiSpeechy : public MM::Services::Service {
 				"testwindow"_hs,
 				"testwindow",
 				[this](MM::Engine& engine) {
-					MM::ImGuiSoundInfo(engine);
-					MM::ImGuiSoundPref(engine);
-
 					renderImGui(engine);
 				}
 			}};
@@ -148,6 +149,15 @@ TEST(imgui_sound, basic) {
 
 	engine.addService<MM::Services::ImGuiService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
+
+	engine.addService<MM::Services::ImGuiMenuBar>();
+	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiMenuBar>());
+
+	engine.addService<MM::Services::ImGuiEngineTools>();
+	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiEngineTools>());
+
+	engine.addService<MM::Services::ImGuiSoundTools>();
+	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSoundTools>());
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());

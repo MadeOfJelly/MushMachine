@@ -7,9 +7,6 @@
 
 #include <imgui/imgui.h>
 
-#include <mm/logger.hpp>
-#define LOGIGS(x) LOG("ImGuiSceneToolsService", x)
-
 namespace MM::Services {
 
 	bool ImGuiEngineTools::enable(Engine& engine) {
