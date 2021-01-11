@@ -37,6 +37,8 @@ namespace MM::Services {
 		auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
 		menu_bar.menu_tree["Engine"].erase("Stop Engine");
+		menu_bar.menu_tree["Engine"].erase("About");
+		menu_bar.menu_tree["Engine"].erase("Services");
 	}
 
 	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiEngineTools::registerUpdates(void) {

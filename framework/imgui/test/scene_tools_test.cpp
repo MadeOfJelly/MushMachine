@@ -8,6 +8,8 @@
 #include <mm/services/filesystem.hpp>
 #include <mm/services/simple_scene.hpp>
 #include <mm/services/imgui_s.hpp>
+#include <mm/services/imgui_menu_bar.hpp>
+#include <mm/services/engine_tools.hpp>
 
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
@@ -37,6 +39,12 @@ TEST(imgui_scene_tools, it) {
 
 	engine.addService<MM::Services::ImGuiService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
+
+	engine.addService<MM::Services::ImGuiMenuBar>();
+	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiMenuBar>());
+
+	engine.addService<MM::Services::ImGuiEngineTools>();
+	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiEngineTools>());
 
 	engine.addService<MM::Services::ImGuiSceneToolsService>();
 	engine.getUpdateStrategy().depend("ImGuiSceneToolsService::render"_hs, "SimpleSceneService::scene_tick"_hs);
