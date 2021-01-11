@@ -7,6 +7,10 @@ project(imgui_lib CXX)
 add_library(imgui_service
 	./src/mm/services/imgui_s.hpp
 	./src/mm/services/imgui_s.cpp
+
+	# sneak
+	./src/mm/services/imgui_menu_bar.hpp
+	./src/mm/services/imgui_menu_bar.cpp
 )
 
 target_include_directories(imgui_service PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
