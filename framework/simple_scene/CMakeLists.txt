@@ -10,6 +10,7 @@ target_include_directories(simple_scene PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src"
 
 target_link_libraries(simple_scene
 	engine
+	common_components
 )
 
 if (BUILD_TESTING)

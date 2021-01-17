@@ -1,7 +1,6 @@
 #include "./simple_scene.hpp"
-#include "spdlog/fmt/bundled/core.h"
 
-//#include "../systems_container.hpp"
+#include <mm/components/time_delta.hpp>
 
 #include <entt/entity/registry.hpp>
 
@@ -60,6 +59,10 @@ void SimpleSceneService::sceneFixedUpdate(Engine&) {
 	const double dt = f_delta * 1'000'000'000.0;
 
 	size_t continuous_counter = 0;
+
+	auto& time_ctx = _scene->ctx_or_set<MM::Components::TimeDelta>(f_delta, delta_factor);
+	time_ctx.tickDelta = f_delta * delta_factor;
+	time_ctx.deltaFactor = delta_factor;
 
 	// TODO: this is just cancer
 	while (_accumulator >= static_cast<decltype(_accumulator)>(dt)){
