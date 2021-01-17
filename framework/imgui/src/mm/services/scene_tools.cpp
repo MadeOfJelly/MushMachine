@@ -6,6 +6,7 @@
 
 #include <mm/engine.hpp>
 #include "./imgui_menu_bar.hpp"
+#include "mm/components/time_delta.hpp"
 
 #include <imgui/imgui.h>
 
@@ -70,6 +71,17 @@ namespace MM::Services {
 			ImGui::MenuItem("Camera3D Tool", NULL, &_show_camera_tool);
 		};
 
+		menu_bar.menu_tree["Scene"]["TimeCtx"] = [this](Engine& e) {
+			MM::Components::TimeDelta* td_ptr = nullptr;
+
+			if (auto* ssi_ptr = e.tryService<MM::Services::SceneServiceInterface>()) {
+				auto& scene = ssi_ptr->getScene();
+				td_ptr = scene.try_ctx<MM::Components::TimeDelta>();
+			}
+
+			ImGui::MenuItem("TimeDelta Context", NULL, &_show_time_delta_ctx, td_ptr);
+		};
+
 		return true;
 	}
 
@@ -78,6 +90,8 @@ namespace MM::Services {
 
 		menu_bar.menu_tree["Scene"].erase("Metrics");
 		menu_bar.menu_tree["Scene"].erase("EntityEditor");
+		menu_bar.menu_tree["Scene"].erase("CameraTool");
+		menu_bar.menu_tree["Scene"].erase("TimeCtx");
 	}
 
 	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiSceneToolsService::registerUpdates(void) {
@@ -97,15 +111,6 @@ namespace MM::Services {
 	}
 
 	void ImGuiSceneToolsService::renderImGui(Engine& engine) {
-		//if (show_menu && ImGui::BeginMainMenuBar()) {
-
-			//if (ImGui::BeginMenu("Windows")) {
-				//ImGui::MenuItem("Camera Tool", NULL, &_show_camera_tool);
-				//ImGui::EndMenu();
-			//}
-
-		//}
-
 		auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
 		if (_show_scene_metrics) {
@@ -147,6 +152,16 @@ namespace MM::Services {
 		if (_show_camera_tool) {
 			if (ImGui::Begin("Camera3D Tool", &_show_camera_tool)) {
 				ImGuiWidgets::Camera3D(scene);
+			}
+			ImGui::End();
+		}
+
+		if (_show_time_delta_ctx) {
+			if (ImGui::Begin("Scene TimeDelta Context", &_show_time_delta_ctx)) {
+				auto* td_ptr = scene.try_ctx<MM::Components::TimeDelta>();
+				ImGui::Value("tickDelta", td_ptr->tickDelta);
+				ImGui::SliderFloat("deltaFactor", &td_ptr->deltaFactor, 0.f, 10.f, "%.5f", ImGuiSliderFlags_Logarithmic);
+
 			}
 			ImGui::End();
 		}

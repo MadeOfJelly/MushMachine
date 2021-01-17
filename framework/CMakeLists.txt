@@ -9,6 +9,7 @@ add_subdirectory(std_utils)
 add_subdirectory(screen_director)
 add_subdirectory(filesystem)
 add_subdirectory(simple_scene)
+add_subdirectory(organizer_scene)
 
 if(NOT MM_HEADLESS)
 	add_subdirectory(sdl_service)

@@ -23,6 +23,7 @@ namespace MM::Services {
 			bool _show_entity_editor = false;
 			bool _show_entity_list = true;
 			bool _show_camera_tool = false;
+			bool _show_time_delta_ctx = false;
 
 			EntityEditor<Entity> _entity_editor;
 			// for list
