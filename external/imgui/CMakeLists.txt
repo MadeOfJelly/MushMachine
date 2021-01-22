@@ -6,15 +6,18 @@ set(CPP_FILES
 	"imgui/imgui.cpp"
 	"imgui/imgui_draw.cpp"
 	"imgui/imgui_widgets.cpp"
+	"imgui/imgui_tables.cpp"
 	"imgui/imgui_demo.cpp"
 
 	"imgui/misc/cpp/imgui_stdlib.cpp"
 
 	"imgui_plot_var.cpp"
 
-	#"imgui_impl_sdl_gl3.cpp"
-	"imgui_impl_sdl.cpp"
-	"imgui_impl_opengl3.cpp"
+	#"imgui_impl_sdl_gl3.cpp" # very old
+	#"imgui_impl_sdl.cpp" # old
+	#"imgui_impl_opengl3.cpp" # old
+	"imgui/backends/imgui_impl_sdl.cpp"
+	"imgui/backends/imgui_impl_opengl3.cpp"
 )
 
 set(HPP_FILES
@@ -27,9 +30,11 @@ set(HPP_FILES
 
 	"imgui_plot_var.hpp"
 
-	#"imgui_impl_sdl_gl3.h"
-	"imgui_impl_sdl.h"
-	"imgui_impl_opengl3.h"
+	#"imgui_impl_sdl_gl3.h" # very old
+	#"imgui_impl_sdl.h" # old
+	#"imgui_impl_opengl3.h" # old
+	"imgui/backends/imgui_impl_sdl.h"
+	"imgui/backends/imgui_impl_opengl3.h"
 )
 
 add_library(imgui ${CPP_FILES} ${HPP_FILES})

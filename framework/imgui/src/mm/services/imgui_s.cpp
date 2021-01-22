@@ -1,12 +1,12 @@
 #include "./imgui_s.hpp"
 
 #include <imgui/imgui.h>
-#include <imgui_impl_sdl.h>
+#include <imgui/backends/imgui_impl_sdl.h>
 
 #include <entt/core/hashed_string.hpp>
 
 #ifdef MM_OPENGL_3
-#include <imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 #endif
 
 #include <IconsIonicons.h>
