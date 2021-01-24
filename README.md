@@ -33,7 +33,7 @@ The private repo had over 900 commits, before the first public release.
 
 ## Limitations
 - Features in general. It's more of a Personal Framework than something I want everyone to use ;).
-- Only ships where OpenGL 3.3 or OpenGL ES 3 are available (includes web via emsripten's ES3 emu)
+- Only ships where OpenGL 3.3 or OpenGL ES 3 are available (includes web via Emscripten's ES3 emulation)
 - not optimized for performance
 - no multithreading in the Engine itself
 - basically most of the Roadmap fits here too
