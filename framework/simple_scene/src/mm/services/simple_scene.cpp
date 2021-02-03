@@ -60,9 +60,8 @@ void SimpleSceneService::sceneFixedUpdate(Engine&) {
 
 	size_t continuous_counter = 0;
 
-	auto& time_ctx = _scene->ctx_or_set<MM::Components::TimeDelta>(f_delta, delta_factor);
-	time_ctx.tickDelta = f_delta * delta_factor;
-	time_ctx.deltaFactor = delta_factor;
+	auto& time_ctx = _scene->ctx_or_set<MM::Components::TimeDelta>(f_delta, initial_delta_factor);
+	time_ctx.tickDelta = f_delta * time_ctx.deltaFactor;
 
 	// TODO: this is just cancer
 	while (_accumulator >= static_cast<decltype(_accumulator)>(dt)){
@@ -70,7 +69,7 @@ void SimpleSceneService::sceneFixedUpdate(Engine&) {
 		continuous_counter++;
 
 		::MM::EachSystemInScene(*_scene, [&](::MM::Scene& s, ::MM::System& fn) {
-			fn(s, f_delta * delta_factor);
+			fn(s, time_ctx.tickDelta);
 		});
 
 		TracyPlot("MM::Services::SimpleSceneService::_scene.alive", (int64_t)_scene->alive());

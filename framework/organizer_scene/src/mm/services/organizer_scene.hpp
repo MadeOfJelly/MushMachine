@@ -21,7 +21,7 @@ namespace MM::Services {
 		public:
 			const float f_delta;
 
-			float delta_factor = 1.f;
+			float initial_delta_factor = 1.f;
 
 		public: // service
 			explicit OrganizerSceneService(const float update_delta = 1.f/60.f) : f_delta(update_delta) {}
