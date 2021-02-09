@@ -17,6 +17,8 @@ namespace MM::Services {
 			bool _show_about = false;
 			bool _show_services = false;
 
+			bool _services_edit_mode = false;
+
 		private:
 			void renderImGui(Engine& engine);
 

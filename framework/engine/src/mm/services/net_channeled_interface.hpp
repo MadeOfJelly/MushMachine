@@ -28,6 +28,7 @@ namespace MM::Services {
 			// returns wether the channel type is supported
 			virtual bool getSupportedChannelType(channel_type type) = 0;
 
+			// in the best case, this performs a propper MTU estimation (lol)
 			virtual size_t getMaxPacketSize(void) = 0;
 
 			// TODO: add set channel type utils

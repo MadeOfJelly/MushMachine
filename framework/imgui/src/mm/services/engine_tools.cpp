@@ -75,10 +75,46 @@ namespace MM::Services {
 
 	void ImGuiEngineTools::renderServices(Engine& engine) {
 		if (ImGui::Begin("Services##EngineTools", &_show_services)) {
-			ImGui::Text("TODO: use new table api");
+			ImGui::Text("TODO: make sortable");
+			ImGui::Checkbox("edit mode", &_services_edit_mode);
 
-			for (auto& it : engine._services) {
-				ImGui::Text("[%d|%s]: %s", it.first, it.second->second->name(), it.second->first ? "enabled" : "disabled");
+			if (ImGui::BeginTable(
+				"services_table",
+				3,
+				ImGuiTableFlags_RowBg //|
+			)) {
+				ImGui::TableSetupColumn("id", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("name");
+				ImGui::TableSetupColumn("status");
+				ImGui::TableHeadersRow();
+
+				for (auto& it : engine._services) {
+					ImGui::TableNextRow();
+
+					ImGui::TableNextColumn();
+					ImGui::Text("%d", it.first);
+
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", it.second->second->name());
+
+					ImGui::TableNextColumn();
+					if (_services_edit_mode) {
+						ImGui::PushID(it.first);
+						if (ImGui::SmallButton(it.second->first ? "enabled" : "disabled")) {
+							if (it.second->first) {
+								engine.disableService(it.first);
+							} else {
+								engine.enableService(it.first);
+							}
+						}
+						//ImGui::SetTooltip("click to toggle!"); the heck?
+						ImGui::PopID();
+					} else {
+						ImGui::Text("%s", it.second->first ? "enabled" : "disabled");
+					}
+				}
+
+			ImGui::EndTable();
 			}
 		}
 		ImGui::End();
