@@ -49,6 +49,8 @@ class SingleThreadedDefault : public MM::UpdateStrategies::UpdateStrategy {
 		SingleThreadedDefault(void) = default;
 		virtual ~SingleThreadedDefault(void);
 
+		const char* name(void) override { return "SingleThreadedDefault"; }
+
 	protected:
 		bool registerService(const entt::id_type s_id, std::vector<UpdateCreationInfo>&& info_array) override;
 

@@ -37,6 +37,8 @@ class UpdateStrategy {
 	public:
 		virtual ~UpdateStrategy(void) {}
 
+		virtual const char* name(void) = 0;
+
 	protected: // the engine facing interface
 		friend ::MM::Engine;
 

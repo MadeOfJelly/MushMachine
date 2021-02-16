@@ -15,6 +15,8 @@ using namespace entt::literals;
 
 class MockUpdateStrategy : public MM::UpdateStrategies::UpdateStrategy {
 	public:
+		const char* name(void) override { return "MockUpdateStrategy"; }
+
 		MOCK_METHOD(
 			bool,
 			registerService,

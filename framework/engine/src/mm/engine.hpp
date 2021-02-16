@@ -58,10 +58,7 @@ class Engine {
 		// called from destructor or explicitly
 		void cleanup(void);
 
-		//[[nodiscard]] float getFixedDeltaTime(void) const { return _fixed_delta_time; };
-
 		void update(void);
-		//void fixedUpdate(void);
 
 		void run(void); // calls update() until stopped
 		void stop(void);
@@ -70,7 +67,6 @@ class Engine {
 		std::vector<service_family::family_type> _service_add_order; // ?
 		std::vector<service_family::family_type> _service_enable_order; // ?
 
-		//std::unordered_map<service_family::family_type, std::pair<bool, std::unique_ptr<Service>>> _services;
 		std::unordered_map<
 			service_family::family_type,
 			std::shared_ptr<std::pair<
