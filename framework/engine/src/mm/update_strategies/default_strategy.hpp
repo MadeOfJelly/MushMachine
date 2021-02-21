@@ -7,9 +7,16 @@
 #include <vector>
 #include <set>
 
+// fwd
+namespace MM::Services {
+	class ImGuiEngineTools;
+}
+
 namespace MM::UpdateStrategies {
 
 class SingleThreadedDefault : public MM::UpdateStrategies::UpdateStrategy {
+	friend MM::Services::ImGuiEngineTools;
+
 	private:
 		struct Task {
 			std::string name;

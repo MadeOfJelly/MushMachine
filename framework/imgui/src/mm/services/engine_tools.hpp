@@ -16,14 +16,16 @@ namespace MM::Services {
 		private:
 			bool _show_about = false;
 			bool _show_services = false;
+			bool _show_update_stategy = false;
 
 			bool _services_edit_mode = false;
 
 		private:
 			void renderImGui(Engine& engine);
 
-			void renderAbout(void);
+			void renderAbout(Engine& engine);
 			void renderServices(Engine& engine);
+			void renderUpdateStrategy(Engine& engine);
 	};
 
 } // namespace MM::Services

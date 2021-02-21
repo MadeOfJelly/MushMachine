@@ -44,7 +44,8 @@ std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSceneService::registerUp
 			[this](Engine& e) { this->changeSceneFixedUpdate(e); },
 			UpdateStrategies::update_phase_t::MAIN,
 			true,
-			{"SimpleSceneService::scene_update"_hs} // first update, than change????
+			//{"SimpleSceneService::scene_update"_hs} // first update, than change????
+			{"SimpleSceneService::scene_tick"_hs}
 		}
 	};
 }
