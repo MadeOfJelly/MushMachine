@@ -12,6 +12,7 @@ cmake-build-release/
 compile_commands.json
 /build
 .clangd
+.cache
 
 .DS_Store
 .AppleDouble
