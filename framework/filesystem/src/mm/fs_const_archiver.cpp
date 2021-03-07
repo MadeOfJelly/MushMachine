@@ -186,12 +186,14 @@ PHYSFS_Io* FSConstArchiver::createIO(const char* filename, PHYSFS_uint64 pos) {
 }
 
 bool FSConstArchiver::pathIsDir(const char* path) {
+	// TODO: fix leading '/'
+
 	std::string_view pstr {path};
 	//for (auto&[str, data] : _storage) {
 	for (auto& it : _storage) {
 		// stats_with c++20 <.<
 
-		if (it.first.compare(0, pstr.size(), pstr) == 0) {
+		if (it.first.compare(0, pstr.size(), pstr) == 0 && it.first.size() != pstr.size()) {
 			return true;
 		}
 	}

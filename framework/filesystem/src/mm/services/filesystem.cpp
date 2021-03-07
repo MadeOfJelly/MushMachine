@@ -296,11 +296,13 @@ nlohmann::json FilesystemService::readJson(fs_file_t file) const {
 	std::string buffer;
 	readString(file, buffer);
 
-	return nlohmann::json::parse(buffer);
+	// disable exeptions
+	// TODO: use callback instead of readString()
+	return nlohmann::json::parse(buffer, nullptr, false);
 }
 
 nlohmann::json FilesystemService::readJson(const char* filepath) const {
-	if (!exists(filepath)) {
+	if (!isFile(filepath)) {
 		return {};
 	}
 

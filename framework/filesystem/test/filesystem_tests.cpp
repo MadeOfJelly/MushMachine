@@ -219,7 +219,7 @@ TEST(fs_service_system, read_const_json) {
 		ASSERT_TRUE(j.empty());
 	}
 
-	FS_CONST_MOUNT_FILE("json/file1.json",
+	FS_CONST_MOUNT_FILE("/json/file1.json",
 R"({
 	"answer": {
 		"everything": 42
