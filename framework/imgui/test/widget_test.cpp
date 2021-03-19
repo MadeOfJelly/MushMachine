@@ -1,3 +1,5 @@
+#include "mm/imgui/widgets/scalar_range.hpp"
+#include "mm/scalar_range2.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -57,6 +59,8 @@ TEST(imgui_widgets, basic) {
 							ImGui::SameLine();
 							MM::ImGuiWidgets::KnobFloat("knob2", &knob_test, 0.f, 1.f, 0.f, false);
 
+							static MM::ScalarRange2<uint32_t> range {0, 100};
+							MM::ImGuiWidgets::DragScalarRange2("range", range);
 						}
 						ImGui::End();
 					}

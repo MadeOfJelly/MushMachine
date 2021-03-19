@@ -21,6 +21,7 @@ target_link_libraries(imgui_service
 ################## imgui_widgets
 
 add_library(imgui_widgets
+	./src/mm/imgui/widgets/scalar_range.hpp
 	./src/mm/imgui/widgets/knob.hpp
 	./src/mm/imgui/widgets/plot_radar.hpp
 	./src/mm/imgui/widgets/camera.hpp
@@ -43,6 +44,7 @@ add_library(imgui_widgets
 
 ############
 
+	./src/mm/imgui/widgets/scalar_range.cpp
 	./src/mm/imgui/widgets/knob.cpp
 	./src/mm/imgui/widgets/plot_radar.cpp
 	./src/mm/imgui/widgets/camera.cpp
@@ -69,6 +71,7 @@ target_link_libraries(imgui_widgets
 	engine
 
 	common_components
+	std_utils
 )
 
 ################## imgui_tools
