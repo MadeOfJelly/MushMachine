@@ -15,6 +15,8 @@ add_subdirectory("tracy")
 include("${CMAKE_CURRENT_SOURCE_DIR}/entt.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/glm.cmake")
 
+add_subdirectory("SquirrelNoise")
+
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 set(JSON_MultipleHeaders ON CACHE INTERNAL "")
 add_subdirectory("json") # link with "nlohmann_json::nlohmann_json"
