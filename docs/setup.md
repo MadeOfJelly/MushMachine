@@ -4,12 +4,14 @@
 
 First add MM as a git submodule if in git repo:
 ```bash
-git submodule add --init --recursive <url>
+git submodule add <url>
+git submodule update --init --recursive
 ```
-else just git clone
+else just git clone --recursive
 
 add to cmake as subdirectory
 ```cmake
+include("${CMAKE_CURRENT_LIST_DIR}/external/MushMachine/mm_options_and_defines.cmake")
 add_subdirectory(MushMachine)
 ```
 
