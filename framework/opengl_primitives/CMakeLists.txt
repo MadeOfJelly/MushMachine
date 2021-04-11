@@ -11,6 +11,8 @@ target_include_directories(opengl_primitives PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}
 target_link_libraries(opengl_primitives
 	glm
 	stb_image
+	#sdl
+	sdl_service
 
 	logger
 	resource_manager

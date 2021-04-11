@@ -6,6 +6,7 @@ namespace MM::OpenGL {
 
 	struct TextureLoaderFile;
 	struct TextureLoaderConstBuffer;
+	struct TextureLoaderSDLSurface;
 
 	class Texture {
 		private:
@@ -14,6 +15,7 @@ namespace MM::OpenGL {
 		private:
 			friend struct TextureLoaderFile;
 			friend struct TextureLoaderConstBuffer;
+			friend struct TextureLoaderSDLSurface;
 
 			Texture(
 				uint32_t handle,

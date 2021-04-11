@@ -8,7 +8,6 @@
 	#include <glad/glad.h>
 #endif
 
-
 #include <mm/services/filesystem.hpp>
 #include <mm/engine.hpp>
 
@@ -127,6 +126,32 @@ std::shared_ptr<Texture> TextureLoaderConstBuffer::load(const uint8_t* data, siz
 	stbi_image_free(buffer);
 
 	return std::shared_ptr<Texture>(new Texture(handle, width, height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE));
+}
+
+std::shared_ptr<Texture> TextureLoaderSDLSurface::load(SDL_Surface* surface) const {
+	uint32_t handle;
+
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_2D, handle);
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	SDL_LockSurface(surface);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	SDL_UnlockSurface(surface);
+
+	return std::shared_ptr<Texture>(new Texture(handle, surface->w, surface->h, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE));
 }
 
 } // MM::OpenGL

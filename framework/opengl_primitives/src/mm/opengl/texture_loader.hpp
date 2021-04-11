@@ -1,6 +1,9 @@
 #pragma once
 
 #include "./texture.hpp"
+
+#include <SDL2/SDL.h>
+
 #include <utility>
 
 // fwd
@@ -16,6 +19,10 @@ namespace MM::OpenGL {
 
 	struct TextureLoaderConstBuffer final {
 		std::shared_ptr<Texture> load(const uint8_t* data, size_t size) const;
+	};
+
+	struct TextureLoaderSDLSurface final {
+		std::shared_ptr<Texture> load(SDL_Surface* surface) const;
 	};
 
 	struct TextureLoaderEmpty final {
