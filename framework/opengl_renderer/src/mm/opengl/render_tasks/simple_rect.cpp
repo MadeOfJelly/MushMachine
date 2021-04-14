@@ -83,7 +83,7 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(t.position.y/10.f + 500.f));
 
-		if (scene.has<Components::Color>(e)) {
+		if (scene.all_of<Components::Color>(e)) {
 			_shader->setUniform4f("_color", scene.get<Components::Color>(e).color);
 		} else {
 			_shader->setUniform4f("_color", default_color);

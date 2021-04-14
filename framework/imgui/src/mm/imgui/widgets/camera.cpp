@@ -37,7 +37,7 @@ void Camera3D(MM::Scene& scene) {
 
 			MM::ImGuiWidgets::Entity(tracking, scene);
 			if (scene.valid(tracking)) {
-				if (scene.has<MM::Components::Transform2D>(tracking)) {
+				if (scene.all_of<MM::Components::Transform2D>(tracking)) {
 					camera->translation = {scene.get<MM::Components::Transform2D>(tracking).position, 0.f};
 				} else {
 					ImGui::TextUnformatted("error: Entity has no Transform");

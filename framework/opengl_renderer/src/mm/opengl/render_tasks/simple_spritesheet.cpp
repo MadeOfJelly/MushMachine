@@ -101,7 +101,7 @@ void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 		_shader->setUniform2ui("_tileCount", spr.sp.tile_count.x, spr.sp.tile_count.y);
 		_shader->setUniform1ui("_atlasIndex", spr.tile_index);
 
-		if (scene.has<Components::Color>(e)) {
+		if (scene.all_of<Components::Color>(e)) {
 			_shader->setUniform4f("_color", scene.get<Components::Color>(e).color);
 		} else {
 			_shader->setUniform4f("_color", default_color);

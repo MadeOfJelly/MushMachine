@@ -104,7 +104,7 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 		}
 
 		auto* tmp_col_ptr = &default_color;
-		if (scene.has<Components::Color>(e)) {
+		if (scene.all_of<Components::Color>(e)) {
 			tmp_col_ptr = &scene.get<Components::Color>(e).color;
 		}
 

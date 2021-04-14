@@ -14,7 +14,7 @@ void Entity(MM::Entity& e, MM::Scene& ecs, bool dropTarget) {
 	ImGui::PushID(static_cast<int>(entt::to_integral(e)));
 
 	if (ecs.valid(e)) {
-		if (ecs.has<MM::Components::Name>(e)) {
+		if (ecs.all_of<MM::Components::Name>(e)) {
 			ImGui::Text(ICON_II_CUBE "E: %d v%d (%s)", entt::to_integral(ecs.entity(e)), ecs.version(e), ecs.get<MM::Components::Name>(e).str.c_str());
 		} else {
 			ImGui::Text(ICON_II_CUBE "E: %d v%d", entt::to_integral(ecs.entity(e)), ecs.version(e));
