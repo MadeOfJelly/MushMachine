@@ -42,6 +42,8 @@ namespace MM::OpenGL::RenderTasks {
 			BatchedSpriteSheet(Engine& engine);
 			~BatchedSpriteSheet(void);
 
+			const char* name(void) override { return "BatchedSpriteSheet"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

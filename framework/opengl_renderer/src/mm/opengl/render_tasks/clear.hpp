@@ -9,6 +9,8 @@ namespace MM::OpenGL::RenderTasks {
 			Clear(Engine& engine);
 			~Clear(void);
 
+			const char* name(void) override { return "Clear"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

@@ -26,6 +26,8 @@ namespace MM::OpenGL::RenderTasks {
 			Blur(Engine& engine);
 			~Blur(void);
 
+			const char* name(void) override { return "Blur"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

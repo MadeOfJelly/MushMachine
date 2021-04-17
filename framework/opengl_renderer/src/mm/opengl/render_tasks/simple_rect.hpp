@@ -31,6 +31,8 @@ namespace MM::OpenGL::RenderTasks {
 			SimpleRect(Engine& engine);
 			~SimpleRect(void);
 
+			const char* name(void) override { return "SimpleRect"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

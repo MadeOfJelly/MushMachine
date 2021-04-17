@@ -33,6 +33,8 @@ namespace MM::OpenGL {
 				FastSky(MM::Engine& engine);
 				~FastSky(void);
 
+				const char* name(void) override { return "FastSky"; }
+
 				void render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) override;
 
 			public:

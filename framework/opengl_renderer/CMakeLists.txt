@@ -27,6 +27,18 @@ if(EMSCRIPTEN)
 	set_target_properties(opengl_renderer_s PROPERTIES LINK_FLAGS "-s USE_SDL=2")
 endif()
 
+############# imgui opengl renderer tools ###########
+
+add_library(imgui_opengl_renderer_tools
+	src/mm/services/opengl_renderer_tools.hpp
+	src/mm/services/opengl_renderer_tools.cpp
+)
+
+target_link_libraries(imgui_opengl_renderer_tools
+	opengl_renderer_s
+	imgui_service
+)
+
 ############# imgui render task ###########
 
 add_library(imgui_render_task

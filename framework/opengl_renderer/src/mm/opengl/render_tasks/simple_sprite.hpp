@@ -31,6 +31,8 @@ namespace MM::OpenGL::RenderTasks {
 			SimpleSprite(Engine& engine);
 			~SimpleSprite(void);
 
+			const char* name(void) override { return "SimpleSprite"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

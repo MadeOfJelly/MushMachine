@@ -31,6 +31,8 @@ namespace MM::OpenGL::RenderTasks {
 			SimpleSpriteSheet(Engine& engine);
 			~SimpleSpriteSheet(void);
 
+			const char* name(void) override { return "SimpleSpriteSheet"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

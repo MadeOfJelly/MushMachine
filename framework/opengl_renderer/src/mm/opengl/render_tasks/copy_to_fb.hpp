@@ -22,6 +22,8 @@ namespace MM::OpenGL::RenderTasks {
 			CopyToFB(Engine& engine);
 			~CopyToFB(void);
 
+			const char* name(void) override { return "CopyToFB"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

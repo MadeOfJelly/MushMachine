@@ -11,6 +11,8 @@ namespace MM::OpenGL::RenderTasks {
 			BlitFB(Engine& engine);
 			~BlitFB(void);
 
+			const char* name(void) override { return "BlitFB"; }
+
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
 		public:

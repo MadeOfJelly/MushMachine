@@ -25,6 +25,8 @@ namespace MM::OpenGL::RenderTasks {
 			Tilemap(MM::Engine& engine);
 			~Tilemap(void);
 
+			const char* name(void) override { return "Tilemap"; }
+
 			void render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) override;
 
 		public:

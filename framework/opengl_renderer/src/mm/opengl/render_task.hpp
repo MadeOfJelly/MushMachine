@@ -22,6 +22,8 @@ namespace MM::OpenGL {
 		public:
 			virtual ~RenderTask(void) = default;
 
+			virtual const char* name(void) = 0;//{ return "NoName"; };
+
 			virtual void render(Services::OpenGLRenderer& rs, Engine& engine) = 0;
 
 			// a place to reload/compile shaders etc.
