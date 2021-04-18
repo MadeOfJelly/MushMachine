@@ -1,5 +1,7 @@
 #include "./texture_loader.hpp"
 
+#include <SDL.h>
+
 #include <stb/stb_image.h>
 
 #ifdef MM_OPENGL_3_GLES
@@ -128,8 +130,28 @@ std::shared_ptr<Texture> TextureLoaderConstBuffer::load(const uint8_t* data, siz
 	return std::shared_ptr<Texture>(new Texture(handle, width, height, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE));
 }
 
-std::shared_ptr<Texture> TextureLoaderSDLSurface::load(SDL_Surface* surface) const {
+std::shared_ptr<Texture> TextureLoaderSDLSurface::load(SDL_Surface* orig_surface) const {
 	uint32_t handle;
+
+	// setup temp
+	SDL_LockSurface(orig_surface);
+
+	SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, orig_surface->w, orig_surface->h, orig_surface->pitch, orig_surface->format->format);
+	SDL_LockSurface(surface);
+
+	// flip
+	for (int line = orig_surface->h - 1; line >= 0; line--) {
+		memcpy(
+			static_cast<uint8_t*>(surface->pixels) + (line * surface->pitch),
+			static_cast<uint8_t*>(orig_surface->pixels) + (((orig_surface->h - 1) - line) * surface->pitch),
+			//orig_surface->w * orig_surface->format->BytesPerPixel
+			orig_surface->pitch
+		);
+	}
+
+	SDL_UnlockSurface(orig_surface); // does not get used beyond this point
+
+	// now load
 
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
@@ -144,12 +166,12 @@ std::shared_ptr<Texture> TextureLoaderSDLSurface::load(SDL_Surface* surface) con
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	SDL_LockSurface(surface);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	SDL_UnlockSurface(surface);
+	SDL_FreeSurface(surface);
 
 	return std::shared_ptr<Texture>(new Texture(handle, surface->w, surface->h, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE));
 }

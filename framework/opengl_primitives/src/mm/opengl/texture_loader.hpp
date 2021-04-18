@@ -2,11 +2,10 @@
 
 #include "./texture.hpp"
 
-#include <SDL2/SDL.h>
-
 #include <utility>
 
 // fwd
+typedef struct SDL_Surface SDL_Surface;
 namespace MM {
 	class Engine;
 }
