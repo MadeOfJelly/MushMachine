@@ -127,34 +127,34 @@ PHYSFS_Io* FSConstArchiver::createIO(const char* filename, PHYSFS_uint64 pos) {
 		size_t data_size = 0;
 	};
 
-	auto io = new PHYSFS_Io;
+	auto new_io = new PHYSFS_Io;
 
 
-	io->version = 0;
-	io->write = nullptr;
-	io->flush = nullptr;
+	new_io->version = 0;
+	new_io->write = nullptr;
+	new_io->flush = nullptr;
 
-	io->opaque = new io_internal{
+	new_io->opaque = new io_internal{
 		filename,
 		pos,
 		_storage[filename].first,
 		_storage[filename].second
 	};
-	io->destroy = [](PHYSFS_Io* io) {
+	new_io->destroy = [](PHYSFS_Io* io) {
 		delete (io_internal*)io->opaque;
 		delete io;
 	};
 
-	io->tell = [](PHYSFS_Io* io) -> PHYSFS_sint64 { return ((io_internal*)io->opaque)->pos; };
-	io->seek = [](PHYSFS_Io* io, PHYSFS_uint64 offset) -> int {
+	new_io->tell = [](PHYSFS_Io* io) -> PHYSFS_sint64 { return ((io_internal*)io->opaque)->pos; };
+	new_io->seek = [](PHYSFS_Io* io, PHYSFS_uint64 offset) -> int {
 		auto* inter = (io_internal*)io->opaque;
 		if (offset > inter->data_size)
 			return 0; // error, past end
 		inter->pos = offset;
 		return 1;
 	};
-	io->length = [](PHYSFS_Io* io) -> PHYSFS_sint64 { return ((io_internal*)io->opaque)->data_size; };
-	io->duplicate = [](PHYSFS_Io* io) -> PHYSFS_Io* {
+	new_io->length = [](PHYSFS_Io* io) -> PHYSFS_sint64 { return ((io_internal*)io->opaque)->data_size; };
+	new_io->duplicate = [](PHYSFS_Io* io) -> PHYSFS_Io* {
 		if (!io)
 			return nullptr;
 
@@ -162,7 +162,7 @@ PHYSFS_Io* FSConstArchiver::createIO(const char* filename, PHYSFS_uint64 pos) {
 		auto* dup = createIO(inter->filename.c_str(), inter->pos);
 		return dup;
 	};
-	io->read = [](PHYSFS_Io* io, void* buf, PHYSFS_uint64 len) -> PHYSFS_sint64 {
+	new_io->read = [](PHYSFS_Io* io, void* buf, PHYSFS_uint64 len) -> PHYSFS_sint64 {
 		if (!io)
 			return -1;
 
@@ -182,7 +182,7 @@ PHYSFS_Io* FSConstArchiver::createIO(const char* filename, PHYSFS_uint64 pos) {
 		return bytes_to_read;
 	};
 
-	return io;
+	return new_io;
 }
 
 bool FSConstArchiver::pathIsDir(const char* path) {
