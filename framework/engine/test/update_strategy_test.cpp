@@ -1,4 +1,3 @@
-#include "mm/services/service.hpp"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -36,7 +35,8 @@ class MockUpdateStrategy : public MM::UpdateStrategies::UpdateStrategy {
 
 		MOCK_METHOD(bool, depend, (const MM::UpdateStrategies::update_key_t A, const MM::UpdateStrategies::update_key_t B), (override));
 
-		MOCK_METHOD(void, addDefered, (std::function<void(MM::Engine&)> function), (override));
+		MOCK_METHOD(void, addDeferred, (std::function<void(MM::Engine&)> function), (override));
+		MOCK_METHOD(void, addAsync, (std::function<void(MM::Engine&)> function), (override));
 };
 
 class MockService : public MM::Services::Service {

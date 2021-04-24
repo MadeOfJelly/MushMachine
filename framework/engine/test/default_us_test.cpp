@@ -29,6 +29,33 @@ TEST(default_update_strategy, simple_update) {
 	engine.update();
 }
 
+// note: we test pure single-threaded behaviour, so nothing needs to be thread save
+TEST(default_update_strategy, async) {
+	int counter = 1;
+	MM::Engine engine(std::make_unique<MM::UpdateStrategies::SingleThreadedDefault>());
+	ASSERT_EQ(counter, 1);
+
+	engine.getUpdateStrategy().addAsync([&counter](MM::Engine&) { counter++; });
+
+	engine.update();
+
+	ASSERT_EQ(counter, 2);
+
+	for (size_t i = 0; i < 100; i++) {
+		engine.getUpdateStrategy().addAsync([&counter](MM::Engine&) { counter++; });
+	}
+
+	// make sure we dont have an infinity loop in case something is wrong
+	size_t max_loop_safety_count = 0;
+
+	do {
+		engine.update();
+		max_loop_safety_count++;
+	} while (counter != 102 && max_loop_safety_count < 10000);
+
+	ASSERT_EQ(counter, 102);
+}
+
 TEST(default_update_strategy, service) {
 	class TmpMockService : public MockService {
 		public:
@@ -55,7 +82,6 @@ TEST(default_update_strategy, service) {
 		engine.disableService<TmpMockService>();
 	}
 }
-
 
 TEST(default_update_strategy, run_1) {
 	class TmpMockService : public MockService {
@@ -96,7 +122,7 @@ TEST(default_update_strategy, run_1) {
 		ASSERT_TRUE(engine.enableService<TmpMockService>());
 		ASSERT_EQ(counter, 1);
 
-		engine.getUpdateStrategy().addDefered([](MM::Engine& e) { e.stop(); });
+		engine.getUpdateStrategy().addDeferred([](MM::Engine& e) { e.stop(); });
 
 		engine.run();
 

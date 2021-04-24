@@ -69,10 +69,13 @@ class UpdateStrategy {
 		// WIP:
 
 		// dont use, if you are not using it to modify the engine.
-		// you usualy dont need to use this, if you think you need to use this, you probably dont.
-		//virtual void addFixedDefered(std::function<void(Engine&)> function) = 0;
-		virtual void addDefered(std::function<void(Engine&)> function) = 0; // called after everything
+		// you usually dont need to use this, if you think you need to use this, you probably dont.
+		virtual void addDeferred(std::function<void(Engine&)> function) = 0; // called after everything
 
+		// adds a task, which does not need to be completed on the end of the tick.
+		// warning: in a single-threaded environment, they will still be done on the main thread, so blocking is not a option
+		// note: the US might decide to limit the amount of executed asyncs per tick (eg. when single-threaded)
+		virtual void addAsync(std::function<void(Engine&)> function) = 0;
 		//virtual std::future addAsync(std::function<void(Engine&)> function) = 0;
 };
 

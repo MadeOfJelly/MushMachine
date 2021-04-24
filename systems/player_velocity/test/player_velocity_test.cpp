@@ -37,8 +37,9 @@ TEST(player_velocity, basic_run) {
 	//v.velocity = { 1.f, 1.f };
 	//v.rotation = 0.f;
 
-	engine.getUpdateStrategy().addDefered([](auto& e) { e.stop(); });
-	engine.run();
+	//engine.getUpdateStrategy().addDeferred([](auto& e) { e.stop(); });
+	//engine.run();
+	engine.update();
 
 	//ASSERT_EQ(t.position.x, 1.f * delta);
 	// TODO: TEST

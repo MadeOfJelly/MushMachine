@@ -61,7 +61,7 @@ TEST(simple_scene, change_scene) {
 		ASSERT_TRUE(sss->getScene().valid(e));
 
 		//engine.fixedUpdate();
-		engine.getUpdateStrategy().addDefered([](MM::Engine& eng) {eng.stop();});
+		engine.getUpdateStrategy().addDeferred([](MM::Engine& eng) {eng.stop();});
 		engine.run();
 
 		ASSERT_FALSE(sss->getScene().valid(e));

@@ -104,7 +104,7 @@ TEST(sdl_service, event_handle_reg) {
 	};
 
 	// register forge
-	engine.getUpdateStrategy().addDefered(event_forge_f);
+	engine.getUpdateStrategy().addDeferred(event_forge_f);
 
 	// register sdl event handler to just stop the engine
 	auto* stop_event_hook_h = sdl_ss_ptr->addEventHandler([&engine](const SDL_Event&){ engine.stop(); return true; });

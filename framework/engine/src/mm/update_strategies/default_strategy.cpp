@@ -1,6 +1,7 @@
 #include "./default_strategy.hpp"
 
 #include <cassert>
+#include <functional>
 
 namespace MM::UpdateStrategies {
 
@@ -206,17 +207,27 @@ void SingleThreadedDefault::doUpdate(MM::Engine& engine) {
 	// post
 	runType(engine, update_phase_t::POST);
 
-	if (!_defered_queue.empty()) {
-		for (auto&& fn : _defered_queue) {
+	// simulate async
+	for (size_t i = 0; !_async_queue.empty() && i < _max_async_per_tick; i++) {
+		_async_queue.back()(engine);
+		_async_queue.pop_back();
+	}
+
+	if (!_deferred_queue.empty()) {
+		for (auto&& fn : _deferred_queue) {
 			fn(engine);
 		}
 
-		_defered_queue.clear();
+		_deferred_queue.clear();
 	}
 }
 
-void SingleThreadedDefault::addDefered(std::function<void(Engine&)> function) {
-	_defered_queue.emplace_back(std::move(function));
+void SingleThreadedDefault::addDeferred(std::function<void(Engine&)> function) {
+	_deferred_queue.emplace_back(std::move(function));
+}
+
+void SingleThreadedDefault::addAsync(std::function<void(Engine&)> function) {
+	_async_queue.emplace_back(std::move(function));
 }
 
 #undef __L_ASSERT

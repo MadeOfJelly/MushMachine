@@ -44,7 +44,9 @@ class SingleThreadedDefault : public MM::UpdateStrategies::UpdateStrategy {
 		std::set<update_key_t> _main_active;
 		std::set<update_key_t> _post_active;
 
-		std::vector<std::function<void(Engine&)>> _defered_queue;
+		std::vector<std::function<void(Engine&)>> _deferred_queue;
+		std::vector<std::function<void(Engine&)>> _async_queue;
+		const size_t _max_async_per_tick = 5; // prevent blocking, this should be finetuned
 
 	private:
 		Graph& getGraph(update_phase_t phase);
@@ -72,7 +74,9 @@ class SingleThreadedDefault : public MM::UpdateStrategies::UpdateStrategy {
 
 		bool depend(const update_key_t A, const update_key_t B) override;
 
-		void addDefered(std::function<void(Engine&)> function) override;
+		void addDeferred(std::function<void(Engine&)> function) override;
+
+		void addAsync(std::function<void(Engine&)> function) override;
 };
 
 } // MM::UpdateStrategies

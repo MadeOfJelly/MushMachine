@@ -39,7 +39,7 @@ std::vector<UpdateStrategies::UpdateCreationInfo> ScreenDirector::registerUpdate
 
 void ScreenDirector::update(MM::Engine& engine) {
 	if (curr_screen_id != queued_screen_id) {
-		engine.getUpdateStrategy().addDefered([this](MM::Engine& e) {
+		engine.getUpdateStrategy().addDeferred([this](MM::Engine& e) {
 			changeScreenTo(e, queued_screen_id);
 		});
 	}
