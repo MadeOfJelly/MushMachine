@@ -1,5 +1,4 @@
-#include "mm/imgui/widgets/scalar_range.hpp"
-#include "mm/scalar_range2.hpp"
+#include "mm/services/service.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -17,6 +16,7 @@
 #include <imgui/imgui.h>
 
 #include <mm/imgui/widgets/knob.hpp>
+#include <mm/imgui/widgets/scalar_range.hpp>
 
 const char* argv0;
 
@@ -44,14 +44,11 @@ TEST(imgui_widgets, basic) {
 	class TestWindow : public MM::Services::Service {
 		public:
 			const char* name(void) override { return "TestWindow"; }
-			bool enable(MM::Engine&) override { return true; }
-			void disable(MM::Engine&) override {}
 
-			std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
-				return {{
-					"testwindow"_hs,
-					"testwindow",
-					[](MM::Engine&) {
+			bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) override {
+				task_array.push_back(
+					MM::UpdateStrategies::TaskInfo{"testwindow"}
+					.fn([](MM::Engine&) {
 						if (ImGui::Begin("test window")) {
 
 							static float knob_test = 0.f;
@@ -63,9 +60,12 @@ TEST(imgui_widgets, basic) {
 							MM::ImGuiWidgets::DragScalarRange2("range", range);
 						}
 						ImGui::End();
-					}
-				}};
+					})
+				);
+				return true;
 			}
+
+			void disable(MM::Engine&) override {}
 	};
 
 	engine.addService<TestWindow>();

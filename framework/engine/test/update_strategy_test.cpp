@@ -16,37 +16,25 @@ class MockUpdateStrategy : public MM::UpdateStrategies::UpdateStrategy {
 	public:
 		const char* name(void) override { return "MockUpdateStrategy"; }
 
-		MOCK_METHOD(
-			bool,
-			registerService,
-			(const entt::id_type s_id, std::vector<MM::UpdateStrategies::UpdateCreationInfo>&& info),
-			(override)
-		);
-
 		// protected:
 		MOCK_METHOD(void, doUpdate, (MM::Engine& engine), (override));
 
-		MOCK_METHOD(bool, enableService, (const entt::id_type s_id), (override));
+		MOCK_METHOD(bool, enableService, (const entt::id_type s_id, std::vector<MM::UpdateStrategies::TaskInfo>&& task_array), (override));
 		MOCK_METHOD(bool, disableService, (const entt::id_type s_id), (override));
 
 		// public:
-		MOCK_METHOD(bool, enable, (const MM::UpdateStrategies::update_key_t key), (override));
-		MOCK_METHOD(bool, disable, (const MM::UpdateStrategies::update_key_t key), (override));
-
-		MOCK_METHOD(bool, depend, (const MM::UpdateStrategies::update_key_t A, const MM::UpdateStrategies::update_key_t B), (override));
-
 		MOCK_METHOD(void, addDeferred, (std::function<void(MM::Engine&)> function), (override));
 		MOCK_METHOD(void, addAsync, (std::function<void(MM::Engine&)> function), (override));
+
+		MOCK_METHOD(void, forEachTask, (std::function<bool(MM::UpdateStrategies::TaskInfo&)> function), (override));
 };
 
 class MockService : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "MockService"; }
 
-		MOCK_METHOD(bool, enable, (MM::Engine& engine), (override));
+		MOCK_METHOD(bool, enable, (MM::Engine& engine, std::vector<MM::UpdateStrategies::TaskInfo>& task_array), (override));
 		MOCK_METHOD(void, disable, (MM::Engine& engine), (override));
-
-		MOCK_METHOD(std::vector<MM::UpdateStrategies::UpdateCreationInfo>, registerUpdates, (), (override));
 };
 
 TEST(engine_mock, update_strategy_run) {
@@ -63,9 +51,7 @@ TEST(engine_mock, update_strategy_run) {
 TEST(engine_mock, service_update_strategy) {
 	auto mock = std::make_unique<MockUpdateStrategy>();
 
-	EXPECT_CALL(*mock, registerService(_, _))
-		.Times(1);
-	EXPECT_CALL(*mock, enableService(_))
+	EXPECT_CALL(*mock, enableService(_, _))
 		.Times(1);
 	EXPECT_CALL(*mock, disableService(_))
 		.Times(1);
@@ -73,12 +59,9 @@ TEST(engine_mock, service_update_strategy) {
 	class TmpMockService : public MockService {
 		public:
 			TmpMockService(void) {
-				EXPECT_CALL(*this, registerUpdates())
+				EXPECT_CALL(*this, enable(_, _))
 					.Times(1);
-
-				EXPECT_CALL(*this, enable(_))
-					.Times(1);
-				ON_CALL(*this, enable(_))
+				ON_CALL(*this, enable(_, _))
 					.WillByDefault(Return(true));
 
 				EXPECT_CALL(*this, disable(_))
@@ -99,9 +82,7 @@ TEST(engine_mock, service_update_strategy) {
 TEST(engine_mock, service_update_strategy_run_1) {
 	auto mock = std::make_unique<MockUpdateStrategy>();
 
-	EXPECT_CALL(*mock, registerService(_, _))
-		.Times(1);
-	EXPECT_CALL(*mock, enableService(_))
+	EXPECT_CALL(*mock, enableService(_, _))
 		.Times(1);
 	EXPECT_CALL(*mock, disableService(_))
 		.Times(1);
@@ -109,23 +90,20 @@ TEST(engine_mock, service_update_strategy_run_1) {
 	class TmpMockService : public MockService {
 		public:
 			explicit TmpMockService(void) {
-				EXPECT_CALL(*this, registerUpdates())
+				EXPECT_CALL(*this, enable)
 					.Times(1);
-				ON_CALL(*this, registerUpdates())
-					.WillByDefault([]() -> std::vector<MM::UpdateStrategies::UpdateCreationInfo> {
-						return {
-							{
-								"TmpMockService"_hs,
-								"TmpMockService",
-								[](MM::Engine&) {}
-							}
-						};
-					});
+				ON_CALL(*this, enable)
+					.WillByDefault([](MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) -> bool {
+						using MM::UpdateStrategies::TaskInfo;
 
-				EXPECT_CALL(*this, enable(_))
-					.Times(1);
-				ON_CALL(*this, enable(_))
-					.WillByDefault(Return(true));
+						task_array.push_back(
+							TaskInfo{"TmpMockService"}
+								//.precede("PreviousTask")
+								.fn([](MM::Engine& engine) { (void)engine; })
+						);
+
+						return true;
+					});
 
 				EXPECT_CALL(*this, disable(_))
 					.Times(1);

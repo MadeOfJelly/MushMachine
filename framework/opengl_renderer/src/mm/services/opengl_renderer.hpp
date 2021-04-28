@@ -31,13 +31,10 @@ namespace MM::Services {
 			SDLService::EventHandlerHandle _sdl_event_handle = nullptr;
 
 		public:
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "OpenGLRendererService"; }
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
-
 
 		private:
 			void render(Engine& engine);

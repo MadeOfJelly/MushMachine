@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SDL.h>
-
+#include "mm/services/service.hpp"
 #include <glm/vec2.hpp>
 
 #include <mm/services/sdl_service.hpp>
@@ -108,13 +107,10 @@ namespace MM::Services {
 			SDLService::EventHandlerHandle _event_handle = nullptr;
 
 		public:
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "InputService"; }
-
-			// you will likely want to make the scene depend on this
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		public:
 			// returns true if event was relevant

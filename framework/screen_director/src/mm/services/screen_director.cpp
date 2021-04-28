@@ -1,4 +1,6 @@
 #include "./screen_director.hpp"
+#include "mm/services/service.hpp"
+#include "mm/update_strategies/update_strategy.hpp"
 
 #include <entt/core/hashed_string.hpp>
 
@@ -8,7 +10,14 @@
 
 namespace MM::Services {
 
-bool ScreenDirector::enable(MM::Engine& engine) {
+bool ScreenDirector::enable(MM::Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"ScreenDirector::update"}
+			.fn([this](Engine& e) { update(e); })
+			.phase(UpdateStrategies::update_phase_t::POST)
+	);
+
 	// start initial screen
 	if (!queued_screen_id.empty()) {
 		auto next_screen_id = queued_screen_id;
@@ -23,18 +32,6 @@ bool ScreenDirector::enable(MM::Engine& engine) {
 }
 
 void ScreenDirector::disable(MM::Engine&) {
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> ScreenDirector::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"ScreenDirector::update"_hs,
-			"ScreenDirector::update",
-			[this](Engine& engine) { update(engine); },
-			UpdateStrategies::update_phase_t::POST
-		}
-	};
 }
 
 void ScreenDirector::update(MM::Engine& engine) {

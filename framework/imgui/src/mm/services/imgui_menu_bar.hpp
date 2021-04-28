@@ -12,10 +12,8 @@ namespace MM::Services {
 		public:
 			const char* name(void) override { return "ImGuiMenuBar"; }
 
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		public:
 			bool show_menu_bar = true;

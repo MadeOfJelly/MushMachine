@@ -1,4 +1,6 @@
+#include "mm/services/service.hpp"
 #include <gtest/gtest.h>
+
 #include <mm/services/input_service.hpp>
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
@@ -11,7 +13,6 @@
 
 #include <imgui/imgui.h>
 
-
 class InputVisualizer : public MM::Services::Service {
 	private:
 		MM::Input::PlayerID _player_id;
@@ -20,7 +21,7 @@ class InputVisualizer : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "InputVisualizer"; }
 
-		bool enable(MM::Engine& engine) override {
+		bool enable(MM::Engine& engine, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) override {
 			_player_id = UINT16_MAX;
 
 			auto* sdl_ss = engine.tryService<MM::Services::SDLService>();
@@ -40,26 +41,17 @@ class InputVisualizer : public MM::Services::Service {
 				}
 			}
 
+			task_array.push_back(
+				MM::UpdateStrategies::TaskInfo{"InputVisualizer::render"}
+				.fn([this](MM::Engine& e){ renderImGui(e); })
+				.succeed("InputService::update")
+			);
+
 			return true;
 		}
 
 		void disable(MM::Engine&) override {
 		}
-
-		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
-			using namespace entt::literals;
-			return {
-				{
-					"InputVisualizer::render"_hs,
-					"InputVisualizer::render",
-					[this](MM::Engine& e){ this->renderImGui(e); },
-					MM::UpdateStrategies::update_phase_t::MAIN,
-					true,
-					{ "InputService::update"_hs }
-				}
-			};
-		}
-
 
 	private:
 		void renderImGui(MM::Engine& engine) {

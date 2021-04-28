@@ -1,12 +1,10 @@
 #include "./engine_tools.hpp"
-#include "mm/update_strategies/update_strategy.hpp"
 
 #include <entt/config/version.h>
 
 #include <mm/engine.hpp>
-#include <entt/core/hashed_string.hpp>
 
-#include <mm/update_strategies/default_strategy.hpp>
+#include <mm/update_strategies/update_strategy.hpp>
 
 #include <list>
 
@@ -17,10 +15,13 @@ namespace MM::Services {
 using UpdateStrategies::update_key_t;
 
 template<typename NColFn, typename LColFn, typename TTFn>
-static void renderUpdateStratGraph(const std::unordered_map<update_key_t, std::set<update_key_t>>& g, std::set<update_key_t>& a, NColFn&& node_color_fn, LColFn&& line_color_fn, TTFn&& tooltip_fn) {
-	//auto& g = us_default->getGraph(UpdateStrategies::update_phase_t::MAIN);
-	//auto& a = us_default->getActiveSet(UpdateStrategies::update_phase_t::MAIN);
-
+static void renderUpdateStratGraph(
+	const std::unordered_map<update_key_t, std::set<update_key_t>>& g,
+	std::set<update_key_t>& a,
+	NColFn&& node_color_fn,
+	LColFn&& line_color_fn,
+	TTFn&& tooltip_fn
+) {
 	using UpdateStrategies::update_key_t;
 
 	std::set<update_key_t> work_queue{a.begin(), a.end()};
@@ -156,7 +157,7 @@ static void renderUpdateStratGraph(const std::unordered_map<update_key_t, std::s
 	}
 }
 
-bool ImGuiEngineTools::enable(Engine& engine) {
+bool ImGuiEngineTools::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
 	// use underscore hack to make it last
@@ -179,6 +180,13 @@ bool ImGuiEngineTools::enable(Engine& engine) {
 		ImGui::MenuItem("UpdateStrategy", NULL, &_show_update_stategy);
 	};
 
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"ImGuiEngineTools::render"}
+		.fn([this](Engine& e){ renderImGui(e); })
+		.succeed("ImGuiMenuBar::render")
+	);
+
 	return true;
 }
 
@@ -189,22 +197,6 @@ void ImGuiEngineTools::disable(Engine& engine) {
 	menu_bar.menu_tree["Engine"].erase("About");
 	menu_bar.menu_tree["Engine"].erase("Services");
 	menu_bar.menu_tree["Engine"].erase("UpdateStrategy");
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiEngineTools::registerUpdates(void) {
-using namespace entt::literals;
-	return {
-		{
-			"ImGuiEngineTools::render"_hs,
-			"ImGuiEngineTools::render",
-			[this](Engine& e){ renderImGui(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			{
-				"ImGuiMenuBar::render"_hs
-			}
-		}
-	};
 }
 
 void ImGuiEngineTools::renderImGui(Engine& engine) {
@@ -250,7 +242,7 @@ void ImGuiEngineTools::renderServices(Engine& engine) {
 				ImGui::TableNextRow();
 
 				ImGui::TableNextColumn();
-				ImGui::Text("%d", it.first);
+				ImGui::Text("%u", it.first);
 
 				ImGui::TableNextColumn();
 				ImGui::Text("%s", it.second->second->name());
@@ -284,10 +276,99 @@ void ImGuiEngineTools::renderUpdateStrategy(Engine& engine) {
 		auto us_name = us.name();
 
 		ImGui::Text("UpdateStrategy: '%s'", us_name);
-		ImGui::Separator();
 
-		auto* us_default = dynamic_cast<MM::UpdateStrategies::SingleThreadedDefault*>(&us);
-		if (us_default) {
+		// TODO: tabs? dropdown(combo)?
+		static const char* const phase_str[4] = {
+			"All",
+			"Pre",
+			"Main",
+			"Post",
+		};
+		static int curr_phase = 2;
+
+		ImGui::Combo("Phase", &curr_phase, phase_str, 4);
+
+		if (ImGui::BeginTabBar("tabs")) {
+			if (curr_phase != 0 && ImGui::BeginTabItem("Graph")) {
+				// BRUHHH this is needs to be cached
+				std::unordered_map<update_key_t, std::set<update_key_t>> graph;
+				std::unordered_map<update_key_t, UpdateStrategies::TaskInfo*> task_lut;
+				std::set<update_key_t> nodes;
+
+				// build lut
+				us.forEachTask([&graph, &nodes, &task_lut](UpdateStrategies::TaskInfo& task) -> bool {
+					if (task._phase != UpdateStrategies::update_phase_t(curr_phase-1)) {
+						return true; // skip, not our phase
+					}
+
+					graph[task._key] = task._dependencies;
+					task_lut[task._key] = &task;
+					nodes.emplace(task._key);
+
+					return true;
+				});
+
+				// also do dependents // ugh, 2*N
+				us.forEachTask([&graph](UpdateStrategies::TaskInfo& task) -> bool {
+					if (task._phase != UpdateStrategies::update_phase_t(curr_phase-1)) {
+						return true; // skip, not our phase
+					}
+
+					for (const auto it : task._dependents) {
+						graph[it].emplace(task._key);
+					}
+
+					return true;
+				});
+
+				// TODO: make sense of the colloring
+				renderUpdateStratGraph(graph, nodes,
+					[](const update_key_t key) -> ImVec4 {
+						return {0.9f, 1.f, 0.9f, 1.f};
+					},
+					[](const update_key_t from, const update_key_t to) -> ImVec4 {
+						return {0.9f, 1.f, 0.9f, 1.f};
+					},
+					[&task_lut](update_key_t key) {
+						ImGui::SetTooltip("%s\n[%u]", task_lut.at(key)->_name.c_str(), key);
+					}
+				);
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("List")) {
+				if (ImGui::BeginTable("table", curr_phase == 0 ? 3 : 2)) {
+					us.forEachTask([](UpdateStrategies::TaskInfo& task) -> bool {
+						if (
+							curr_phase == 0 ||
+							task._phase == UpdateStrategies::update_phase_t(curr_phase-1)
+						) {
+
+							ImGui::TableNextRow();
+
+							ImGui::TableNextColumn();
+							ImGui::Text("%u", task._key);
+
+							if (curr_phase == 0) {
+								ImGui::TableNextColumn();
+								ImGui::Text("%s", phase_str[task._phase + 1]);
+							}
+
+							ImGui::TableNextColumn();
+							ImGui::Text("%s", task._name.c_str());
+						}
+
+						return true;
+					});
+					ImGui::EndTable();
+				}
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+#if 0
 			auto& g = us_default->getGraph(UpdateStrategies::update_phase_t::MAIN);
 			auto& a = us_default->getActiveSet(UpdateStrategies::update_phase_t::MAIN);
 			std::set<update_key_t> nodes;
@@ -305,7 +386,7 @@ void ImGuiEngineTools::renderUpdateStrategy(Engine& engine) {
 							ImGui::Text("%u", it);
 
 							ImGui::TableNextColumn();
-							ImGui::Text("%s", us_default->_tasks[it].name.c_str());
+							ImGui::Text("%s", us_default->_tasks.at(it)._name.c_str());
 						}
 						ImGui::EndTable();
 					}
@@ -329,7 +410,7 @@ void ImGuiEngineTools::renderUpdateStrategy(Engine& engine) {
 						}
 					},
 					[us_default](update_key_t key) {
-						ImGui::SetTooltip("'%s'\n[%u]", us_default->_tasks[key].name.c_str(), key);
+						ImGui::SetTooltip("'%s'\n[%u]", us_default->_tasks.at(key)._name.c_str(), key);
 					});
 					ImGui::EndTabItem();
 				}
@@ -337,6 +418,7 @@ void ImGuiEngineTools::renderUpdateStrategy(Engine& engine) {
 				ImGui::EndTabBar();
 			}
 		}
+#endif
 	}
 	ImGui::End();
 }

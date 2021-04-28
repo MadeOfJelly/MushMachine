@@ -36,7 +36,25 @@ static std::ostream& operator<<(std::ostream& out, const std::vector<entt::organ
 
 namespace MM::Services {
 
-bool OrganizerSceneService::enable(Engine& engine) {
+bool OrganizerSceneService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+	// add tasks
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_update"}
+		.fn([this](Engine& e) { sceneUpdate(e); })
+	);
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_tick"}
+		.fn([this](Engine& e) { sceneFixedUpdate(e); })
+
+		// bc it renders imgui, but this is not "hard"
+		.succeed("OrganizerSceneService::scene_update")
+	);
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_changer"}
+		.fn([this](Engine& e) { changeSceneFixedUpdate(e); })
+		.succeed("OrganizerSceneService::scene_tick")
+	);
+
 	// default scene
 	if (!_scene) {
 		_scene = std::make_unique<Scene>();
@@ -50,38 +68,6 @@ bool OrganizerSceneService::enable(Engine& engine) {
 }
 
 void OrganizerSceneService::disable(Engine&) {
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> OrganizerSceneService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"OrganizerSceneService::scene_update"_hs,
-			"OrganizerSceneService::scene_update",
-			[this](Engine& e) { sceneUpdate(e); },
-			// depends on imgui
-		},
-		{
-			"OrganizerSceneService::scene_tick"_hs,
-			"OrganizerSceneService::scene_tick",
-			[this](Engine& e) { sceneFixedUpdate(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			{
-				"OrganizerSceneService::scene_update"_hs, // bc it renders imgui, but this is not "hard"
-			}
-		},
-		{
-			"OrganizerSceneService::scene_changer"_hs,
-			"OrganizerSceneService::scene_changer",
-			[this](Engine& e) { changeSceneFixedUpdate(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			{
-				"OrganizerSceneService::scene_tick"_hs,
-			}
-		},
-	};
 }
 
 void OrganizerSceneService::sceneFixedUpdate(Engine&) {

@@ -1,5 +1,5 @@
 #include "./sound_tools.hpp"
-#include "mm/imgui/sound_info.hpp"
+#include <mm/imgui/sound_info.hpp>
 
 #include <mm/engine.hpp>
 #include <entt/core/hashed_string.hpp>
@@ -13,7 +13,7 @@
 
 namespace MM::Services {
 
-	bool ImGuiSoundTools::enable(Engine& engine) {
+	bool ImGuiSoundTools::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 		auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
 		//menu_bar.menu_tree["Engine"]["Stop Engine"] = [](Engine& e) {
@@ -35,6 +35,13 @@ namespace MM::Services {
 			ImGui::MenuItem("Info", NULL, &_show_info);
 		};
 
+		// add task
+		task_array.push_back(
+			UpdateStrategies::TaskInfo{"ImGuiSoundTools::render"}
+			.fn([this](Engine& e){ renderImGui(e); })
+			.succeed("ImGuiMenuBar::render")
+		);
+
 		return true;
 	}
 
@@ -43,22 +50,6 @@ namespace MM::Services {
 
 		menu_bar.menu_tree["Sound"].erase("GlobalVolume");
 		menu_bar.menu_tree["Sound"].erase("Info");
-	}
-
-	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiSoundTools::registerUpdates(void) {
-	using namespace entt::literals;
-		return {
-			{
-				"ImGuiSoundTools::render"_hs,
-				"ImGuiSoundTools::render",
-				[this](Engine& e){ renderImGui(e); },
-				UpdateStrategies::update_phase_t::MAIN,
-				true,
-				{
-					"ImGuiMenuBar::render"_hs
-				}
-			}
-		};
 	}
 
 	void ImGuiSoundTools::renderImGui(Engine& engine) {

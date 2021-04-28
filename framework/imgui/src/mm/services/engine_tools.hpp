@@ -8,10 +8,8 @@ namespace MM::Services {
 		public:
 			const char* name(void) override { return "ImGuiEngineTools"; }
 
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		private:
 			bool _show_about = false;

@@ -77,7 +77,7 @@ InputService::InputService(void) {
 InputService::~InputService(void) {
 }
 
-bool InputService::enable(Engine& engine) {
+bool InputService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	auto* sdl_ss = engine.tryService<SDLService>();
 	if (!sdl_ss) {
 		LOG_ERROR("InputService requires SDLService in engine!");
@@ -89,6 +89,24 @@ bool InputService::enable(Engine& engine) {
 		LOG_ERROR("couldnt register event handler!");
 		return false;
 	}
+
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"InputService::update"}
+		.fn([this](MM::Engine&) {
+				for (size_t i = 0; i < 4; i++) {
+					if (!_player_active[i])
+						continue;
+
+					auto& p = _player[i];
+					if (p.is_controller) {
+					} else {
+						updateKPlayerDirs(p);
+					}
+				}
+			}
+		)
+	);
 
 	return true;
 }
@@ -103,28 +121,6 @@ void InputService::disable(Engine& engine) {
 
 		sdl_ss->removeEventHandler(_event_handle);
 	}
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> InputService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"InputService::update"_hs,
-			"InputService::update",
-			[this](MM::Engine&) {
-				for (size_t i = 0; i < 4; i++) {
-					if (!_player_active[i])
-						continue;
-
-					auto& p = _player[i];
-					if (p.is_controller) {
-					} else {
-						updateKPlayerDirs(p);
-					}
-				}
-			}
-		}
-	};
 }
 
 bool InputService::handleSDL_Event(const SDL_Event& e, MM::Engine& engine) {

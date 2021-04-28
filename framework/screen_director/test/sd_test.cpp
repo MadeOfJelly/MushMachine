@@ -7,7 +7,7 @@ class TestService1 : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "TestService1"; }
 
-		bool enable(MM::Engine&) override { return true; }
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>&) override { return true; }
 		void disable(MM::Engine&) override {}
 };
 
@@ -15,7 +15,7 @@ class TestService2 : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "TestService2"; }
 
-		bool enable(MM::Engine&) override { return true; }
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>&) override { return true; }
 		void disable(MM::Engine&) override {}
 };
 
@@ -23,7 +23,7 @@ class TestServiceInterface : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "TestServiceInterface"; }
 
-		bool enable(MM::Engine&) override { return true; }
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>&) override { return true; }
 		void disable(MM::Engine&) override {}
 
 	public:
@@ -34,7 +34,7 @@ class TestServiceInterfaceImpl1 : public TestServiceInterface {
 	public:
 		const char* name(void) override { return "TestServiceInterfaceImpl1"; }
 
-		bool enable(MM::Engine&) override { return true; }
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>&) override { return true; }
 		void disable(MM::Engine&) override {}
 
 	public:
@@ -47,7 +47,7 @@ class TestServiceInterfaceImpl2 : public TestServiceInterface {
 	public:
 		const char* name(void) override { return "TestServiceInterfaceImpl2"; }
 
-		bool enable(MM::Engine&) override { return true; }
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>&) override { return true; }
 		void disable(MM::Engine&) override {}
 
 	public:

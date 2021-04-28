@@ -1,4 +1,6 @@
 #include "./sdl_service.hpp"
+#include "mm/services/service.hpp"
+#include "mm/update_strategies/update_strategy.hpp"
 
 #include <entt/core/hashed_string.hpp>
 
@@ -70,19 +72,14 @@ SDLService::~SDLService(void) {
 	SDL_Quit();
 }
 
-std::vector<UpdateStrategies::UpdateCreationInfo> SDLService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"SDLService::events"_hs,
-			"SDLService::events",
-			[this](Engine& e) { this->processEvents(e); },
-			UpdateStrategies::update_phase_t::PRE
-		}
-	};
-}
+bool SDLService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"SDLService::events"}
+		.phase(UpdateStrategies::update_phase_t::PRE)
+		.fn([this](Engine& e) { this->processEvents(e); })
+	);
 
-bool SDLService::enable(Engine&) {
 	bool succ = true;
 	return succ;
 }

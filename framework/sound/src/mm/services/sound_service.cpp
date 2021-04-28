@@ -19,7 +19,7 @@ SoundService::SoundService(void) : engine() {
 SoundService::~SoundService(void) {
 }
 
-bool SoundService::enable(Engine&) {
+bool SoundService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&) {
 	unsigned int flags = SoLoud::Soloud::CLIP_ROUNDOFF;
 	auto r = engine.init(flags);
 	if (r != 0) {

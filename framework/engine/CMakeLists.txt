@@ -7,13 +7,12 @@ add_library(engine
 	src/mm/engine.cpp
 
 	src/mm/update_strategies/update_strategy.hpp
+	src/mm/update_strategies/dummy.hpp
 
 	src/mm/services/service.hpp
 
-	src/mm/update_strategies/dependency_check_decorater.hpp
-
-	src/mm/update_strategies/default_strategy.hpp
-	src/mm/update_strategies/default_strategy.cpp
+	src/mm/update_strategies/sequential_strategy.hpp
+	src/mm/update_strategies/sequential_strategy.cpp
 
 	src/mm/services/scene_service_interface.hpp
 	src/mm/services/scene_service_interface.cpp

@@ -6,7 +6,7 @@ namespace MM {
 
 	class Engine;
 	namespace UpdateStrategies {
-		struct UpdateCreationInfo;
+		struct TaskInfo;
 	}
 
 	namespace Services {
@@ -17,14 +17,12 @@ namespace MM {
 
 				virtual const char* name(void) = 0;
 
-				virtual bool enable(Engine& engine) = 0;
+				// tasks are to be filled in by the service impl
+				virtual bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) = 0;
 				virtual void disable(Engine& engine) = 0;
-
-				// optional, only if service actually needs to be part of the update loop
-				virtual std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) { return {}; }
 		};
 
 	} // Services
 
-} //MM
+} // MM
 

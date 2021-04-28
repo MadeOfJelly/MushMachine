@@ -1,3 +1,4 @@
+#include "mm/services/service.hpp"
 #include <functional>
 #include <gtest/gtest.h>
 
@@ -32,16 +33,16 @@ class TemplateUpdateMainService : public MM::Services::Service {
 		explicit TemplateUpdateMainService(std::function<void(MM::Engine&)> fn) : _fn(fn) {}
 
 		const char* name(void) override { return "TemplateUpdateMainService"; }
-		bool enable(MM::Engine&) override { return true; }
-		void disable(MM::Engine&) override {}
 
-		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
-			return {{
-				"TemplateUpdateMainService::fn"_hs,
-				"TemplateUpdateMainService::fn",
-				_fn
-			}};
+		bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) override {
+			task_array.push_back(
+				MM::UpdateStrategies::TaskInfo{"TemplateUpdateMainService::fn"}
+				.fn(_fn)
+			);
+			return true; 
 		}
+
+		void disable(MM::Engine&) override {}
 };
 
 TEST(imgui_text_edit, it) {

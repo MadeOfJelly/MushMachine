@@ -11,9 +11,11 @@ namespace MM {
 	using System = std::function<void(::MM::Scene&, float)>;
 
 	// opaque way to add a System to a Scene
+	[[deprecated("use organizer")]]
 	void AddSystemToScene(::MM::Scene& scene, ::MM::System fn);
 
 	// opaque way to iterate over the Systems
+	[[deprecated("use organizer")]]
 	void EachSystemInScene(::MM::Scene& scene, std::function<void(::MM::Scene&, ::MM::System&)> fn);
 
 } // MM
@@ -35,7 +37,7 @@ namespace MM::Services {
 
 			// adds a System to current Scene.
 			// default impl. will use getScene() !
-			inline virtual void addSystemToScene(::MM::System fn) {
+			virtual void addSystemToScene(::MM::System fn) {
 				::MM::AddSystemToScene(getScene(), std::move(fn));
 			}
 	};

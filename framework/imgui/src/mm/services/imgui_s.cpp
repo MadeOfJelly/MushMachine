@@ -1,4 +1,6 @@
 #include "./imgui_s.hpp"
+#include "mm/services/service.hpp"
+#include "mm/update_strategies/update_strategy.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_sdl.h>
@@ -25,7 +27,7 @@
 
 namespace MM::Services {
 
-bool ImGuiService::enable(Engine& engine) {
+bool ImGuiService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	IMGUI_CHECKVERSION();
 
 	ImGui::CreateContext();
@@ -69,6 +71,14 @@ bool ImGuiService::enable(Engine& engine) {
 		[this](const SDL_Event& e) { return handle_sdl_event(e); }
 	);
 
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"ImGuiService::new_frame"}
+		.phase(UpdateStrategies::update_phase_t::PRE)
+		.fn([this](Engine& e) { this->imgui_new_frame(e); })
+		.succeed("SDLService::events")
+	);
+
 	return true;
 }
 
@@ -83,20 +93,6 @@ void ImGuiService::disable(Engine& engine) {
 #endif
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"ImGuiService::new_frame"_hs,
-			"ImGuiService::new_frame",
-			[this](Engine& e) { this->imgui_new_frame(e); },
-			UpdateStrategies::update_phase_t::PRE,
-			true,
-			{"SDLService::events"_hs}
-		}
-	};
 }
 
 void ImGuiService::imgui_new_frame(Engine& engine) {

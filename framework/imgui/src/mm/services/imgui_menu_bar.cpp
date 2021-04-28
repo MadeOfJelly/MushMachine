@@ -1,4 +1,5 @@
 #include "./imgui_menu_bar.hpp"
+#include "mm/services/service.hpp"
 
 #include <mm/engine.hpp>
 #include <entt/core/hashed_string.hpp>
@@ -17,7 +18,7 @@
 
 namespace MM::Services {
 
-	bool ImGuiMenuBar::enable(Engine& engine) {
+	bool ImGuiMenuBar::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 		MM::Logger::initSectionLogger("ImGuiMenuBar");
 
 		auto* sdl_ss = engine.tryService<MM::Services::SDLService>();
@@ -32,6 +33,12 @@ namespace MM::Services {
 			LOG_WARN("no SDLService, skipping toggle hotkey");
 		}
 
+		// add task
+		task_array.push_back(
+			UpdateStrategies::TaskInfo{"ImGuiMenuBar::render"}
+			.fn([this](Engine& e){ renderImGui(e); })
+		);
+
 		return true;
 	}
 
@@ -41,17 +48,6 @@ namespace MM::Services {
 			sdl_ss->removeEventHandler(_event_handle);
 			_event_handle = nullptr;
 		}
-	}
-
-	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiMenuBar::registerUpdates(void) {
-	using namespace entt::literals;
-		return {
-			{
-				"ImGuiMenuBar::render"_hs,
-				"ImGuiMenuBar::render",
-				[this](Engine& e){ renderImGui(e); }
-			}
-		};
 	}
 
 	void ImGuiMenuBar::renderImGui(Engine& engine) {
@@ -80,7 +76,8 @@ namespace MM::Services {
 			}
 
 
-			ImGui::Text("| %.1fFPS", ImGui::GetIO().Framerate);
+			ImGui::Separator();
+			ImGui::Text("%.1fFPS", ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
 	}

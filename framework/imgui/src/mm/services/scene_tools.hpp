@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mm/services/service.hpp"
 #define MM_IEEE_ENTITY_WIDGET ::MM::ImGuiWidgets::Entity // evil
 #define MM_IEEE_ASSERT(x)
 #include <mm/imgui/widgets/entity.hpp>
@@ -11,12 +12,10 @@ namespace MM::Services {
 
 	class ImGuiSceneToolsService : public Service {
 		public:
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "ImGuiSceneToolsService"; }
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		private:
 			bool _show_scene_metrics = false;

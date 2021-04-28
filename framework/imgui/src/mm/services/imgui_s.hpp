@@ -14,12 +14,10 @@ namespace MM::Services {
 			// new frame needs to start AFTER the events have been processed (and obv bf rendt)
 
 		public:
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "ImGuiService"; }
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		private:
 			void imgui_new_frame(Engine& engine);

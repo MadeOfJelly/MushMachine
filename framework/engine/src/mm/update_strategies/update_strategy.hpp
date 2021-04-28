@@ -2,37 +2,89 @@
 
 #include "../engine_fwd.hpp"
 
+#include <entt/core/hashed_string.hpp>
+
 #include <mm/services/service.hpp>
+
 #include <functional>
 #include <string>
 #include <vector>
+#include <set>
+
+// fwd / hack
+namespace MM::Services {
+	class ImGuiEngineTools;
+}
 
 namespace MM::UpdateStrategies {
 
 using update_key_t = entt::id_type;
 
-enum class update_phase_t {
-	PRE, // for on-main-thread
+enum update_phase_t {
+	PRE = 0, // for on-main-thread
 	MAIN,
 	POST // for on-main-thread
 };
 
-struct UpdateCreationInfo {
-	update_key_t key; // key for dependencies
+struct TaskInfo {
+	update_key_t _key; // key for dependencies
+	std::string _name; // unhashed key
 
-	std::string name; // for debugging
+	update_phase_t _phase = update_phase_t::MAIN;
 
-	std::function<void(Engine&)> fn; // the actual payload
-
-	update_phase_t phase = update_phase_t::MAIN;
-
-	bool auto_enable = true; // whether this update is enabled with the service
+	// updates we make dependents
+	std::set<update_key_t> _dependents {};
 
 	// this update also depends on (in the same phase)
-	std::vector<update_key_t> dependencies {};
+	std::set<update_key_t> _dependencies {};
+
+	std::function<void(Engine&)> _fn; // the actual payload
+
+	public: // construction and assignment
+		TaskInfo(void) = delete;
+		TaskInfo(const TaskInfo&) = default;
+		TaskInfo(TaskInfo&&) = default;
+
+		// TODO: is this right??
+		TaskInfo& operator=(const TaskInfo&) = default;
+		TaskInfo& operator=(TaskInfo&&) = default;
+
+		explicit TaskInfo(const std::string_view key_in) {
+			key(key_in);
+		}
+
+	public: // builder interface
+		// TODO: does this need to be public?
+		TaskInfo& key(const std::string_view key) {
+			_name = key;
+			_key = entt::hashed_string::value(key.data(), key.size());
+			return *this;
+		}
+
+		// default phase is main
+		TaskInfo& phase(const update_phase_t phase) {
+			_phase = phase;
+			return *this;
+		}
+
+		template<typename Fn>
+		TaskInfo& fn(Fn&& fn) {
+			_fn = fn;
+			return *this;
+		}
+
+		TaskInfo& precede(const std::string_view key) {
+			_dependents.emplace(entt::hashed_string::value(key.data(), key.size()));
+			return *this;
+		}
+
+		TaskInfo& succeed(const std::string_view key) {
+			_dependencies.emplace(entt::hashed_string::value(key.data(), key.size()));
+			return *this;
+		}
 };
 
-// pure virtual interface for managing the update logic of the engine
+// pure virtual interface for managing the update(-task) logic of the engine
 class UpdateStrategy {
 	public:
 		virtual ~UpdateStrategy(void) {}
@@ -42,30 +94,17 @@ class UpdateStrategy {
 	protected: // the engine facing interface
 		friend ::MM::Engine;
 
-		// TODO: return something?
-		virtual bool registerService(const entt::id_type s_id, std::vector<UpdateCreationInfo>&& info_array) = 0;
-
 		// returns true on success
 		// failure conditions may include:
 		// - already en/dis-abled
-		// - is auto_enable
-		// - impossible dependencies
-		virtual bool enableService(const entt::id_type s_id) = 0;
+		// - impossible dependencies?
+		virtual bool enableService(const entt::id_type s_id, std::vector<TaskInfo>&& task_array) = 0;
 		virtual bool disableService(const entt::id_type s_id) = 0;
 
 		// runs one update
 		virtual void doUpdate(MM::Engine& engine) = 0;
 
 	public: // the user facing interface
-		// similar to *ableService, can only be used for non-auto_enable-updates
-		virtual bool enable(const update_key_t key) = 0;
-		virtual bool disable(const update_key_t key) = 0;
-
-		// add extra dependencies into the tree, the user has the most knowlage about
-		// the order the services should execute in.
-		// A -> B (make A depend on B)
-		virtual bool depend(const update_key_t A, const update_key_t B) = 0;
-
 		// WIP:
 
 		// dont use, if you are not using it to modify the engine.
@@ -77,6 +116,10 @@ class UpdateStrategy {
 		// note: the US might decide to limit the amount of executed asyncs per tick (eg. when single-threaded)
 		virtual void addAsync(std::function<void(Engine&)> function) = 0;
 		//virtual std::future addAsync(std::function<void(Engine&)> function) = 0;
+	protected: // engine tools inspector
+		friend ::MM::Services::ImGuiEngineTools;
+
+		virtual void forEachTask(std::function<bool(TaskInfo&)> fn) = 0;
 };
 
 } // MM::UpdateStrategies

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mm/services/service.hpp"
 #include <SDL.h>
 
 #include <mm/engine.hpp>
@@ -23,13 +24,10 @@ namespace MM::Services {
 
 
 		public:
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
 
 			const char* name(void) override { return "SimpleSDLServiceSystem"; };
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
-
 
 		private:
 			void render(Engine& engine);

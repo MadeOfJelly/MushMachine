@@ -10,7 +10,7 @@
 
 namespace MM::Services {
 
-bool ImGuiOpenGLRendererTools::enable(Engine& engine) {
+bool ImGuiOpenGLRendererTools::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
     auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
 	menu_bar.menu_tree["OpenGL"]["RenderTasks"] = [this](Engine&) {
@@ -21,6 +21,13 @@ bool ImGuiOpenGLRendererTools::enable(Engine& engine) {
         ImGui::MenuItem("Texture Cache (legacy)", NULL, &_show_texture_cache_legacy);
     };
 
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"ImGuiOpenGLRendererTools::render"}
+		.fn([this](Engine& e) { renderImGui(e); })
+		.succeed("ImGuiMenuBar::render")
+	);
+
 	return true;
 }
 
@@ -29,22 +36,6 @@ void ImGuiOpenGLRendererTools::disable(Engine& engine) {
 
     menu_bar.menu_tree["OpenGL"].erase("RenderTasks");
     menu_bar.menu_tree["OpenGL"].erase("TextureCacheLegacy");
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiOpenGLRendererTools::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"ImGuiOpenGLRendererTools::render"_hs,
-			"ImGuiOpenGLRendererTools::render",
-			[this](Engine& e) { renderImGui(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			{
-				"ImGuiMenuBar::render"_hs
-			}
-		}
-	};
 }
 
 void ImGuiOpenGLRendererTools::renderImGui(Engine& engine) {

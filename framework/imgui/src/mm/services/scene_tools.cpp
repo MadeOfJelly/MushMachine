@@ -7,6 +7,7 @@
 #include <mm/engine.hpp>
 #include "./imgui_menu_bar.hpp"
 #include "mm/components/time_delta.hpp"
+#include "mm/services/service.hpp"
 
 #include <imgui/imgui.h>
 
@@ -36,7 +37,7 @@
 
 namespace MM::Services {
 
-	bool ImGuiSceneToolsService::enable(Engine& engine) {
+	bool ImGuiSceneToolsService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 		if (!engine.tryService<MM::Services::SceneServiceInterface>()) {
 			LOGIGS("error: no SceneServiceInterface");
 			return false;
@@ -82,6 +83,13 @@ namespace MM::Services {
 			ImGui::MenuItem("TimeDelta Context", NULL, &_show_time_delta_ctx, td_ptr);
 		};
 
+		// add task
+		task_array.push_back(
+			UpdateStrategies::TaskInfo{"ImGuiSceneToolsService::render"}
+			.fn([this](Engine& e){ renderImGui(e); })
+			.succeed("ImGuiMenuBar::render")
+		);
+
 		return true;
 	}
 
@@ -92,22 +100,6 @@ namespace MM::Services {
 		menu_bar.menu_tree["Scene"].erase("EntityEditor");
 		menu_bar.menu_tree["Scene"].erase("CameraTool");
 		menu_bar.menu_tree["Scene"].erase("TimeCtx");
-	}
-
-	std::vector<UpdateStrategies::UpdateCreationInfo> ImGuiSceneToolsService::registerUpdates(void) {
-		using namespace entt::literals;
-		return {
-			{
-				"ImGuiSceneToolsService::render"_hs,
-				"ImGuiSceneToolsService::render",
-				[this](Engine& e){ renderImGui(e); },
-				UpdateStrategies::update_phase_t::MAIN,
-				true,
-				{
-					"ImGuiMenuBar::render"_hs
-				}
-			}
-		};
 	}
 
 	void ImGuiSceneToolsService::renderImGui(Engine& engine) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mm/services/service.hpp"
 #include <mm/services/scene_service_interface.hpp>
 
 #include <chrono>
@@ -26,10 +27,8 @@ namespace MM::Services {
 
 			const char* name(void) override { return "SimpleSceneService"; }
 
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		private:
 			void sceneFixedUpdate(Engine& engine);

@@ -30,17 +30,16 @@ TEST(imgui_render_task, demowindow) {
 	class ImGuiDemoWindowService : public MM::Services::Service {
 		public:
 			const char* name(void) override { return "ImGuiDemoWindowService"; }
-			bool enable(MM::Engine&) override { return true; }
-			void disable(MM::Engine&) override {}
 
-			std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
-				return {{
-					"ImGuiDemoWindow"_hs,
-					"ImGuiDemoWindow",
-					[](MM::Engine&) { ImGui::ShowDemoWindow(); }
-				}};
+			bool enable(MM::Engine&, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) override {
+				task_array.push_back(
+					MM::UpdateStrategies::TaskInfo{"ImGuiDemoWindow"}
+					.fn([](MM::Engine&) { ImGui::ShowDemoWindow(); })
+				);
+				return true;
 			}
 
+			void disable(MM::Engine&) override {}
 	};
 	engine.addService<ImGuiDemoWindowService>();
 	ASSERT_TRUE(engine.enableService<ImGuiDemoWindowService>());

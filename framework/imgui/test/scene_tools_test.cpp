@@ -47,7 +47,7 @@ TEST(imgui_scene_tools, it) {
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiEngineTools>());
 
 	engine.addService<MM::Services::ImGuiSceneToolsService>();
-	engine.getUpdateStrategy().depend("ImGuiSceneToolsService::render"_hs, "SimpleSceneService::scene_tick"_hs);
+	//engine.getUpdateStrategy().depend("ImGuiSceneToolsService::render"_hs, "SimpleSceneService::scene_tick"_hs);
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());

@@ -1,6 +1,7 @@
 #include "./engine.hpp"
 
-#include <mm/update_strategies/default_strategy.hpp>
+#include <mm/update_strategies/sequential_strategy.hpp>
+#include <mm/update_strategies/dummy.hpp>
 
 #include <chrono>
 #include <algorithm>
@@ -29,8 +30,10 @@ void Engine::setup(void) {
 Engine::Engine(void) {
 	setup();
 
-	_update_strategy = std::make_unique<MM::UpdateStrategies::SingleThreadedDefault>();
-	LOG_INFO("defaulting to SingleThreadedDefault UpdateStrategy");
+	_update_strategy = std::make_unique<MM::UpdateStrategies::Sequential>();
+	LOG_INFO("defaulting to Sequential (single threaded) UpdateStrategy");
+	//_update_strategy = std::make_unique<MM::UpdateStrategies::Dummy>();
+	//LOG_WARN("Dummy UpdateStrategy [TESTING]");
 }
 
 Engine::~Engine(void) {
@@ -59,47 +62,11 @@ void Engine::cleanup(void) {
 
 void Engine::update(void) {
 	FrameMarkStart("update")
-	//if (_update_functions_modified) {
-		//ZoneScopedN("MM::Engine::update::sort_update_functions")
-		//std::sort(_update_functions.begin(), _update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
-		//_update_functions_modified = false;
-	//}
-
-	//{
-		//ZoneScopedN("MM::Engine::update::traverseUpdateFunctions")
-		//traverseUpdateFunctions(_update_functions);
-	//}
 
 	_update_strategy->doUpdate(*this);
 
 	FrameMarkEnd("update")
 }
-
-//void Engine::fixedUpdate(void) {
-	//FrameMarkStart("fixedUpdate")
-	////if (_fixed_update_functions_modified) {
-		////ZoneScopedN("MM::Engine::fixedUpdate::sort_update_functions")
-
-		////std::sort(_fixed_update_functions.begin(), _fixed_update_functions.end(), [](const auto& a, const auto& b) { return a->priority > b->priority; });
-		////_fixed_update_functions_modified = false;
-	////}
-
-	////{
-		////ZoneScopedN("MM::Engine::fixedUpdate::traverseUpdateFunctions")
-		////traverseUpdateFunctions(_fixed_update_functions);
-	////}
-
-	////if (!_fixed_defered.empty()) {
-		////ZoneScopedN("MM::Engine::fixedUpdate::defered")
-		////for (auto& fn : _fixed_defered) {
-			////fn(*this);
-		////}
-
-		////_fixed_defered.clear();
-	////}
-
-	//FrameMarkEnd("fixedUpdate")
-//}
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -136,14 +103,20 @@ bool Engine::enableService(entt::id_type s_t) {
 
 		_service_enable_order.emplace_back(s_t); // TODO: make sure
 
-		ss_entry->first = ss_entry->second.get()->enable(*this);
+		{ // tasking
+			std::vector<UpdateStrategies::TaskInfo> task_array;
 
-		_update_strategy->enableService(s_t); // after service::enable()
+			ss_entry->first = ss_entry->second.get()->enable(*this, task_array);
+			if (ss_entry->first) {
+				_update_strategy->enableService(s_t, std::move(task_array));
+			}
+		}
 
 		return ss_entry->first;
 	}
 
 	// not found
+	// TODO: improve this
 	assert(false && "first add Service");
 	return false;
 }
@@ -158,7 +131,6 @@ void Engine::disableService(entt::id_type s_t) {
 			s_entry->first = false;
 
 			s_entry->second.get()->disable(*this);
-			//_service_enable_order.emplace_back(service_family::type<T>);
 			auto it = std::find(_service_enable_order.begin(), _service_enable_order.end(), s_t);
 			if (it != _service_enable_order.end()) {
 				_service_enable_order.erase(it);
@@ -170,6 +142,7 @@ void Engine::disableService(entt::id_type s_t) {
 bool Engine::provide(entt::id_type I, entt::id_type T) {
 	if (!_services.count(T)) {
 		// TODO: log error
+		assert(false && "cant provide something that does not exist!");
 		return false;
 	}
 

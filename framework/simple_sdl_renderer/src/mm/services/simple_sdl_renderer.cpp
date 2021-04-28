@@ -20,7 +20,7 @@ SimpleSDLRendererService::SimpleSDLRendererService(void) {
 SimpleSDLRendererService::~SimpleSDLRendererService(void) {
 }
 
-bool SimpleSDLRendererService::enable(Engine& engine) {
+bool SimpleSDLRendererService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	auto* sdl_ss = engine.tryService<SDLService>();
 	if (!sdl_ss) {
 		LOG_ERROR("SimpleSDLRendererService requires SDLService in engine!");
@@ -46,6 +46,13 @@ bool SimpleSDLRendererService::enable(Engine& engine) {
 
 	targets["display"].reset(renderer, 800, 600);
 
+	// add tasks
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"SimpleSDLRendererService::render"}
+		.phase(UpdateStrategies::update_phase_t::POST)
+		.fn([this](Engine& e){ this->render(e); })
+	);
+
 	return true;
 }
 
@@ -55,18 +62,6 @@ void SimpleSDLRendererService::disable(Engine&) {
 	targets.clear();
 
 	SDL_DestroyRenderer(renderer);
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSDLRendererService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"SimpleSDLRendererService::render"_hs,
-			"SimpleSDLRendererService::render",
-			[this](Engine& e){ this->render(e); },
-			UpdateStrategies::update_phase_t::POST
-		}
-	};
 }
 
 void SimpleSDLRendererService::render(Engine& engine) {

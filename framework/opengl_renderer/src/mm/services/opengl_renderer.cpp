@@ -43,7 +43,7 @@ OpenGLRenderer::OpenGLRenderer(void) {
 OpenGLRenderer::~OpenGLRenderer(void) {
 }
 
-bool OpenGLRenderer::enable(Engine& engine) {
+bool OpenGLRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	if (!engine.tryService<SDLService>()) {
 		LOG_ERROR("OpenGLRenderer requires SDLService");
 		return false;
@@ -126,6 +126,14 @@ bool OpenGLRenderer::enable(Engine& engine) {
 		}
 	}
 
+	{ // add task
+		task_array.push_back(
+			UpdateStrategies::TaskInfo{"OpenGLRenderer::render"}
+			.phase(UpdateStrategies::update_phase_t::POST)
+			.fn([this](Engine& e){ this->render(e); })
+		);
+	}
+
 	return true;
 }
 
@@ -136,17 +144,6 @@ void OpenGLRenderer::disable(Engine&) {
 
 	// TODO: reallly?
 	MM::ResourceManager<MM::OpenGL::Texture>::ref().clear();
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> OpenGLRenderer::registerUpdates(void) {
-	return {
-		{
-			"OpenGLRenderer::render"_hs,
-			"OpenGLRenderer::render",
-			[this](Engine& e){ this->render(e); },
-			UpdateStrategies::update_phase_t::POST
-		}
-	};
 }
 
 void OpenGLRenderer::render(Engine& engine) {

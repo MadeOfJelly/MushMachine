@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mm/services/service.hpp"
+#include "mm/update_strategies/update_strategy.hpp"
 #include <cstdint>
 #include <functional>
 
@@ -20,7 +22,7 @@ class FilesystemService : public Service {
 
 
 	public:
-		bool enable(Engine&) override;
+		bool enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&) override;
 		void disable(Engine&) override;
 
 		const char* name(void) override { return "Filesystem"; }

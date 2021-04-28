@@ -27,9 +27,7 @@ namespace MM::Services {
 			~SDLService(void);
 
 		public:
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
-
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override; // destroys windows and ass contexts
 
 			const char* name(void) override { return "SDLService"; }

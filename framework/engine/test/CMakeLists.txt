@@ -1,7 +1,6 @@
 add_executable(engine_test
 	update_strategy_test.cpp
-	default_us_test.cpp
-	#dependency_check_us_test.cpp
+	#default_us_test.cpp
 
 	# old:
 	#update_test.cpp

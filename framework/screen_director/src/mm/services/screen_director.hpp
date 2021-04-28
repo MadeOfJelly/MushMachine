@@ -12,10 +12,8 @@ class ScreenDirector : public Service {
 		const char* name(void) override { return "ScreenDirector"; }
 
 		// enable switches to queued_screen_index
-		bool enable(MM::Engine&) override;
+		bool enable(MM::Engine&, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 		void disable(MM::Engine&) override;
-
-		std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 	public:
 		struct Screen {

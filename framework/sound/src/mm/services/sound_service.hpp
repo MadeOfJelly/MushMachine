@@ -11,7 +11,7 @@ namespace MM::Services {
 			SoLoud::Soloud engine;
 
 		public:
-			bool enable(Engine&) override;
+			bool enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&) override;
 			void disable(Engine&) override;
 
 			const char* name(void) override { return "SoundService"; }

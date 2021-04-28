@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mm/services/service.hpp"
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/fwd.hpp>
 
@@ -28,10 +29,8 @@ namespace MM::Services {
 
 			const char* name(void) override { return "OrganizerSceneService"; }
 
-			bool enable(Engine& engine) override;
+			bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
 			void disable(Engine& engine) override;
-
-			std::vector<UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override;
 
 		public: // scene interface
 			Scene& getScene(void) override { return *_scene; }

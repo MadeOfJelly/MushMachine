@@ -1,3 +1,4 @@
+#include "mm/services/service.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -45,7 +46,7 @@ class ImGuiSpeechy : public MM::Services::Service {
 	public:
 		const char* name(void) override { return "TestWindow"; }
 
-		bool enable(MM::Engine& engine) override {
+		bool enable(MM::Engine& engine, std::vector<MM::UpdateStrategies::TaskInfo>& task_array) override {
 			auto& sound = engine.getService<MM::Services::SoundService>().engine;
 
 			speech.setText("Test text. 1. 2. 3.");
@@ -55,20 +56,15 @@ class ImGuiSpeechy : public MM::Services::Service {
 			sound.setGlobalFilter(1, &echo);
 			sound.setGlobalFilter(2, &freeverb);
 
+			task_array.push_back(
+				MM::UpdateStrategies::TaskInfo{"testwindow"}
+				.fn([this](MM::Engine& engine) { renderImGui(engine); })
+			);
+
 			return true;
 		}
 
 		void disable(MM::Engine&) override {}
-
-		std::vector<MM::UpdateStrategies::UpdateCreationInfo> registerUpdates(void) override {
-			return {{
-				"testwindow"_hs,
-				"testwindow",
-				[this](MM::Engine& engine) {
-					renderImGui(engine);
-				}
-			}};
-		}
 
 		void renderImGui(MM::Engine& engine) {
 			auto& sound = *engine.tryService<MM::Services::SoundService>();

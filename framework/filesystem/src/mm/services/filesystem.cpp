@@ -22,7 +22,7 @@
 
 namespace MM::Services {
 
-bool FilesystemService::enable(Engine&) {
+bool FilesystemService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&) {
 	if (PHYSFS_isInit()) {
 		LOG_ERROR("physfs already initialized!!");
 		return false;

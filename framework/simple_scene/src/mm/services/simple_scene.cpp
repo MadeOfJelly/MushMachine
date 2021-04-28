@@ -1,4 +1,5 @@
 #include "./simple_scene.hpp"
+#include "mm/services/service.hpp"
 
 #include <mm/components/time_delta.hpp>
 
@@ -12,7 +13,18 @@
 
 namespace MM::Services {
 
-bool SimpleSceneService::enable(Engine& engine) {
+bool SimpleSceneService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+	// add tasks
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"SimpleSceneService::scene_tick"}
+		.fn([this](Engine& e) { sceneFixedUpdate(e); })
+	);
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"SimpleSceneService::scene_change"}
+		.succeed("SimpleSceneService::scene_tick")
+		.fn([this](Engine& e) { changeSceneFixedUpdate(e); })
+	);
+
 	// default scene
 	if (!_scene) {
 		_scene = std::make_unique<Scene>();
@@ -25,29 +37,6 @@ bool SimpleSceneService::enable(Engine& engine) {
 }
 
 void SimpleSceneService::disable(Engine&) {
-}
-
-std::vector<UpdateStrategies::UpdateCreationInfo> SimpleSceneService::registerUpdates(void) {
-	using namespace entt::literals;
-	return {
-		{
-			"SimpleSceneService::scene_tick"_hs,
-			"SimpleSceneService::scene_tick",
-			[this](Engine& e) { this->sceneFixedUpdate(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			{} // no dependencies"
-		},
-		{
-			"SimpleSceneService::scene_change"_hs,
-			"SimpleSceneService::scene_change",
-			[this](Engine& e) { this->changeSceneFixedUpdate(e); },
-			UpdateStrategies::update_phase_t::MAIN,
-			true,
-			//{"SimpleSceneService::scene_update"_hs} // first update, than change????
-			{"SimpleSceneService::scene_tick"_hs}
-		}
-	};
 }
 
 void SimpleSceneService::sceneFixedUpdate(Engine&) {

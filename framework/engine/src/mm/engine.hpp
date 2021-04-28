@@ -26,44 +26,21 @@ namespace Services {
 class Engine {
 	friend Services::ImGuiEngineTools;
 
-	private:
-		//using service_family = entt::family<struct internal_service_family>;
-
 	public:
-		//using service_family_type = service_family::family_type;
+		using service_id_type = entt::id_type; // alias, for future proof
 
+	// UpdateStrategy
 	protected:
 		std::unique_ptr<UpdateStrategies::UpdateStrategy> _update_strategy;
 
 	public:
 		UpdateStrategies::UpdateStrategy& getUpdateStrategy(void) { return *_update_strategy; }
 
+	// state
 	private:
 		volatile bool _is_running = false;
+		// ... just realisied: i never needed a getter ...
 
-	private:
-		void setup(void);
-
-	public:
-		Engine(void);
-
-		explicit Engine(std::unique_ptr<UpdateStrategies::UpdateStrategy> us) {
-			setup();
-			_update_strategy = std::move(us);
-		}
-
-	public:
-		~Engine(void);
-
-		// called from destructor or explicitly
-		void cleanup(void);
-
-		void update(void);
-
-		void run(void); // calls update() until stopped
-		void stop(void);
-
-	private:
 		std::vector<entt::id_type> _service_add_order; // ?
 		std::vector<entt::id_type> _service_enable_order; // ?
 
@@ -74,6 +51,29 @@ class Engine {
 				std::unique_ptr<Services::Service>
 			>>
 		> _services;
+
+
+	// private state helper
+	private:
+		void setup(void);
+
+	// ctr dtr ...
+	public:
+		Engine(void);
+		~Engine(void);
+
+		explicit Engine(std::unique_ptr<UpdateStrategies::UpdateStrategy> us) {
+			setup();
+			_update_strategy = std::move(us);
+		}
+
+		// called from destructor or explicitly (if eg "global", u need dis)
+		void cleanup(void);
+
+		void update(void);
+
+		void run(void); // calls update() until stopped
+		void stop(void);
 
 	public:
 		template<typename T>
@@ -95,12 +95,6 @@ class Engine {
 				);
 
 			_service_add_order.emplace_back(type<T>());
-
-			// add updates to update strategy
-			_update_strategy->registerService(
-				type<T>(),
-				ss_entry.get()->second->registerUpdates()
-			);
 
 			return (T&)*ss_entry.get()->second.get();
 		}
@@ -154,13 +148,8 @@ class Engine {
 			return provide(type<I>(), type<T>());
 		}
 
-		// TODO: reimplement???
-		//template<typename I>
+		// TODO: remove service
 		//void removeProvider(void) {
-			//if (auto it = _implementation_provider.find(service_family::type<I>); it != _implementation_provider.end()) {
-				//_implementation_provider.erase(it);
-			//}
-		//}
 };
 
 } // MM
