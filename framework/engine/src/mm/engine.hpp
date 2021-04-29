@@ -2,7 +2,7 @@
 
 #include "./engine_fwd.hpp"
 
-#include <entt/core/family.hpp>
+#include <entt/core/type_info.hpp>
 
 #include <functional>
 #include <memory>
@@ -27,10 +27,10 @@ class Engine {
 	friend Services::ImGuiEngineTools;
 
 	private:
-		using service_family = entt::family<struct internal_service_family>;
+		//using service_family = entt::family<struct internal_service_family>;
 
 	public:
-		using service_family_type = service_family::family_type;
+		//using service_family_type = service_family::family_type;
 
 	protected:
 		std::unique_ptr<UpdateStrategies::UpdateStrategy> _update_strategy;
@@ -64,11 +64,11 @@ class Engine {
 		void stop(void);
 
 	private:
-		std::vector<service_family::family_type> _service_add_order; // ?
-		std::vector<service_family::family_type> _service_enable_order; // ?
+		std::vector<entt::id_type> _service_add_order; // ?
+		std::vector<entt::id_type> _service_enable_order; // ?
 
 		std::unordered_map<
-			service_family::family_type,
+			entt::id_type,
 			std::shared_ptr<std::pair<
 				bool,
 				std::unique_ptr<Services::Service>
@@ -77,15 +77,16 @@ class Engine {
 
 	public:
 		template<typename T>
-		constexpr auto type(void) {
-			return service_family::type<T>;
+		constexpr static auto type(void) {
+			//return entt::type_id<T>.hash();
+			return entt::type_hash<T>::value();
 		}
 
 		template<typename T, typename... Args>
 		T& addService(Args&& ... args) {
 			assert(!tryService<T>());
 
-			auto& ss_entry = _services[service_family::type<T>] =
+			auto& ss_entry = _services[type<T>()] =
 				std::make_shared<std::pair<bool, std::unique_ptr<Services::Service>>>(
 					std::make_pair<bool, std::unique_ptr<Services::Service>>(
 						false,
@@ -93,11 +94,11 @@ class Engine {
 					)
 				);
 
-			_service_add_order.emplace_back(service_family::type<T>);
+			_service_add_order.emplace_back(type<T>());
 
 			// add updates to update strategy
 			_update_strategy->registerService(
-				service_family::type<T>,
+				type<T>(),
 				ss_entry.get()->second->registerUpdates()
 			);
 
@@ -106,8 +107,8 @@ class Engine {
 
 		template<typename T>
 		[[nodiscard]] T* tryService(void) const {
-			if (_services.count(service_family::type<T>)) {
-				return static_cast<T*>(_services.at(service_family::type<T>).get()->second.get());
+			if (_services.count(type<T>())) {
+				return static_cast<T*>(_services.at(type<T>()).get()->second.get());
 			}
 
 			return nullptr;
@@ -126,22 +127,22 @@ class Engine {
 			return *tmp;
 		}
 
-		bool enableService(service_family::family_type s_t);
-		void disableService(service_family::family_type s_t);
+		bool enableService(entt::id_type s_t);
+		void disableService(entt::id_type s_t);
 
 		template<typename T>
 		bool enableService(void) {
-			return enableService(service_family::type<T>);
+			return enableService(type<T>());
 		}
 
 		template<typename T>
 		void disableService(void) {
-			disableService(service_family::type<T>);
+			disableService(type<T>());
 		}
 
 		// provide T as I implementation
 		// T needs to be an added Service
-		bool provide(service_family::family_type I, service_family::family_type T);
+		bool provide(entt::id_type I, entt::id_type T);
 
 		// provide T as I implementation
 		// T needs to be an added Service
@@ -150,7 +151,7 @@ class Engine {
 			static_assert(std::is_base_of_v<I, T>, "T is not derived from I!");
 			static_assert(!std::is_same_v<I, T>, "I and T are the same, makes no sense!");
 
-			return provide(service_family::type<I>, service_family::type<T>);
+			return provide(type<I>(), type<T>());
 		}
 
 		// TODO: reimplement???

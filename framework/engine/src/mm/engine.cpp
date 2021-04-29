@@ -127,7 +127,7 @@ void Engine::stop(void) {
 	_is_running = false;
 }
 
-bool Engine::enableService(service_family::family_type s_t) {
+bool Engine::enableService(entt::id_type s_t) {
 	if (_services.count(s_t)) {
 		auto* ss_entry = _services[s_t].get();
 		if (ss_entry->first) {
@@ -148,7 +148,7 @@ bool Engine::enableService(service_family::family_type s_t) {
 	return false;
 }
 
-void Engine::disableService(service_family::family_type s_t) {
+void Engine::disableService(entt::id_type s_t) {
 	if (_services.count(s_t)) {
 		auto* s_entry = _services[s_t].get();
 		if (s_entry->first) {
@@ -167,7 +167,7 @@ void Engine::disableService(service_family::family_type s_t) {
 	}
 }
 
-bool Engine::provide(service_family::family_type I, service_family::family_type T) {
+bool Engine::provide(entt::id_type I, entt::id_type T) {
 	if (!_services.count(T)) {
 		// TODO: log error
 		return false;

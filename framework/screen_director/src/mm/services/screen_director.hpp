@@ -20,20 +20,20 @@ class ScreenDirector : public Service {
 	public:
 		struct Screen {
 			// lists of services relevant for this screen, disable and enable are called when its changed to
-			std::vector<Engine::service_family_type> start_disable;
-			std::vector<Engine::service_family_type> start_enable;
+			std::vector<entt::id_type> start_disable;
+			std::vector<entt::id_type> start_enable;
 
 			// register provider, when its changed to
 			std::vector<
 				std::pair<
-					Engine::service_family_type,	// I
-					Engine::service_family_type		// T
+					entt::id_type,	// I
+					entt::id_type		// T
 				>
 			> start_provide;
 
 			// lists of services relevant for this screen, disable and enable are called when its changed from
-			std::vector<Engine::service_family_type> end_disable;
-			std::vector<Engine::service_family_type> end_enable;
+			std::vector<entt::id_type> end_disable;
+			std::vector<entt::id_type> end_enable;
 
 			// called when its changed to, after services disable and enable
 			std::function<void(MM::Engine&)> start_fn = [](MM::Engine&){};
