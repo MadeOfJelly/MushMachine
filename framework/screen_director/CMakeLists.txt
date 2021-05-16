@@ -14,9 +14,6 @@ target_link_libraries(screen_director
 	entt
 )
 
-message("screen_director_simple ALIAS TODO: remove!!")
-add_library(screen_director_simple ALIAS screen_director)
-
 if (BUILD_TESTING)
 	add_subdirectory(test)
 endif()

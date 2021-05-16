@@ -1,10 +1,5 @@
 #pragma once
 
-#include "mm/services/service.hpp"
-#include "mm/update_strategies/update_strategy.hpp"
-#include <cstdint>
-#include <functional>
-
 //#include <physfs.h>
 //fwd
 typedef struct PHYSFS_File PHYSFS_File;
@@ -13,6 +8,8 @@ typedef struct PHYSFS_Stat PHYSFS_Stat;
 #include <nlohmann/json_fwd.hpp>
 
 #include <mm/engine.hpp>
+
+#include <cstdint>
 
 namespace MM::Services {
 

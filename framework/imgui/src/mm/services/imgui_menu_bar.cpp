@@ -1,8 +1,6 @@
 #include "./imgui_menu_bar.hpp"
-#include "mm/services/service.hpp"
 
 #include <mm/engine.hpp>
-#include <entt/core/hashed_string.hpp>
 
 #include <imgui/imgui.h>
 
@@ -37,6 +35,8 @@ namespace MM::Services {
 		task_array.push_back(
 			UpdateStrategies::TaskInfo{"ImGuiMenuBar::render"}
 			.fn([this](Engine& e){ renderImGui(e); })
+			.phase(UpdateStrategies::update_phase_t::PRE)
+			.succeed("ImGuiService::new_frame")
 		);
 
 		return true;

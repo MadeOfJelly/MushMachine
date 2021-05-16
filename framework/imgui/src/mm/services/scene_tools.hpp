@@ -1,6 +1,7 @@
 #pragma once
 
-#include "mm/services/service.hpp"
+#include <mm/services/service.hpp>
+
 #define MM_IEEE_ENTITY_WIDGET ::MM::ImGuiWidgets::Entity // evil
 #define MM_IEEE_ASSERT(x)
 #include <mm/imgui/widgets/entity.hpp>

@@ -1,7 +1,5 @@
 #include "./input_service.hpp"
 
-#include <entt/core/hashed_string.hpp>
-
 #include <glm/common.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>

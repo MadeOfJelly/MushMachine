@@ -1,4 +1,3 @@
-#include "mm/services/imgui_menu_bar.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -6,11 +5,11 @@
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
 #include <mm/services/imgui_s.hpp>
+#include <mm/services/imgui_menu_bar.hpp>
+#include <mm/services/engine_tools.hpp>
 
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
-
-#include <mm/services/engine_tools.hpp>
 
 static char* argv0;
 

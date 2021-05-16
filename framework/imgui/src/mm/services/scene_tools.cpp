@@ -5,15 +5,15 @@
 //#include <mm/resource_manager.hpp>
 
 #include <mm/engine.hpp>
-#include "./imgui_menu_bar.hpp"
-#include "mm/components/time_delta.hpp"
-#include "mm/services/service.hpp"
+
+#include <mm/services/imgui_menu_bar.hpp>
 
 #include <imgui/imgui.h>
 
 #include <mm/components/name.hpp>
 #include <mm/components/transform2d.hpp>
 #include <mm/components/velocity2d.hpp>
+#include <mm/components/time_delta.hpp>
 
 //#include <mm/imgui/widgets/texture_resource_manager.hpp>
 #include <mm/imgui/widgets/entity.hpp>
@@ -87,6 +87,7 @@ namespace MM::Services {
 		task_array.push_back(
 			UpdateStrategies::TaskInfo{"ImGuiSceneToolsService::render"}
 			.fn([this](Engine& e){ renderImGui(e); })
+			.phase(UpdateStrategies::update_phase_t::PRE)
 			.succeed("ImGuiMenuBar::render")
 		);
 

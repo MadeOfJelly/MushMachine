@@ -1,11 +1,7 @@
 #include "./imgui_s.hpp"
-#include "mm/services/service.hpp"
-#include "mm/update_strategies/update_strategy.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_sdl.h>
-
-#include <entt/core/hashed_string.hpp>
 
 #ifdef MM_OPENGL_3
 #include <imgui/backends/imgui_impl_opengl3.h>

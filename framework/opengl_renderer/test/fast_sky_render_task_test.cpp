@@ -1,4 +1,3 @@
-#include "mm/opengl/camera_3d.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -12,6 +11,8 @@
 
 #include <mm/opengl/render_tasks/fast_sky_render_task.hpp>
 #include <mm/systems/fast_sky_sun_system.hpp>
+
+#include <mm/opengl/camera_3d.hpp>
 
 const char* argv0;
 

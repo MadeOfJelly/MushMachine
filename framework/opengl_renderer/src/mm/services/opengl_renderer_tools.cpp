@@ -11,20 +11,21 @@
 namespace MM::Services {
 
 bool ImGuiOpenGLRendererTools::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
-    auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
+	auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
 	menu_bar.menu_tree["OpenGL"]["RenderTasks"] = [this](Engine&) {
-        ImGui::MenuItem("Render Tasks", NULL, &_show_render_tasks);
-    };
+		ImGui::MenuItem("Render Tasks", NULL, &_show_render_tasks);
+	};
 
 	menu_bar.menu_tree["OpenGL"]["TextureCacheLegacy"] = [this](Engine&) {
-        ImGui::MenuItem("Texture Cache (legacy)", NULL, &_show_texture_cache_legacy);
-    };
+		ImGui::MenuItem("Texture Cache (legacy)", NULL, &_show_texture_cache_legacy);
+	};
 
 	// add task
 	task_array.push_back(
 		UpdateStrategies::TaskInfo{"ImGuiOpenGLRendererTools::render"}
 		.fn([this](Engine& e) { renderImGui(e); })
+		.phase(UpdateStrategies::update_phase_t::PRE)
 		.succeed("ImGuiMenuBar::render")
 	);
 
@@ -34,8 +35,8 @@ bool ImGuiOpenGLRendererTools::enable(Engine& engine, std::vector<UpdateStrategi
 void ImGuiOpenGLRendererTools::disable(Engine& engine) {
 	auto& menu_bar = engine.getService<MM::Services::ImGuiMenuBar>();
 
-    menu_bar.menu_tree["OpenGL"].erase("RenderTasks");
-    menu_bar.menu_tree["OpenGL"].erase("TextureCacheLegacy");
+	menu_bar.menu_tree["OpenGL"].erase("RenderTasks");
+	menu_bar.menu_tree["OpenGL"].erase("TextureCacheLegacy");
 }
 
 void ImGuiOpenGLRendererTools::renderImGui(Engine& engine) {

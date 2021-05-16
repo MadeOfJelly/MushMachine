@@ -1,5 +1,3 @@
-#include "mm/opengl/render_tasks/clear.hpp"
-#include "mm/opengl/render_tasks/copy_to_fb.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -12,6 +10,8 @@
 
 #include <entt/entity/registry.hpp>
 
+#include <mm/opengl/render_tasks/clear.hpp>
+#include <mm/opengl/render_tasks/copy_to_fb.hpp>
 #include <mm/opengl/render_tasks/simple_rect.hpp>
 #include <mm/opengl/render_tasks/blur.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>

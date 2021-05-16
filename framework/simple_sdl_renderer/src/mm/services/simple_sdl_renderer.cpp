@@ -1,7 +1,4 @@
 #include "simple_sdl_renderer.hpp"
-#include "mm/update_strategies/update_strategy.hpp"
-
-#include <entt/core/hashed_string.hpp>
 
 #include <mm/logger.hpp>
 #define LOG_CRIT(...)		__LOG_CRIT(	"SimpleSDLRenderer", __VA_ARGS__)

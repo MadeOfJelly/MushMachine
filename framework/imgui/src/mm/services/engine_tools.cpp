@@ -184,6 +184,7 @@ bool ImGuiEngineTools::enable(Engine& engine, std::vector<UpdateStrategies::Task
 	task_array.push_back(
 		UpdateStrategies::TaskInfo{"ImGuiEngineTools::render"}
 		.fn([this](Engine& e){ renderImGui(e); })
+		.phase(UpdateStrategies::update_phase_t::PRE)
 		.succeed("ImGuiMenuBar::render")
 	);
 

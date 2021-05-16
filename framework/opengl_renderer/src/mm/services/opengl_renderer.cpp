@@ -10,7 +10,6 @@
 #include <mm/opengl/texture_loader.hpp>
 #include "../opengl/res/default_texture.h" // data
 #include "../opengl/res/errig_texture.h" // data
-#include "mm/update_strategies/update_strategy.hpp"
 
 #include <tracy/Tracy.hpp>
 #ifndef MM_OPENGL_3_GLES

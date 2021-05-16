@@ -1,12 +1,10 @@
 #include "./sound_tools.hpp"
-#include <mm/imgui/sound_info.hpp>
 
 #include <mm/engine.hpp>
-#include <entt/core/hashed_string.hpp>
+#include <mm/services/sound_service.hpp>
+#include <mm/imgui/sound_info.hpp>
 
 #include <imgui/imgui.h>
-
-#include <mm/services/sound_service.hpp>
 
 #include <mm/logger.hpp>
 #define LOGIGS(x) LOG("ImGuiSceneToolsService", x)
@@ -39,6 +37,7 @@ namespace MM::Services {
 		task_array.push_back(
 			UpdateStrategies::TaskInfo{"ImGuiSoundTools::render"}
 			.fn([this](Engine& e){ renderImGui(e); })
+			.phase(UpdateStrategies::update_phase_t::PRE)
 			.succeed("ImGuiMenuBar::render")
 		);
 
