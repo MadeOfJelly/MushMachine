@@ -42,7 +42,6 @@ namespace MM::Services {
 			void sceneFixedUpdate(Engine& engine);
 			void changeSceneFixedUpdate(Engine& engine);
 
-			void sceneUpdate(Engine& engine);
 			void updateOrganizerVertices(Scene& scene);
 
 			void resetTime(void);

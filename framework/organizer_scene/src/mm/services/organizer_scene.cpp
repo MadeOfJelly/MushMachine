@@ -39,15 +39,8 @@ namespace MM::Services {
 bool OrganizerSceneService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	// add tasks
 	task_array.push_back(
-		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_update"}
-		.fn([this](Engine& e) { sceneUpdate(e); })
-	);
-	task_array.push_back(
 		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_tick"}
 		.fn([this](Engine& e) { sceneFixedUpdate(e); })
-
-		// bc it renders imgui, but this is not "hard"
-		.succeed("OrganizerSceneService::scene_update")
 	);
 	task_array.push_back(
 		UpdateStrategies::TaskInfo{"OrganizerSceneService::scene_changer"}
@@ -108,21 +101,6 @@ void OrganizerSceneService::changeSceneFixedUpdate(Engine& engine) {
 		_scene->set<MM::Engine*>(&engine); // make engine accessible from scene
 		updateOrganizerVertices(*_scene);
 	}
-}
-
-void OrganizerSceneService::sceneUpdate(Engine&) {
-	ZoneScoped;
-
-	//if (ImGui::Begin("OrganizerScene")) {
-		//ImGui::SliderFloat("time_factor", &delta_factor, 0.f, 10.f, "%.5f", ImGuiSliderFlags_Logarithmic);
-	//}
-	//ImGui::End();
-
-	//for (auto&& v : _scene->ctx<std::vector<entt::organizer::vertex>>()) {
-		//v.callback()(v.data(), *_scene);
-	//}
-
-	//TracyPlot("MM::Services::OrganizerSceneService::_scene.alive", (int64_t)_scene->alive());
 }
 
 void OrganizerSceneService::changeScene(std::unique_ptr<Scene>&& new_scene) {
