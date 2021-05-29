@@ -27,13 +27,16 @@ namespace SquirrelNoise4 {
 namespace Easing {
 	static float SmoothStep( float t ) {
 		//return 2*(t*t*t) - 3*(t*t);
-		return t*t * (2*t-3); // optimised
+		//return t*t * (2*t-3); // optimised
+
+		//return 3*(t*t) - 2*(t*t*t);
+		return t*t * (3-2*t); // optimised
 	}
 } // Easing
 
 
 //-----------------------------------------------------------------------------------------------
-float Compute1dFractal( float position, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute1dFractalNoise( float position, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 
@@ -81,7 +84,7 @@ float Compute1dFractal( float position, float scale, uint32_t numOctaves, float 
 
 
 //-----------------------------------------------------------------------------------------------
-float Compute2dFractal( float posX, float posY, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute2dFractalNoise( float posX, float posY, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 
@@ -140,7 +143,7 @@ float Compute2dFractal( float posX, float posY, float scale, uint32_t numOctaves
 
 
 //-----------------------------------------------------------------------------------------------
-float Compute3dFractal( float posX, float posY, float posZ, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute3dFractalNoise( float posX, float posY, float posZ, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 
@@ -216,7 +219,7 @@ float Compute3dFractal( float posX, float posY, float posZ, float scale, uint32_
 
 
 //-----------------------------------------------------------------------------------------------
-float Compute4dFractal( float posX, float posY, float posZ, float posT, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute4dFractalNoise( float posX, float posY, float posZ, float posT, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 
@@ -318,7 +321,7 @@ float Compute4dFractal( float posX, float posY, float posZ, float posT, float sc
 //
 // In 1D, the gradients are trivial: -1.0 or 1.0, so resulting noise is boring at one octave.
 //
-float Compute1dPerlin( float position, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute1dPerlinNoise( float position, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 	const float gradients[2] = { -1.f, 1.f }; // 1D unit "gradient" vectors; one back, one forward
@@ -376,7 +379,7 @@ float Compute1dPerlin( float position, float scale, uint32_t numOctaves, float o
 //
 // In 2D, gradients are unit-length vectors in various directions with even angular distribution.
 //
-float Compute2dPerlin( float posX, float posY, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute2dPerlinNoise( float posX, float posY, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 	const ::glm::vec2 gradients[ 8 ] = // Normalized unit vectors in 8 quarter-cardinal directions
@@ -467,7 +470,7 @@ float Compute2dPerlin( float posX, float posY, float scale, uint32_t numOctaves,
 //
 // In 3D, gradients are unit-length vectors in random (3D) directions.
 //
-float Compute3dPerlin( float posX, float posY, float posZ, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute3dPerlinNoise( float posX, float posY, float posZ, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 	const float fSQRT_3_OVER_3 = 0.577350269189f;
@@ -585,7 +588,7 @@ float Compute3dPerlin( float posX, float posY, float posZ, float scale, uint32_t
 //
 // In 4D, gradients are unit-length hyper-vectors in random (4D) directions.
 //
-float Compute4dPerlin( float posX, float posY, float posZ, float posT, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
+float Compute4dPerlinNoise( float posX, float posY, float posZ, float posT, float scale, uint32_t numOctaves, float octavePersistence, float octaveScale, bool renormalize, uint32_t seed )
 {
 	const float OCTAVE_OFFSET = 0.636764989593174f; // Translation/bias to add to each octave
 
