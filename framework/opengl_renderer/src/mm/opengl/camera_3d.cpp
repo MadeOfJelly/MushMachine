@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <tracy/Tracy.hpp>
+
 namespace MM::OpenGL {
 
 Camera3D::Camera3D(void) {
@@ -81,6 +83,8 @@ glm::mat4 Camera3D::getProjection() const {
 }
 
 std::array<glm::vec4, 6> Camera3D::getFrustumPlanes(void) const {
+	ZoneScopedN("Camera3D::getFrustumPlanes")
+
 	std::array<glm::vec4, 6> planes;
 
 	glm::mat4 wvp = getViewProjection();
@@ -172,10 +176,37 @@ std::array<glm::vec4, 6> Camera3D::getFrustumPlanes(void) const {
 	// normalize
 	for (size_t i = 0; i < 6; i++) {
 		planes[i] = glm::normalize(planes[i]);
-		//planes[i] /= glm::length(glm::vec3(planes[i]));
 	}
 
 	return planes;
+}
+
+template<typename T>
+static T dot34(glm::vec<3, T> lhs, glm::vec<4, T> rhs) {
+	return glm::dot(lhs, glm::vec<3, T>(rhs)) + rhs.w;
+}
+
+bool in_frustum_aabb(
+	const std::array<glm::vec4, 6>& frustum,
+	const std::array<glm::vec3, 8>& aabb
+) {
+	// test each plane
+	for (int i = 0; i < 6; i++) {
+		bool inside = false; // inside current plane
+
+		for (int j = 0; j < 8; j++) {
+			if (dot34(aabb[j], frustum[i]) >= 0) { // == for on plane
+				inside = true;
+				break;
+			}
+		}
+
+		if (!inside) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 } // MM::Rendering

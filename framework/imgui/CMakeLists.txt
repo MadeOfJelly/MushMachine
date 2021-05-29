@@ -91,6 +91,9 @@ add_library(imgui_tools
 
 	./src/mm/services/engine_tools.hpp
 	./src/mm/services/engine_tools.cpp
+
+	./src/mm/services/screen_director_tools.hpp
+	./src/mm/services/screen_director_tools.cpp
 )
 
 target_include_directories(imgui_tools PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -98,6 +101,8 @@ target_link_libraries(imgui_tools
 	imgui_render_task
 	imgui_widgets
 	imgui_color_text_edit
+
+	screen_director
 )
 
 ################## imgui_sound

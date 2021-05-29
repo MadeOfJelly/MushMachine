@@ -48,6 +48,10 @@ namespace MM::OpenGL {
 				return _size;
 			}
 
+			size_t getSizeBytes(void) const {
+				return _size * sizeof(TInstance);
+			}
+
 			TInstance* map(size_t size, GLenum usage = GL_DYNAMIC_DRAW, bool shrink = false) {
 				if (size > _size || (shrink && (size < _size)))
 					resize(size, usage);

@@ -11,6 +11,8 @@ namespace MM::Services {
 
 	class SDLService : public Service {
 		public:
+			uint32_t sdl_init_flags = SDL_INIT_EVERYTHING;
+
 			SDL_Window* win{nullptr};
 			SDL_GLContext gl_context{nullptr};
 

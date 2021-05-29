@@ -28,10 +28,21 @@
 
 namespace MM::Services {
 
-SDLService::SDLService(uint32_t sdl_init_flags) {
+SDLService::SDLService(uint32_t _sdl_init_flags) {
 	MM::Logger::initSectionLogger("SDLService");
 
-	LOG_TRACE("constructing SDLService...");
+//#ifdef __EMSCRIPTEN__
+	//_sdl_init_flags &= ~SDL_INIT_HAPTIC;
+//#endif
+
+	sdl_init_flags = _sdl_init_flags;
+}
+
+SDLService::~SDLService(void) {
+}
+
+bool SDLService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+	LOG_TRACE("enabling SDLService...");
 
 	SDL_LogSetOutputFunction(
 		+[](void*, int category, SDL_LogPriority priority, const char* message) {
@@ -43,19 +54,25 @@ SDLService::SDLService(uint32_t sdl_init_flags) {
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
 
 
-//#ifdef __EMSCRIPTEN__
-	//sdl_init_flags &= ~SDL_INIT_HAPTIC;
-//#endif
-
 	if (SDL_Init(sdl_init_flags)) {
 		LOG_CRIT("SDL_Init() failed: {}", SDL_GetError());
-		return;
+		return false;
 	}
+
+	// add task
+	task_array.push_back(
+		UpdateStrategies::TaskInfo{"SDLService::events"}
+		.phase(UpdateStrategies::update_phase_t::PRE)
+		.fn([this](Engine& e) { this->processEvents(e); })
+	);
+
+	return true;
 }
 
-SDLService::~SDLService(void) {
-	LOG_TRACE("deconstructing SDLService...");
+void SDLService::disable(Engine&) {
+	LOG_TRACE("disabling SDLService...");
 
+	// destroy stuff
 	if (gl_context) {
 		SDL_GL_DeleteContext(gl_context);
 	}
@@ -66,30 +83,6 @@ SDLService::~SDLService(void) {
 	}
 
 	SDL_Quit();
-}
-
-bool SDLService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>& task_array) {
-	// add task
-	task_array.push_back(
-		UpdateStrategies::TaskInfo{"SDLService::events"}
-		.phase(UpdateStrategies::update_phase_t::PRE)
-		.fn([this](Engine& e) { this->processEvents(e); })
-	);
-
-	bool succ = true;
-	return succ;
-}
-
-void SDLService::disable(Engine&) {
-	// destroy stuff
-	if (gl_context) {
-		SDL_GL_DeleteContext(gl_context);
-	}
-
-	if (win) {
-		LOG_WARN("destroying open window");
-		destroyWindow();
-	}
 }
 
 bool SDLService::createWindow(const char* title, int screen_width, int screen_height, uint32_t sdl_window_flags) {

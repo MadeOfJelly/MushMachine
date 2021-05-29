@@ -50,5 +50,20 @@ namespace MM::OpenGL {
 			// call updateView beforehand, does not cache
 			std::array<glm::vec4, 6> getFrustumPlanes(void) const;
 	};
+
+	// test if aabb in frustum
+	// aabb is in world space
+	bool in_frustum_aabb(
+		const std::array<glm::vec4, 6>& frustum,
+		const std::array<glm::vec3, 8>& aabb
+	);
+
+	// TODO: implement
+	//// test if sphere in frustum
+	//bool in_frustum_sphere(
+		//const std::array<glm::vec4, 6>& frustum,
+		//const glm::vec3 position, const float radius
+	//);
+
 } // MM::OpenGL
 
