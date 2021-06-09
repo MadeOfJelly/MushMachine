@@ -67,6 +67,9 @@ class Engine {
 			_update_strategy = std::move(us);
 		}
 
+		Engine(const Engine&) = delete;
+		Engine(Engine&&) = delete;
+
 		// called from destructor or explicitly (if eg "global", u need dis)
 		void cleanup(void);
 

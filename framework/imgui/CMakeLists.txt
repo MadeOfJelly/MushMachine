@@ -18,6 +18,7 @@ target_link_libraries(imgui_service
 	engine
 	imgui_render_task
 )
+
 ################## imgui_widgets
 
 add_library(imgui_widgets
@@ -30,6 +31,7 @@ add_library(imgui_widgets
 	./src/mm/imgui/widgets/spritesheet.hpp
 	./src/mm/imgui/widgets/texture.hpp
 	./src/mm/imgui/widgets/texture_resource_manager.hpp
+	./src/mm/imgui/widgets/imgui_json_editor.hpp
 
 	./src/mm/imgui/widgets/auto_wrap.hpp
 

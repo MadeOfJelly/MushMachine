@@ -1,3 +1,21 @@
+add_executable(imgui_json_test
+	./json_editor_test.cpp
+)
+target_include_directories(imgui_json_test PRIVATE ".")
+target_link_libraries(imgui_json_test
+	engine
+	sdl_service
+	opengl_renderer_s
+	imgui_service
+	imgui_render_task
+	imgui_widgets
+	nlohmann_json::nlohmann_json
+	gtest_main
+)
+add_test(NAME imgui_json_test COMMAND imgui_json_test)
+
+####################
+
 add_executable(imgui_widget_test
 	./widget_test.cpp
 )
