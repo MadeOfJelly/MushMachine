@@ -22,8 +22,8 @@ target_link_libraries(opengl_primitives
 if(MM_OPENGL_3_GLES)
 	target_link_libraries(opengl_primitives "GL") # TODO: make more specific
 	if(EMSCRIPTEN)
-		set_target_properties(opengl_primitives PROPERTIES COMPILE_FLAGS "-s USE_WEBGL2=1")
-		set_target_properties(opengl_primitives PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1")
+		set_target_properties(opengl_primitives PROPERTIES COMPILE_FLAGS "-s USE_WEBGL2=1 -s USE_SDL=2")
+		set_target_properties(opengl_primitives PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1 -s USE_SDL=2")
 	endif()
 
 else()
