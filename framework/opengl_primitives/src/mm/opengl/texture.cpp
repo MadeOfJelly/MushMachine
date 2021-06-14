@@ -15,9 +15,9 @@ uint32_t Texture::getHandle(void) const {
 
 Texture::Texture(
 	uint32_t handle,
-	int32_t width, int32_t height,
+	int32_t width_, int32_t height_,
 	int32_t internalFormat, int32_t format, int32_t type
-) : _handle(handle), width(width), height(height),
+) : _handle(handle), width(width_), height(height_),
 	_internalFormat(internalFormat), _format(format), _type(type) {}
 
 Texture::~Texture(void) {
@@ -44,7 +44,7 @@ void Texture::resize(int32_t new_width, int32_t new_height) {
 	*(const_cast<int32_t*>(&height)) = new_height;
 }
 
-Texture::handle Texture::createEmpty(int32_t internalFormat, int32_t width, int32_t height, int32_t format, int32_t type) {
+Texture::handle_t Texture::createEmpty(int32_t internalFormat, int32_t width, int32_t height, int32_t format, int32_t type) {
 	uint32_t id;
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
@@ -54,7 +54,7 @@ Texture::handle Texture::createEmpty(int32_t internalFormat, int32_t width, int3
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	return handle(new Texture(id, width, height, internalFormat, format, type));
+	return handle_t(new Texture(id, width, height, internalFormat, format, type));
 }
 
 } // MM::OpenGL

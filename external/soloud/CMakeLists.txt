@@ -159,7 +159,7 @@ target_compile_definitions(soloud PRIVATE WITH_NULL)
 #target_compile_definitions(soloud PRIVATE WITH_SDL2)
 target_compile_definitions(soloud PRIVATE WITH_SDL2_STATIC)
 
-target_include_directories(soloud PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/soloud/include")
+target_include_directories(soloud SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/soloud/include")
 #target_include_directories(soloud PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 
 #if not android or emscripten

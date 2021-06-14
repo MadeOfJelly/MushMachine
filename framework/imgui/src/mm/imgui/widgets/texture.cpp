@@ -8,7 +8,7 @@
 namespace MM::ImGuiWidgets {
 
 // TODO: fix formating
-void Texture(MM::OpenGL::Texture::handle& texture, bool dropTarget) {
+void Texture(MM::OpenGL::Texture::handle_t& texture, bool dropTarget) {
 	const float s_sz = ImGui::GetFrameHeight();
 	//const float w_all = ImGui::CalcItemWidth();
 	//const char* lable_display_end = ImGui::FindRenderedTextEnd(label);
@@ -58,7 +58,7 @@ void Texture(MM::OpenGL::Texture::handle& texture, bool dropTarget) {
 	ImGui::EndGroup();
 }
 
-void LabelTexture(const char* label, MM::OpenGL::Texture::handle& texture, bool dropTarget) {
+void LabelTexture(const char* label, MM::OpenGL::Texture::handle_t& texture, bool dropTarget) {
 	const float s_sz = ImGui::GetFrameHeight();
 	const float w_all = ImGui::CalcItemWidth();
 	const char* lable_display_end = ImGui::FindRenderedTextEnd(label);

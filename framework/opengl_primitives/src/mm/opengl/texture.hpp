@@ -19,12 +19,12 @@ namespace MM::OpenGL {
 
 			Texture(
 				uint32_t handle,
-				int32_t width, int32_t height,
+				int32_t width_, int32_t height_,
 				int32_t internalFormat, int32_t format, int32_t type
 			);
 
 		public:
-			using handle = std::shared_ptr<Texture>;
+			using handle_t = std::shared_ptr<Texture>;
 
 			int32_t const width;
 			int32_t const height;
@@ -44,7 +44,7 @@ namespace MM::OpenGL {
 
 			void resize(int32_t new_width, int32_t new_height);
 
-			static handle createEmpty(int32_t internalFormat, int32_t width, int32_t height, int32_t format, int32_t type);
+			static handle_t createEmpty(int32_t internalFormat, int32_t width, int32_t height, int32_t format, int32_t type);
 	};
 
 } // MM::OpenGL

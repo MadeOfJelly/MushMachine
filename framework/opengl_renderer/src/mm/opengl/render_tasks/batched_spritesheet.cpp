@@ -85,7 +85,7 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 		std::vector<instance_data> instances;
 	};
 	// HACK: assume same sp for same texture
-	std::unordered_map<MM::OpenGL::Texture::handle, sp_data> batch_map;
+	std::unordered_map<MM::OpenGL::Texture::handle_t, sp_data> batch_map;
 
 	auto view = scene.view<Components::Transform2D, SpriteSheetRenderable>();
 
