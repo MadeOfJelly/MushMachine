@@ -37,7 +37,6 @@ struct SRNG {
 	// more advanced
 
 	// inclusive
-	// TODO: test for floats
 	template<typename T>
 	T range(const ScalarRange2<T>& range) {
 		return (getNext() % ((range.max() - range.min()) + 1)) + range.min();
@@ -51,7 +50,22 @@ struct SRNG {
 	bool operator()(float prob) {
 		return roll(prob);
 	}
+
+	// std:: distributions need those
+	constexpr static uint32_t min(void) {
+		return 0;
+	}
+
+	constexpr static uint32_t max(void) {
+		return 0xffffffff;
+	}
 };
+
+template<>
+double SRNG::range(const ScalarRange2<double>& range);
+
+template<>
+float SRNG::range(const ScalarRange2<float>& range);
 
 } // MM::Random
 

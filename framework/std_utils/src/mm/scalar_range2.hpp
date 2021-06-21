@@ -9,6 +9,11 @@ struct ScalarRange2 {
 
 	ScalarRange2(void) = default;
 
+	ScalarRange2(const T& both) noexcept {
+		v_min = both;
+		v_max = both;
+	}
+
 	ScalarRange2(const T& min, const T& max) noexcept {
 		if (min <= max) {
 			v_min = min;
