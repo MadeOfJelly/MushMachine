@@ -5,6 +5,7 @@
 #include <cassert>
 #include <functional>
 
+#include <mm/logger.hpp>
 #include <tracy/Tracy.hpp>
 
 namespace MM::UpdateStrategies {
@@ -34,6 +35,20 @@ bool Sequential::enableService(const entt::id_type service_id, std::vector<TaskI
 	auto& service = _service_tasks[service_id];
 
 	for (const auto& task : task_array) {
+		if (_tasks.count(task._key)) {
+			entt::id_type other_service = 0;
+			for (const auto& it : _service_tasks) {
+				if (it.second.count(task._key)) {
+					other_service = it.first;
+				}
+			}
+
+			// TODO: this is cryptic
+			SPDLOG_ERROR("service '{}' adding task with taken id '{}'/'{}'. taken by '{}'", service_id, task._key, task._name, other_service);
+
+			continue;
+		}
+
 		_tasks.emplace(task._key, task);
 		service.emplace(task._key);
 	}
