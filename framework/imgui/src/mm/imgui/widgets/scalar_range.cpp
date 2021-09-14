@@ -44,5 +44,16 @@ namespace MM::ImGuiWidgets {
 		return DragScalarRange2EXT(label, ImGuiDataType_S64, &range.min(), &range.max(), 0.1f, v_min, v_max);
 	}
 
+	// float, double
+	template<>
+	bool DragScalarRange2(const char* label, ScalarRange2<float>& range, float v_min , float v_max) {
+		return DragScalarRange2EXT(label, ImGuiDataType_Float, &range.min(), &range.max(), 0.1f, v_min, v_max);
+	}
+
+	template<>
+	bool DragScalarRange2(const char* label, ScalarRange2<double>& range, double v_min , double v_max) {
+		return DragScalarRange2EXT(label, ImGuiDataType_Double, &range.min(), &range.max(), 0.1f, v_min, v_max);
+	}
+
 } // MM::ImGuiWidgets
 

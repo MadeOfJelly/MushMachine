@@ -69,7 +69,11 @@ namespace MM::ImGuiWidgets {
 	template<>
 	bool DragScalarRange2(const char* label, ScalarRange2<int64_t>& range, int64_t v_min , int64_t v_max);
 
-	// TODO: float, double
+	// float, double
+	template<>
+	bool DragScalarRange2(const char* label, ScalarRange2<float>& range, float v_min , float v_max);
+	template<>
+	bool DragScalarRange2(const char* label, ScalarRange2<double>& range, double v_min , double v_max);
 
 } // MM::ImGuiWidgets
 
