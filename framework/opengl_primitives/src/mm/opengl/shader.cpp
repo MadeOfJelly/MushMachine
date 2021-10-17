@@ -1,6 +1,10 @@
 #include "./shader.hpp"
 
-#include <map>
+#ifdef MM_OPENGL_3_GLES
+	#include <GLES3/gl3.h>
+#else
+	#include <glad/glad.h>
+#endif
 
 #include <mm/services/filesystem.hpp>
 

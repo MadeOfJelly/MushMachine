@@ -6,12 +6,6 @@
 #include <unordered_map>
 #include <memory>
 
-#ifdef MM_OPENGL_3_GLES
-	#include <GLES3/gl3.h>
-#else
-	#include <glad/glad.h>
-#endif
-
 #include <glm/fwd.hpp>
 #include <glm/mat3x3.hpp>
 
@@ -22,7 +16,12 @@ namespace MM {
 
 namespace MM::OpenGL {
 
+	// fwd
+	class ShaderBuilder;
+
 	class Shader {
+		friend ShaderBuilder;
+
 		private:
 			uint32_t _rendererID;
 			std::unordered_map<std::string, int32_t> _uniformLocationCache;
@@ -50,6 +49,7 @@ namespace MM::OpenGL {
 			void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
 			void setUniformMat3f(const std::string& name, const glm::mat3& matrix);
 
+			// prefere ShaderBuilder
 			static std::shared_ptr<Shader> createF(Engine& engine, const char* vertexShaderPath, const char* fragmentShaderPath);
 			static std::shared_ptr<Shader> create(const std::string& vertexShader, const std::string& fragmentShader);
 

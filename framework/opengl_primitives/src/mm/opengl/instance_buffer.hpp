@@ -38,6 +38,11 @@ namespace MM::OpenGL {
 				glBindBuffer(target, 0);
 			}
 
+			// for transform feedback
+			void bindBase(GLuint index, GLenum target = GL_TRANSFORM_FEEDBACK_BUFFER) const {
+				glBindBufferBase(target, index, _handle);
+			}
+
 			void resize(size_t size, GLenum usage) {
 				glBindBuffer(GL_ARRAY_BUFFER, _handle);
 				glBufferData(GL_ARRAY_BUFFER, size * sizeof(TInstance), nullptr, usage);
