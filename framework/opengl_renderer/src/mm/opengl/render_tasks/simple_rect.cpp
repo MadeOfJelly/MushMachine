@@ -56,16 +56,13 @@ SimpleRect::~SimpleRect(void) {
 void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::SimpleRect::render");
 
-	rs.targets[target_fbo]->bind(FrameBufferObject::W);
+	rs.targets[target_fbo]->bind(FrameBufferObject::RW);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	_shader->bind();
-	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
-
-	//_shader->setUniform4f("_color", default_color);
 
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
@@ -94,7 +91,6 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	}
 
 	_vao->unbind();
-	_vertexBuffer->unbind(GL_ARRAY_BUFFER);
 	_shader->unbind();
 }
 

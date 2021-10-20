@@ -19,7 +19,7 @@ namespace MM::OpenGL {
 	class InstanceBuffer {
 		private:
 			GLuint _handle;
-			size_t _size;
+			std::size_t _size;
 
 		public:
 			explicit InstanceBuffer(void) : _handle(0), _size(0) {
@@ -43,21 +43,21 @@ namespace MM::OpenGL {
 				glBindBufferBase(target, index, _handle);
 			}
 
-			void resize(size_t size, GLenum usage) {
+			void resize(std::size_t size, GLenum usage) {
 				glBindBuffer(GL_ARRAY_BUFFER, _handle);
 				glBufferData(GL_ARRAY_BUFFER, size * sizeof(TInstance), nullptr, usage);
 				_size = size;
 			}
 
-			size_t getSize(void) const {
+			std::size_t getSize(void) const {
 				return _size;
 			}
 
-			size_t getSizeBytes(void) const {
+			std::size_t getSizeBytes(void) const {
 				return _size * sizeof(TInstance);
 			}
 
-			TInstance* map(size_t size, GLenum usage = GL_DYNAMIC_DRAW, bool shrink = false) {
+			TInstance* map(std::size_t size, GLenum usage = GL_DYNAMIC_DRAW, bool shrink = false) {
 				if (size > _size || (shrink && (size < _size)))
 					resize(size, usage);
 
@@ -71,12 +71,21 @@ namespace MM::OpenGL {
 						GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
 					)
 				);
-				//auto* res = static_cast<TInstance*>(
-					//glMapBuffer(
-						//GL_ARRAY_BUFFER,
-						//GL_WRITE_ONLY
-					//)
-				//);
+
+				return res;
+			}
+
+			TInstance* mapRange(std::size_t offset, std::size_t size, GLbitfield access = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT) {
+				glBindBuffer(GL_ARRAY_BUFFER, _handle);
+
+				auto* res = static_cast<TInstance*>(
+					glMapBufferRange(
+						GL_ARRAY_BUFFER,
+						offset * sizeof(TInstance),
+						size * sizeof(TInstance),
+						access
+					)
+				);
 
 				return res;
 			}

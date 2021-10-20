@@ -24,6 +24,7 @@ void FrameBufferObject::bind(Target target) const {
 	}
 }
 
+// TODO: refactor, make depth and stencil set-able
 void FrameBufferObject::clear(float r, float g, float b, float a, GLbitfield target_mask) {
 	bind(FrameBufferObject::RW);
 
