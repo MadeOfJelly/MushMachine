@@ -6,7 +6,12 @@
 	#include <glad/glad.h>
 #endif
 
+#include <string_view>
+
 #include <mm/services/filesystem.hpp>
+#include <mm/path_utils.hpp>
+
+#include <mm/string_view_split.hpp>
 
 #include <mm/logger.hpp>
 #define LOG_CRIT(...)		__LOG_CRIT(	"OpenGL", __VA_ARGS__)
@@ -15,6 +20,8 @@
 #define LOG_INFO(...)		__LOG_INFO(	"OpenGL", __VA_ARGS__)
 #define LOG_DEBUG(...)		__LOG_DEBUG("OpenGL", __VA_ARGS__)
 #define LOG_TRACE(...)		__LOG_TRACE("OpenGL", __VA_ARGS__)
+
+//#include <iostream>
 
 namespace MM::OpenGL {
 
@@ -82,6 +89,7 @@ void Shader::setUniformMat3f(const std::string& name, const glm::mat3& matrix) {
 	glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }
 
+// TODO: refactor this whole thing out
 std::string Shader::parse(Engine& engine, const std::string& filePath) {
 	auto& fs = engine.getService<MM::Services::FilesystemService>();
 
@@ -91,11 +99,160 @@ std::string Shader::parse(Engine& engine, const std::string& filePath) {
 		return "";
 	}
 
-	std::string file;
-	fs.readString(handle, file);
+	std::string in_file;
+	{
+		auto read_count = fs.readString(handle, in_file);
+		fs.close(handle);
 
-	fs.close(handle);
-	return file;
+		if (read_count == 0) {
+			LOG_WARN("empty file");
+			return "";
+		}
+	}
+
+	// preprocessor, without the preprocessing, only does uncontitional include
+	// actual "parsing" here:
+	// ... #include is all we need tho
+
+	std::string out_file;
+	std::string_view in_file_view = in_file;
+
+	// for each line
+	while (true) {
+		// view empty, end loop
+		if (in_file_view.empty() || in_file_view.front() == '\0') { // fix random \0
+			break;
+		}
+
+		auto next_nl_pos = in_file_view.find_first_of('\n');
+		std::string_view line;
+		if (next_nl_pos == 0) { // empty line, skip
+			in_file_view = in_file_view.substr(1);
+			//std::cout << "!!! empty line\n";
+			out_file += '\n';
+			continue;
+		} else {
+			// works for npos too
+			line = in_file_view.substr(0, next_nl_pos);
+		}
+
+		// do line parsing
+
+		auto original_line = line;
+
+		// trim front
+		// there should be no \n
+		line.remove_prefix(std::min(line.find_first_not_of(" \t\r\n"), line.size()));
+		// trim back
+		// WRONG!!, but idc, idn
+		//line.remove_suffix(std::min(line.find_last_not_of(" \t\r\n"), line.size()));
+		//std::cout << "tline: " << line << "\n";
+
+		if (line.empty()) {
+			out_file += '\n';
+			continue; // line was empty after trim
+		}
+
+		// TODO: refactor
+		// TODO: add support for spaces in include paths
+		// are we a preprocessor token
+		if (line.at(0) == '#' && line.size() > 1) {
+			// this trims, if all whitespace are delims
+			auto tokens = MM::std_utils::split(line.substr(1), " \t\r\n");
+
+			// rn only include
+			if (tokens.empty()) {
+				// TODO: warn
+				out_file += original_line;
+				out_file += '\n';
+			} else if (tokens.front() == "include") {
+				if (tokens.size() <= 1) {
+					// error include missing path
+					//continue;
+					break;
+				}
+
+				std::string_view include_path = tokens[1];
+				if (include_path.size() > 2 && include_path.front() == '"' && include_path.back() == '"') {
+					include_path = include_path.substr(1, include_path.size()-2);
+					//std::cout << "include path: " << include_path << "\n";
+
+					std::string path;
+					// try relative/absolut path
+					if (include_path.front() == '/') { // absolut
+						path = include_path;
+					} else { // relative
+						path = MM::base_path(filePath);
+						assert(path.back() == '/'); // lel
+						path += include_path;
+					}
+
+					if (!MM::path_shorten(path)) {
+						LOG_ERROR("too many '..' in '{}'", path);
+						break;
+					}
+
+					if (!fs.isFile(path.c_str())) {
+						LOG_ERROR("unknown file '{}' ('{}')", include_path, path);
+						break;
+					}
+
+					// prevent recursion
+					if (filePath == path) {
+						LOG_WARN("skipping direct recursion of '{}'", filePath);
+					}
+
+					std::string tmp_include_file = parse(engine, path);
+
+					//std::cout << "#####in_file:\n";
+					//for (const char c : tmp_include_file) {
+						//std::cout << (int)c << "(" << std::hex << (int)c << std::dec << ") ";
+					//}
+					//std::cout << "\n";
+
+					out_file += "// INCLUDED FILE START (";
+					out_file += path;
+					out_file += ")\n";
+
+					out_file += tmp_include_file;
+
+					out_file += "\n// INCLUDED FILE END (";
+					out_file += path;
+					out_file += ")\n";
+
+					LOG_INFO("#included file '{}'", path);
+
+					// otherwise use library path
+				} else if (include_path.size() > 2 && include_path.front() == '<' && include_path.back() == '>') {
+					include_path = include_path.substr(1, include_path.size()-2);
+					//std::cout << "include path: " << include_path << "\n";
+					// handle library path
+				} else {
+					LOG_ERROR("include path missing delimiters ('\"\"', '<>'): '{}'", include_path);
+					//continue;
+					break;
+				}
+			} else {
+				// if not include
+				out_file += original_line;
+				out_file += '\n';
+			}
+		} else {
+			out_file += original_line;
+			out_file += '\n';
+		}
+
+		// was last line
+		if (next_nl_pos == std::string_view::npos) {
+			break;
+		}
+
+		in_file_view = in_file_view.substr(next_nl_pos+1);
+	}
+
+	//std::cout << "file after parsing:\n" << out_file;
+
+	return out_file;
 }
 
 uint32_t Shader::compile(uint32_t type, const std::string& source) {

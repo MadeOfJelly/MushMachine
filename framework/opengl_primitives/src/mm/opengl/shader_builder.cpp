@@ -39,6 +39,7 @@ std::shared_ptr<Shader> ShaderBuilder::finish(void) {
 	for (auto& stage : _stages) {
 		if (stage.fail) {
 			// log error
+			LOG_ERROR("error in shader stage");
 			return nullptr;
 		}
 	}
