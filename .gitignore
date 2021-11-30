@@ -10,7 +10,7 @@ cmake-build-release/
 *.stackdump
 *.coredump
 compile_commands.json
-/build
+/build*
 .clangd
 .cache
 

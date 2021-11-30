@@ -19,10 +19,11 @@ endif()
 
 target_include_directories(tracy_client PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 
-#target_link_libraries(tracy_client
-#)
-
 if(UNIX)
 	target_link_libraries(tracy_client dl)
+endif()
+
+if(WIN32)
+	target_link_libraries(tracy_client ws2_32 dbghelp)
 endif()
 

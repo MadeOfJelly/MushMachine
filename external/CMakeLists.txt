@@ -26,7 +26,11 @@ add_subdirectory("physfs")
 
 if(NOT MM_HEADLESS)
 	if(NOT EMSCRIPTEN)
-		find_package(SDL2 REQUIRED)
+		if(VCPKG_TARGET_TRIPLET)
+			find_package(SDL2 CONFIG REQUIRED)
+		else() # HACK: fix sdl find module
+			find_package(SDL2 REQUIRED)
+		endif()
 	endif()
 
 	if(NOT MM_OPENGL_3_GLES)

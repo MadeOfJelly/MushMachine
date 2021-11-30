@@ -31,6 +31,8 @@ if(NOT MM_HEADLESS)
 	if(EMSCRIPTEN)
 		set_target_properties(filesystem_service PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
 		set_target_properties(filesystem_service PROPERTIES LINK_FLAGS "-s USE_SDL=2")
+	elseif(VCPKG_TARGET_TRIPLET)
+		target_link_libraries(filesystem_service SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
 	else()
 		#if not android or emscripten
 		target_include_directories(filesystem_service PUBLIC "${SDL2_INCLUDE_DIR}")

@@ -34,6 +34,9 @@ SDLService::SDLService(uint32_t _sdl_init_flags) {
 //#ifdef __EMSCRIPTEN__
 	//_sdl_init_flags &= ~SDL_INIT_HAPTIC;
 //#endif
+#if 1 // hack for mingw + wine
+	_sdl_init_flags &= ~SDL_INIT_SENSOR;
+#endif
 
 	sdl_init_flags = _sdl_init_flags;
 }

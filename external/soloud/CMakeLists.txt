@@ -163,9 +163,12 @@ target_include_directories(soloud SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/sol
 #target_include_directories(soloud PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 
 #if not android or emscripten
-target_include_directories(soloud PUBLIC "${SDL2_INCLUDE_DIR}")
-target_link_libraries(soloud ${SDL2_LIBRARY})
-#endif
+if(VCPKG_TARGET_TRIPLET)
+	target_link_libraries(soloud SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
+else()
+	target_include_directories(soloud PUBLIC "${SDL2_INCLUDE_DIR}")
+	target_link_libraries(soloud ${SDL2_LIBRARY})
+endif()
 
 #if android
 #target_link_libraries(soloud SDL)
