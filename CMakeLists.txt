@@ -19,6 +19,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+# enable test
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	include(CTest)
+	#enable_testing()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/mm_options_and_defines.cmake")
 
 # external libs
@@ -45,10 +51,6 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 	endif()
-endif()
-
-if (BUILD_TESTING)
-	enable_testing()
 endif()
 
 # cmake setup end
