@@ -15,7 +15,7 @@ target_link_libraries(mm_logo_screen
 	glm
 	engine
 	screen_director
-	simple_scene
+	organizer_scene
 
 	opengl_renderer_s
 	simple_sprite_render_task

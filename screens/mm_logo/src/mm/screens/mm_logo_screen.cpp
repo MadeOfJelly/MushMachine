@@ -2,7 +2,7 @@
 
 #include <glm/gtc/constants.hpp>
 
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>

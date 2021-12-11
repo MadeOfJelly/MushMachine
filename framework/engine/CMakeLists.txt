@@ -15,7 +15,6 @@ add_library(engine
 	src/mm/update_strategies/sequential_strategy.cpp
 
 	src/mm/services/scene_service_interface.hpp
-	src/mm/services/scene_service_interface.cpp
 
 	src/mm/services/net_channeled_interface.hpp
 )

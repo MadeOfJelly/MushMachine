@@ -6,7 +6,6 @@ target_include_directories(simple_velocity_test PRIVATE ".")
 
 target_link_libraries(simple_velocity_test
 	simple_velocity_system
-	simple_scene
 	gtest_main
 )
 
