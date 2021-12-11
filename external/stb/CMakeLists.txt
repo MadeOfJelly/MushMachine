@@ -11,8 +11,9 @@ target_link_libraries(stb_image stb)
 add_library(stb_image_write "stb/stb_image_write.h" "stb_image_write.cpp")
 target_link_libraries(stb_image_write stb)
 
-add_library(stb_perlin "stb/stb_perlin.h" "stb_perlin.cpp")
-target_link_libraries(stb_perlin stb)
+# lel TODO: add back in when patent expires
+#add_library(stb_perlin "stb/stb_perlin.h" "stb_perlin.cpp")
+#target_link_libraries(stb_perlin stb)
 
 add_library(stb_rect_pack "stb/stb_rect_pack.h" "stb_rect_pack.cpp")
 target_link_libraries(stb_rect_pack stb)
