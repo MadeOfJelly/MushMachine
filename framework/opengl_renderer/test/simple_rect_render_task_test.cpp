@@ -1,4 +1,3 @@
-#include "entt/entity/fwd.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/engine.hpp>
@@ -9,6 +8,7 @@
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/render_tasks/simple_rect.hpp>
 
@@ -17,7 +17,7 @@
 
 #include <mm/systems/simple_velocity_system2d.hpp>
 
-#include <random>
+#include <mm/random/srng.hpp>
 
 const char* argv0;
 
@@ -46,10 +46,12 @@ TEST(simple_rect_render_task, it) {
 
 	// setup v system
 	auto& org = scene.set<entt::organizer>();
+	org.emplace<&MM::Systems::simple_velocity>("simple_velocity");
 
-	//MM::AddSystemToScene(scene, MM::Systems::SimpleVelocity);
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
 
-	std::mt19937 mt(42);
+	MM::Random::SRNG rng{42};
 
 	for (int y = 0; y < 10; y++) {
 		for (int i = 0; i < 10; i++) {
@@ -62,14 +64,10 @@ TEST(simple_rect_render_task, it) {
 			auto& v = scene.emplace<MM::Components::Velocity2D>(e);
 			v.rotation = i * 0.3f;
 
-			if (mt() % 2) {
+			if (rng.roll(0.5f)) {
 				auto& col = scene.emplace<MM::Components::Color>(e);
-				auto rc = [&mt]() -> float {
-					return (mt() % 1001) / 1000.f ;
-				};
-				col.color = {rc(),rc(),rc(),1};
+				col.color = {rng.zeroToOne(), rng.zeroToOne(), rng.zeroToOne(), 1.f};
 			}
-
 		}
 	}
 

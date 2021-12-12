@@ -4,11 +4,12 @@
 
 #include <mm/services/filesystem.hpp>
 #include <mm/services/sdl_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/services/imgui_s.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/render_tasks/clear.hpp>
 #include <mm/opengl/render_tasks/copy_to_fb.hpp>
@@ -26,7 +27,7 @@
 
 #include <imgui/imgui.h>
 
-#include <random>
+#include <mm/random/srng.hpp>
 
 using namespace entt::literals;
 
@@ -40,10 +41,10 @@ TEST(blur_render_task, it) {
 
 	sdl_ss.createGLWindow("blur_render_task_test", 1280, 720);
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
@@ -111,9 +112,13 @@ TEST(blur_render_task, it) {
 
 
 	// setup v system
-	MM::AddSystemToScene(scene, MM::Systems::SimpleVelocity);
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<&MM::Systems::simple_velocity>("simple_velocity");
 
-	std::mt19937 mt(42);
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
+
+	MM::Random::SRNG rng{42};
 
 	for (int i = 0; i < 10; i++) {
 		auto e = scene.create();
@@ -124,14 +129,10 @@ TEST(blur_render_task, it) {
 		auto& v = scene.emplace<MM::Components::Velocity2D>(e);
 		v.rotation = float(i) * 0.3f;
 
-		if (mt() % 2) {
+		if (rng.roll(0.5f)) {
 			auto& col = scene.emplace<MM::Components::Color>(e);
-			auto rc = [&mt]() -> float {
-				return (mt() % 1001) / 1000.f ;
-			};
-			col.color = {rc(),rc(),rc(),1};
+			col.color = {rng.zeroToOne(), rng.zeroToOne(), rng.zeroToOne(), 1.f};
 		}
-
 	}
 
 	engine.run();

@@ -7,6 +7,10 @@ namespace MM::Random {
 
 // Seeded (Pseudo-) Random Number Generator
 struct SRNG {
+	// make shuffle compat 
+	// TODO: add more type info
+	using result_type = uint32_t;
+
 	uint32_t seed = 1337;
 	int32_t pos = 0;
 

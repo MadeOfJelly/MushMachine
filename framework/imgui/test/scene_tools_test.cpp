@@ -6,7 +6,7 @@
 
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/imgui_s.hpp>
 #include <mm/services/imgui_menu_bar.hpp>
 #include <mm/services/engine_tools.hpp>
@@ -31,10 +31,10 @@ TEST(imgui_scene_tools, it) {
 	engine.addService<MM::Services::FilesystemService>(argv0, "imgui_scene_tools_test");
 	ASSERT_TRUE(engine.enableService<MM::Services::FilesystemService>());
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 
 	engine.addService<MM::Services::ImGuiService>();
@@ -56,16 +56,12 @@ TEST(imgui_scene_tools, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 
-	//InitializeYojimbo();
-
 	engine.run();
 
 
 	// TODO: clear asset manager
 
 	sdl_ss.destroyWindow();
-
-	//ShutdownYojimbo();
 }
 
 int main(int argc, char** argv) {

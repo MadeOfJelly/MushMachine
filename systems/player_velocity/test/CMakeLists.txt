@@ -6,7 +6,7 @@ target_include_directories(player_velocity_test PRIVATE ".")
 
 target_link_libraries(player_velocity_test
 	player_velocity_system
-	simple_scene
+	organizer_scene
 	gtest_main
 )
 

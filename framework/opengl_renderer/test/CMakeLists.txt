@@ -31,6 +31,8 @@ target_link_libraries(simple_rect_render_task_test
 
 	simple_velocity_system
 
+	random
+
 	gtest_main
 )
 
@@ -99,6 +101,8 @@ target_link_libraries(blur_render_task_test
 	imgui_render_task
 
 	simple_velocity_system
+
+	random
 
 	gtest_main
 )

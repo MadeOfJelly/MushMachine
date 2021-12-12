@@ -4,10 +4,11 @@
 
 #include <mm/services/filesystem.hpp>
 #include <mm/services/sdl_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/texture_loader.hpp>
 
@@ -15,12 +16,24 @@
 
 #include <mm/components/transform2d.hpp>
 #include <mm/components/color.hpp>
+#include <mm/components/time_delta.hpp>
 #include <mm/opengl/render_tasks/spritesheet_renderable.hpp>
 
 #include <physfs.h>
 #include "res/textures.zip.h"
 
 using namespace entt::literals;
+
+void update_spritesheet_animation(entt::view<entt::exclude_t<>, MM::OpenGL::SpriteSheetRenderable> view, float& accu, const MM::Components::TimeDelta& td) {
+	accu += td.tickDelta;
+
+	if (accu >= 1.f/10) {
+		accu -= 1.f/10;
+		view.each([](auto& spr) {
+			spr.tile_index = (spr.tile_index+spr.sp.tile_count.x) % (spr.sp.tile_count.x*spr.sp.tile_count.y);
+		});
+	}
+}
 
 TEST(simple_spritesheet_render_task, it) {
 	MM::Engine engine;
@@ -30,10 +43,10 @@ TEST(simple_spritesheet_render_task, it) {
 
 	sdl_ss.createGLWindow("simple_spritesheet_render_task_test", 1280, 720);
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
@@ -52,19 +65,13 @@ TEST(simple_spritesheet_render_task, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleSpriteSheet>(engine);
 
-	float accu = 0.f;
-	MM::AddSystemToScene(scene, [&accu](auto& scene, float delta) {
-		accu += delta;
+	// setup systems
+	scene.set<float>(0.f); // accu
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<&update_spritesheet_animation>("update_spritesheet_animation");
 
-		if (accu >= 1.f/10) {
-			accu -= 1.f/10;
-			scene.template view<MM::OpenGL::SpriteSheetRenderable>()
-				.each([](auto, auto& spr) {
-						spr.tile_index = (spr.tile_index+spr.sp.tile_count.x) % (spr.sp.tile_count.x*spr.sp.tile_count.y);
-					}
-				);
-		}
-	});
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
 
 	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 	ASSERT_TRUE(rm_t.load<MM::OpenGL::TextureLoaderFile>("anim_run", engine, "/textures/animation_running-1_ea_0.3.png"));

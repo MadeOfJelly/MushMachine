@@ -11,6 +11,7 @@ target_include_directories(fast_sky_sun_system PUBLIC "${CMAKE_CURRENT_SOURCE_DI
 target_link_libraries(fast_sky_sun_system
 	engine
 	fast_sky_render_task
+	common_components
 )
 
 if(EMSCRIPTEN)

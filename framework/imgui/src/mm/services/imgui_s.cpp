@@ -91,14 +91,14 @@ void ImGuiService::disable(Engine& engine) {
 	ImGui::DestroyContext();
 }
 
-void ImGuiService::imgui_new_frame(Engine& engine) {
+void ImGuiService::imgui_new_frame(Engine&) {
 	ZoneScopedN("MM::Services::ImGuiService::imgui_new_frame");
 
 #ifdef MM_OPENGL_3
 	ImGui_ImplOpenGL3_NewFrame();
 #endif
 
-	ImGui_ImplSDL2_NewFrame(engine.getService<MM::Services::SDLService>().win);
+	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 }
 

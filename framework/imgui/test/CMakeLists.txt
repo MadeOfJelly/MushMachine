@@ -43,7 +43,7 @@ target_include_directories(imgui_scene_tools_test PRIVATE ".")
 
 target_link_libraries(imgui_scene_tools_test
 	engine
-	simple_scene
+	organizer_scene
 	opengl_renderer_s
 	imgui_service
 	imgui_render_task
@@ -100,7 +100,6 @@ target_include_directories(imgui_text_edit_test PRIVATE ".")
 
 target_link_libraries(imgui_text_edit_test
 	engine
-	simple_scene
 	opengl_renderer_s
 	imgui_service
 	imgui_render_task

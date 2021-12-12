@@ -4,10 +4,11 @@
 
 #include <mm/services/filesystem.hpp>
 #include <mm/services/sdl_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/render_tasks/simple_sprite.hpp>
 
@@ -31,10 +32,10 @@ TEST(simple_sprite_render_task, it) {
 
 	sdl_ss.createGLWindow("simple_sprite_render_task_test", 1280, 720);
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
@@ -47,7 +48,11 @@ TEST(simple_sprite_render_task, it) {
 	rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleSprite>(engine);
 
 	// setup v system
-	MM::AddSystemToScene(scene, MM::Systems::SimpleVelocity);
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<&MM::Systems::simple_velocity>("simple_velocity");
+
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
 
 	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 

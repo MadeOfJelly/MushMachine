@@ -4,15 +4,17 @@
 
 #include <mm/services/filesystem.hpp>
 #include <mm/services/sdl_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/render_tasks/fast_sky_render_task.hpp>
 #include <mm/systems/fast_sky_sun_system.hpp>
 
 #include <mm/opengl/camera_3d.hpp>
+#include <mm/components/time_delta.hpp>
 
 const char* argv0;
 
@@ -24,10 +26,10 @@ TEST(fast_sky_render_task, it) {
 
 	sdl_ss.createGLWindow("fast_sky_render_task_test", 1280, 720);
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
@@ -39,7 +41,13 @@ TEST(fast_sky_render_task, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::FastSky>(engine);
 
-	MM::AddSystemToScene(scene, MM::Systems::FastSkySun);
+	// setup systems
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<&MM::Systems::fast_sky_sun>("fast_sky_sun");
+
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
+
 
 	auto& cam = scene.set<MM::OpenGL::Camera3D>();
 	cam.setPerspective();

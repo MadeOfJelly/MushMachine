@@ -3,9 +3,10 @@
 #include <mm/engine.hpp>
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/input_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/systems/player_velocity2d_system.hpp>
 
@@ -19,16 +20,21 @@ TEST(player_velocity, basic_run) {
 	engine.addService<MM::Services::InputService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::InputService>());
 
-	engine.addService<MM::Services::SimpleSceneService>(delta);
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>(delta);
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
 	// setup v system
-	MM::AddSystemToScene(scene, MM::Systems::PlayerVelocity2D);
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<&MM::Systems::player_velocity2d>("player_velocity2d");
+
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
+
 
 	//auto [e, t, v] = scene.create<MM::Components::Transform, MM::Components::Velocity>();
 	//t.position = { 0.f, 0.f };

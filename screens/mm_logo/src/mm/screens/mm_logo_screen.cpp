@@ -6,6 +6,7 @@
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/render_tasks/simple_sprite.hpp>
 
@@ -14,11 +15,59 @@
 
 #include <mm/components/transform2d.hpp>
 #include <mm/components/color.hpp>
+#include <mm/components/time_delta.hpp>
 #include <mm/opengl/components/texture.hpp>
 
+#include <mm/random/srng.hpp>
 #include <random>
 
 namespace MM::Screens {
+
+namespace Components {
+
+	struct screen_timer {
+		float accumulator = 0.f;
+		float duration = 0.f;
+		std::string next_screen;
+	};
+
+	struct easing {
+		glm::vec2 start{0.f, 0.f};
+		glm::vec2 end{0.f, 0.f};
+
+		float accumulator = 0.f;
+		float duration = 1.f;
+	};
+
+} // Components
+
+namespace Systems {
+
+	void screen_timer_system(Components::screen_timer& sc_timer, const MM::Components::TimeDelta& td, const MM::Engine* engine) {
+		sc_timer.accumulator += td.tickDelta;
+		if (sc_timer.accumulator >= sc_timer.duration) {
+			engine->getService<MM::Services::ScreenDirector>().queueChangeScreenTo(sc_timer.next_screen);
+		}
+	}
+
+	// elastic scale easing
+	void elasic_scale_easing(entt::view<entt::exclude_t<>, MM::Components::Transform2D, Components::easing> view, const MM::Components::TimeDelta& td) {
+		view.each([&td](auto& t, auto& easing_comp) {
+			easing_comp.accumulator += td.tickDelta;
+
+			// taken from https://github.com/warrenm/AHEasing
+			// licensed under WTFPL
+			auto elasticOut = [](float x) -> float {
+				return glm::sin(-13.f * glm::half_pi<float>() * (x + 1.f)) * glm::pow(2.f, -10.f * x) + 1.f;
+			};
+
+			t.scale.x = glm::mix(easing_comp.start.x, easing_comp.end.x, elasticOut(easing_comp.accumulator / easing_comp.duration));
+			t.scale.y = glm::mix(easing_comp.start.y, easing_comp.end.y, elasticOut(easing_comp.accumulator / easing_comp.duration));
+
+		});
+	}
+
+} // Systems
 
 #include "../res/mush_machine_logo_1.svg.png.h"
 
@@ -27,14 +76,14 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 	using namespace entt::literals;
 
 	screen.start_enable.push_back(engine.type<MM::Services::OpenGLRenderer>());
-	screen.start_enable.push_back(engine.type<MM::Services::SimpleSceneService>());
+	screen.start_enable.push_back(engine.type<MM::Services::OrganizerSceneService>());
 
-	screen.start_provide.push_back({engine.type<MM::Services::SceneServiceInterface>(), engine.type<MM::Services::SimpleSceneService>()});
+	screen.start_provide.push_back({engine.type<MM::Services::SceneServiceInterface>(), engine.type<MM::Services::OrganizerSceneService>()});
 
-	screen.end_disable.push_back(engine.type<MM::Services::SimpleSceneService>());
+	screen.end_disable.push_back(engine.type<MM::Services::OrganizerSceneService>());
 
-	screen.start_fn = [anim_duration, screen_duration, next_screen](MM::Engine& engine) {
-		auto& rs = engine.getService<MM::Services::OpenGLRenderer>();
+	screen.start_fn = [anim_duration, screen_duration, next_screen](MM::Engine& _engine) {
+		auto& rs = _engine.getService<MM::Services::OpenGLRenderer>();
 
 		//rss->renderers.clear();
 
@@ -47,7 +96,7 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 		}
 
 		if (!found) {
-			rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleSprite>(engine);
+			rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleSprite>(_engine);
 		}
 
 		// =================================================
@@ -59,58 +108,18 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 
 		// =================================================
 
-		engine.getService<MM::Services::SceneServiceInterface>().changeSceneNow(std::make_unique<MM::Scene>());
-		auto& scene = engine.getService<MM::Services::SceneServiceInterface>().getScene();
+		auto new_scene = std::make_unique<MM::Scene>();
+		auto& scene = *new_scene;
 
-		scene.ctx_or_set<MM::Engine*>(&engine);
+		auto& org = scene.set<entt::organizer>();
 
-		struct easing {
-			glm::vec2 start{0.f, 0.f};
-			glm::vec2 end{0.f, 0.f};
+		scene.set<MM::Engine*>(&_engine);
 
-			float accumulator = 0.f;
-			float duration = 1.f;
-		};
+		scene.set<Components::screen_timer>(0.f, screen_duration, next_screen);
 
-		struct screen_timer {
-			float accumulator = 0.f;
-		};
+		org.emplace<&Systems::screen_timer_system>("screen_timer_system");
 
-		MM::AddSystemToScene(scene, [screen_duration, next_screen](MM::Scene& scene, float delta) {
-			auto& sc_timer = scene.ctx<screen_timer>();
-			sc_timer.accumulator += delta;
-
-			if (sc_timer.accumulator >= screen_duration) {
-				scene.ctx<MM::Engine*>()->getService<MM::Services::ScreenDirector>().queueChangeScreenTo(next_screen);
-			}
-		});
-		scene.set<screen_timer>();
-
-		// elastic scale easing
-		MM::AddSystemToScene(scene, [](MM::Scene& scene, float delta) {
-			auto view = scene.view<MM::Components::Transform2D, easing>();
-
-			for (auto& e : view) {
-				auto& t = view.get<MM::Components::Transform2D>(e);
-				auto& easing_comp = view.get<easing>(e);
-				easing_comp.accumulator += delta;
-
-				//auto elasticOut = [](float x) -> float {
-					//const float c4 = (2.f * glm::pi<float>()) / 3.f;
-					//return x <= 0.f ? 0.f : x >= 1.f ? 1.f // limit output to [0,1]
-					//: glm::pow(2.f, -10.f * x) * glm::sin((x * 10.f - 0.75f) * c4) + 1.f;
-				//};
-				// taken from https://github.com/warrenm/AHEasing
-				// licensed under WTFPL
-				auto elasticOut = [](float x) -> float {
-					return glm::sin(-13.f * glm::half_pi<float>() * (x + 1.f)) * glm::pow(2.f, -10.f * x) + 1.f;
-				};
-
-				t.scale.x = glm::mix(easing_comp.start.x, easing_comp.end.x, elasticOut(easing_comp.accumulator / easing_comp.duration));
-				t.scale.y = glm::mix(easing_comp.start.y, easing_comp.end.y, elasticOut(easing_comp.accumulator / easing_comp.duration));
-
-			}
-		});
+		org.emplace<&Systems::elasic_scale_easing>("elasic_scale_easing");
 
 		auto& cam = scene.set<MM::OpenGL::Camera3D>();
 		cam.horizontalViewPortSize = 89.f;
@@ -122,7 +131,7 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 			auto& t = scene.emplace<MM::Components::Transform2D>(e_logo);
 			t.scale = {0,0};
 
-			auto& easing_comp = scene.emplace<easing>(e_logo);
+			auto& easing_comp = scene.emplace<Components::easing>(e_logo);
 			easing_comp.start = {0.f, 0.f};
 			easing_comp.end = {50.f * 1.12609649122807017543f, 50.f};
 			easing_comp.duration = anim_duration;
@@ -152,19 +161,21 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 				1.f,
 			};
 
-			std::mt19937_64 mt{std::random_device{}()};
+			//std::mt19937_64 mt{std::random_device{}()};
+			MM::Random::SRNG rng{std::random_device{}(), 0};
 
 			std::vector<glm::vec3> colors {color1, color2, color3};
-			std::shuffle(colors.begin(), colors.end(), mt);
+			std::shuffle(colors.begin(), colors.end(), rng);
 
 			auto& col = scene.emplace<MM::Components::Color>(e_logo);
 			col.color = {colors.front(), 1.f};
 		}
 
+		_engine.getService<MM::Services::SceneServiceInterface>().changeSceneNow(std::move(new_scene));
 	};
 
-	screen.end_fn = [](MM::Engine& engine) {
-		engine.getService<MM::Services::SceneServiceInterface>().changeSceneNow(std::make_unique<MM::Scene>());
+	screen.end_fn = [](MM::Engine& _engine) {
+		_engine.getService<MM::Services::SceneServiceInterface>().changeSceneNow(std::make_unique<MM::Scene>());
 	};
 }
 

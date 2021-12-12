@@ -4,7 +4,7 @@
 
 #include <mm/services/filesystem.hpp>
 #include <mm/services/sdl_service.hpp>
-#include <mm/services/simple_scene.hpp>
+#include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
@@ -27,10 +27,10 @@ TEST(tilemap_render_task_test, it) {
 
 	sdl_ss.createGLWindow("tilemap_render_task_test", 1280, 720);
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
+	engine.addService<MM::Services::OrganizerSceneService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
 
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
+	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 

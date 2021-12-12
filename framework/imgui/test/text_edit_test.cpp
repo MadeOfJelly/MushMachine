@@ -7,7 +7,6 @@
 
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/filesystem.hpp>
-#include <mm/services/simple_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/services/imgui_s.hpp>
 #include <mm/services/imgui_menu_bar.hpp>
@@ -19,8 +18,6 @@
 
 #include <mm/imgui/file_text_editor.hpp>
 #include <mm/imgui/file_shader_editor.hpp>
-
-#include <mm/services/scene_tools.hpp>
 
 static char* argv0;
 
@@ -55,12 +52,6 @@ TEST(imgui_text_edit, it) {
 	engine.addService<MM::Services::FilesystemService>(argv0, "imgui_text_edit_test");
 	ASSERT_TRUE(engine.enableService<MM::Services::FilesystemService>());
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
-
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(provide_ret);
-
 	engine.addService<MM::Services::ImGuiService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
 
@@ -70,14 +61,10 @@ TEST(imgui_text_edit, it) {
 	engine.addService<MM::Services::ImGuiEngineTools>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiEngineTools>());
 
-	engine.addService<MM::Services::ImGuiSceneToolsService>();
-
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
-
-	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSceneToolsService>());
 
 	engine.addService<TemplateUpdateMainService>([](MM::Engine& e) {
 		static MM::FileTextEditor fte{e};
@@ -103,12 +90,6 @@ TEST(imgui_text_edit, shader) {
 	engine.addService<MM::Services::FilesystemService>(argv0, "imgui_text_edit_test");
 	ASSERT_TRUE(engine.enableService<MM::Services::FilesystemService>());
 
-	engine.addService<MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(engine.enableService<MM::Services::SimpleSceneService>());
-
-	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::SimpleSceneService>();
-	ASSERT_TRUE(provide_ret);
-
 	engine.addService<MM::Services::ImGuiService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiService>());
 
@@ -118,17 +99,10 @@ TEST(imgui_text_edit, shader) {
 	engine.addService<MM::Services::ImGuiEngineTools>();
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiEngineTools>());
 
-	engine.addService<MM::Services::ImGuiSceneToolsService>();
-
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
-
-	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSceneToolsService>());
-
-	//auto& rc = engine.getScene().ctx<MM::OpenGL::RenderController>();
-	//rc.registerRenderer<MM::OpenGL::Renderers::QuadRenderer>();
 
 	MM::FileTextEditor fte{engine};
 	MM::FileShaderEditor fse{engine};
@@ -142,24 +116,6 @@ TEST(imgui_text_edit, shader) {
 	fse.open("shader/quad_renderer/frag.glsl");
 
 	// TODO: a shader to display plx
-	//{
-		//auto& ecs = engine.getScene();
-
-		//auto& ee = igsts->getEntityEditor();
-		//ee.registerTrivial<MM::OpenGL::Renderers::QuadRenderable>("QuadRenderable");
-		//ee.registerComponentCreateFn(ecs.type<MM::OpenGL::Renderers::QuadRenderable>(),
-				//[](MM::EngineConfig::ECS& ecs, MM::EngineConfig::Entity e) {
-					//auto& r = ecs.assign<MM::OpenGL::Renderers::QuadRenderable>(e);
-					//r._texture = MM::ResourceManager<MM::OpenGL::Texture>::ref().get("default"_hs);
-				//}
-			//);
-		//ee.registerComponentWidgetFn(ecs.type<MM::OpenGL::Renderers::QuadRenderable>(),
-				//[](MM::EngineConfig::ECS& ecs, MM::EngineConfig::Entity e) {
-					//auto& r = ecs.get<MM::OpenGL::Renderers::QuadRenderable>(e);
-					//MM::ImGuiWidgets::Components::QuadRenderable(r);
-				//}
-			//);
-	//}
 
 	engine.run();
 

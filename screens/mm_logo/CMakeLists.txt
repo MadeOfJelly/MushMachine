@@ -21,6 +21,8 @@ target_link_libraries(mm_logo_screen
 	simple_sprite_render_task
 
 	common_components
+
+	random
 )
 
 #if (BUILD_TESTING)
