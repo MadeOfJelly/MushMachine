@@ -51,7 +51,7 @@ namespace Systems {
 	}
 
 	// elastic scale easing
-	void elasic_scale_easing(entt::view<entt::exclude_t<>, MM::Components::Transform2D, Components::easing> view, const MM::Components::TimeDelta& td) {
+	void elasic_scale_easing(entt::view<entt::get_t<MM::Components::Transform2D, Components::easing>> view, const MM::Components::TimeDelta& td) {
 		view.each([&td](auto& t, auto& easing_comp) {
 			easing_comp.accumulator += td.tickDelta;
 

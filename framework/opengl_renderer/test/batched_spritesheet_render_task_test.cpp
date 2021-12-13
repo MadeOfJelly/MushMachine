@@ -28,7 +28,7 @@ using namespace entt::literals;
 
 const char* argv0;
 
-void update_spritesheet_animation(entt::view<entt::exclude_t<>, MM::OpenGL::SpriteSheetRenderable> view, float& accu, const MM::Components::TimeDelta& td) {
+void update_spritesheet_animation(entt::view<entt::get_t<MM::OpenGL::SpriteSheetRenderable>> view, float& accu, const MM::Components::TimeDelta& td) {
 	accu += td.tickDelta;
 
 	if (accu >= 1.f/10) {

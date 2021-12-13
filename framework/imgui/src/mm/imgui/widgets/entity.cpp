@@ -1,4 +1,4 @@
-#include "entity.hpp"
+#include "./entity.hpp"
 
 #include <mm/imgui/imgui_entt_entity_editor.hpp>
 
@@ -15,9 +15,9 @@ void Entity(MM::Entity& e, MM::Scene& ecs, bool dropTarget) {
 
 	if (ecs.valid(e)) {
 		if (ecs.all_of<MM::Components::Name>(e)) {
-			ImGui::Text(ICON_II_CUBE "E: %d v%d (%s)", entt::to_integral(ecs.entity(e)), ecs.version(e), ecs.get<MM::Components::Name>(e).str.c_str());
+			ImGui::Text(ICON_II_CUBE "E: %d v%d (%s)", entt::to_entity(e), entt::to_version(e), ecs.get<MM::Components::Name>(e).str.c_str());
 		} else {
-			ImGui::Text(ICON_II_CUBE "E: %d v%d", entt::to_integral(ecs.entity(e)), ecs.version(e));
+			ImGui::Text(ICON_II_CUBE "E: %d v%d", entt::to_entity(e), entt::to_version(e));
 		}
 	} else {
 		ImGui::Text(ICON_II_CUBE "E: invalid");
@@ -26,7 +26,7 @@ void Entity(MM::Entity& e, MM::Scene& ecs, bool dropTarget) {
 	if (ecs.valid(e)) {
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 			ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
-			ImGui::Text(ICON_II_CUBE "E: %d v%d", entt::to_integral(ecs.entity(e)), ecs.version(e));
+			ImGui::Text(ICON_II_CUBE "E: %d v%d", entt::to_entity(e), entt::to_version(e));
 			ImGui::EndDragDropSource();
 		}
 	}

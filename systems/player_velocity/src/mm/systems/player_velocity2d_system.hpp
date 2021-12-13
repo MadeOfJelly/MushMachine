@@ -8,7 +8,7 @@
 namespace MM::Systems {
 
 	// this system transforms the input from the input_service into velocity
-	void player_velocity2d(entt::view<entt::exclude_t<>, MM::Input::PlayerID, MM::Components::Velocity2D> view, const MM::Engine* engine);
+	void player_velocity2d(entt::view<entt::get_t<MM::Input::PlayerID, MM::Components::Velocity2D>> view, const MM::Engine* engine);
 
 } // MM::Systems
 

@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 project(simple_velocity_system CXX)
 
-set(HPP_FILES
+add_library(simple_velocity_system
 	src/mm/systems/simple_velocity_system2d.hpp
+	src/mm/systems/simple_velocity_system2d.cpp
 )
-
-set(CPP_FILES
-)
-
-add_library(simple_velocity_system ${CPP_FILES} ${HPP_FILES})
 
 target_include_directories(simple_velocity_system PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 

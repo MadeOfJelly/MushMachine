@@ -112,7 +112,11 @@ namespace MM::Services {
 				ImGui::Text("size: %lu", scene.size());
 				ImGui::Text("alive: %lu", scene.alive());
 				size_t orphans = 0;
-				scene.orphans([&](auto) { orphans++; });
+				scene.each([&orphans, &scene](auto entity) {
+					if (scene.orphan(entity)) {
+						orphans++;
+					}
+				});
 				ImGui::Text("orphans: %lu", orphans);
 			}
 			ImGui::End();
