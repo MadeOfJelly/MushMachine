@@ -62,16 +62,23 @@ namespace MM::Services {
 			//virtual bool getPacket
 
 			// calls fn for each packet and fills in peer, channel, data_ptr, and data_size
+			// if fn retruns true, the packet will be deleted
 			// returns number of fn calls
-			virtual size_t forEachPacket(std::function<void(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
+			virtual size_t forEachPacket(std::function<bool(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
 
 			// calls fn for each packet and fills in channel, data_ptr, and data_size
+			// if fn retruns true, the packet will be deleted
 			// returns number of fn calls
-			virtual size_t forEachPacketPeer(peer_id peer, std::function<void(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
+			virtual size_t forEachPacketPeer(peer_id peer, std::function<bool(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
 
 			// calls fn for each packet and fills in data_ptr, and data_size
+			// if fn retruns true, the packet will be deleted
 			// returns number of fn calls
-			virtual size_t forEachPacketPeerChannel(peer_id peer, channel_id channel, std::function<void(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
+			virtual size_t forEachPacketPeerChannel(peer_id peer, channel_id channel, std::function<bool(peer_id, channel_id, uint8_t*, size_t)> fn) = 0;
+
+			// deletes all packets
+			// it is a good idea to call this every once in a while, since garbage could accumulate
+			virtual void clearPackets(void) = 0;
 	};
 
 } // MM::Services
