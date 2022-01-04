@@ -1,3 +1,5 @@
+#pragma once
+
 #include <mm/opengl/spritesheet.hpp>
 
 namespace MM::OpenGL {

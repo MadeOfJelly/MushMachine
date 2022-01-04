@@ -14,10 +14,16 @@
 
 #include <mm/opengl/render_tasks/batched_spritesheet.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position2d_zoffset.hpp>
+#include <mm/components/scale2d.hpp>
+#include <mm/components/position3d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
 #include <mm/components/time_delta.hpp>
 #include <mm/opengl/render_tasks/spritesheet_renderable.hpp>
+
+#include <mm/systems/transform.hpp>
 
 #include <physfs.h>
 #include "res/textures.zip.h"
@@ -69,10 +75,27 @@ TEST(batched_spritesheet_render_task, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::BatchedSpriteSheet>(engine);
 
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position2D_ZOffset>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position3D>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Transform4x4>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+
+	scene.on_update<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position2D_ZOffset>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position3D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Scale2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+
+
 	// setup systems
 	scene.set<float>(0.f); // accu
 	auto& org = scene.set<entt::organizer>();
 	org.emplace<&update_spritesheet_animation>("update_spritesheet_animation");
+	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
+	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");
+	org.emplace<MM::Systems::transform3d_rotate2d>("transform3d_rotate2d");
+	org.emplace<MM::Systems::transform3d_scale2d>("transform3d_scale2d");
+	org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");
+
 
 	// HACK: instead you would switch to this scene
 	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
@@ -83,10 +106,13 @@ TEST(batched_spritesheet_render_task, it) {
 
 	{
 		auto e = scene.create();
-		auto& t = scene.emplace<MM::Components::Transform2D>(e);
-		t.position.x = -1.f;
-		t.scale.x = 1.5f;
-		t.scale.y = 2.f;
+		auto& p = scene.emplace<MM::Components::Position2D>(e);
+		p.pos.x = -1.f;
+
+		// zoffset is created by event
+
+		auto& s = scene.emplace<MM::Components::Scale2D>(e);
+		s.scale = {1.5f,2.f};
 
 		auto& spr = scene.emplace<MM::OpenGL::SpriteSheetRenderable>(e);
 		spr.sp.tex = rm_t.get("anim_run"_hs);
@@ -97,10 +123,13 @@ TEST(batched_spritesheet_render_task, it) {
 
 	{
 		auto e = scene.create();
-		auto& t = scene.emplace<MM::Components::Transform2D>(e);
-		t.position.x = 1.f;
-		t.scale.x = 1.5f;
-		t.scale.y = 2.f;
+		auto& p = scene.emplace<MM::Components::Position2D>(e);
+		p.pos.x = 1.f;
+
+		// zoffset is created by event
+
+		auto& s = scene.emplace<MM::Components::Scale2D>(e);
+		s.scale = {1.5f,2.f};
 
 		auto& spr = scene.emplace<MM::OpenGL::SpriteSheetRenderable>(e);
 		spr.sp.tex = rm_t.get("anim_idle"_hs);

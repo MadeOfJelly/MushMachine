@@ -36,9 +36,13 @@ add_library(imgui_widgets
 	./src/mm/imgui/widgets/auto_wrap.hpp
 
 	./src/mm/imgui/widgets/components/name.hpp
-	./src/mm/imgui/widgets/components/transform2d.hpp
-	./src/mm/imgui/widgets/components/transform3d.hpp
-	./src/mm/imgui/widgets/components/velocity2d.hpp
+	./src/mm/imgui/widgets/components/position2d.hpp
+	./src/mm/imgui/widgets/components/position2d_zoffset.hpp
+	./src/mm/imgui/widgets/components/position3d.hpp
+	./src/mm/imgui/widgets/components/rotation2d.hpp
+	./src/mm/imgui/widgets/components/scale2d.hpp
+	./src/mm/imgui/widgets/components/velocity2d_position.hpp
+	./src/mm/imgui/widgets/components/velocity2d_rotation.hpp
 	./src/mm/imgui/widgets/components/view_dir2d.hpp
 	./src/mm/imgui/widgets/components/view_dir3d.hpp
 	./src/mm/imgui/widgets/components/color.hpp
@@ -57,9 +61,13 @@ add_library(imgui_widgets
 	./src/mm/imgui/widgets/texture_resource_manager.cpp
 
 	./src/mm/imgui/widgets/components/name.cpp
-	./src/mm/imgui/widgets/components/transform2d.cpp
-	./src/mm/imgui/widgets/components/transform3d.cpp
-	./src/mm/imgui/widgets/components/velocity2d.cpp
+	./src/mm/imgui/widgets/components/position2d.cpp
+	./src/mm/imgui/widgets/components/position2d_zoffset.cpp
+	./src/mm/imgui/widgets/components/position3d.cpp
+	./src/mm/imgui/widgets/components/rotation2d.cpp
+	./src/mm/imgui/widgets/components/scale2d.cpp
+	./src/mm/imgui/widgets/components/velocity2d_position.cpp
+	./src/mm/imgui/widgets/components/velocity2d_rotation.cpp
 	./src/mm/imgui/widgets/components/view_dir2d.cpp
 	./src/mm/imgui/widgets/components/view_dir3d.cpp
 	./src/mm/imgui/widgets/components/color.cpp

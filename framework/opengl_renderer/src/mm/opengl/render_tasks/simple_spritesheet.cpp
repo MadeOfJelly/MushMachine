@@ -11,7 +11,7 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
 #include "./spritesheet_renderable.hpp"
 
@@ -69,6 +69,13 @@ SimpleSpriteSheet::~SimpleSpriteSheet(void) {
 void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::SimpleSpriteSheet::render");
 
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
+	}
+
+	auto& scene = ssi->getScene();
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::W);
 
 	glEnable(GL_DEPTH_TEST);
@@ -78,9 +85,6 @@ void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
-
 	auto* cam = scene.try_ctx<Camera3D>();
 	if (!cam) {
 		cam = &default_cam;
@@ -88,16 +92,14 @@ void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto vp = cam->getViewProjection();
 
-	auto view = scene.view<Components::Transform2D, SpriteSheetRenderable>();
-
-	view.each([&](auto e, Components::Transform2D& t, SpriteSheetRenderable& spr) {
+	scene.view<const Components::Transform4x4, SpriteSheetRenderable>().each([this, &scene, &vp](entt::entity e, const auto& t, auto& spr) {
 		assert(spr.sp.tex); // debug
 
 		TracyGpuZone("MM::OpenGL::Renderers::SimpleSpriteSheetRenderer::render.each");
 
 		spr.sp.tex->bind(0);
 
-		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(t.position.y/10.f + 500.f));
+		_shader->setUniformMat4f("_WVP", vp * t.trans);
 		_shader->setUniform2ui("_tileCount", spr.sp.tile_count.x, spr.sp.tile_count.y);
 		_shader->setUniform1ui("_atlasIndex", spr.tile_index);
 

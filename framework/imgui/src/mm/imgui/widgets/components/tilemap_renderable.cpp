@@ -9,8 +9,6 @@
 namespace MM::ImGuiWidgets::Components {
 
 void TilemapRenderable(MM::OpenGL::TilemapRenderable& tm_r) {
-	ImGui::InputFloat("z", &tm_r.z);
-
 	for (size_t i = 0; i < tm_r.sprite_layer.size(); i++) {
 		ImGui::Separator();
 		std::string label = "sprite_sheet##";
@@ -19,7 +17,7 @@ void TilemapRenderable(MM::OpenGL::TilemapRenderable& tm_r) {
 	}
 }
 
-}
+} // MM::ImGuiWidgets::Components
 
 namespace MM {
 

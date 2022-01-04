@@ -11,7 +11,7 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/opengl/components/texture.hpp>
 #include <mm/components/color.hpp>
 
@@ -87,9 +87,10 @@ void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 
 	_shader->setUniform3f("_ambient_color", ambient_color);
 
-	auto view = scene.view<MM::Components::Transform2D, OpenGL::TilemapRenderable>();
-	view.each([&](auto, MM::Components::Transform2D& t, OpenGL::TilemapRenderable& tilemap) {
-		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(tilemap.z + 500.f));
+	scene.view<MM::Components::Transform4x4, OpenGL::TilemapRenderable>()
+		.each([&](auto, MM::Components::Transform4x4& t, OpenGL::TilemapRenderable& tilemap) {
+		//_shader->setUniformMat4f("_WVP", vp * t.getTransform4(tilemap.z + 500.f));
+		_shader->setUniformMat4f("_WVP", vp * t.trans);
 
 		// for each sprite layer
 		for (auto& sp_layer : tilemap.sprite_layer) {

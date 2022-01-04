@@ -30,6 +30,7 @@ target_link_libraries(simple_rect_render_task_test
 	simple_rect_render_task
 
 	simple_velocity_system
+	transform_system
 
 	random
 
@@ -48,6 +49,9 @@ target_link_libraries(simple_sprite_render_task_test
 	simple_sprite_render_task
 
 	simple_velocity_system
+	transform_system
+
+	random
 
 	gtest_main
 )
@@ -64,6 +68,7 @@ target_link_libraries(simple_spritesheet_render_task_test
 	simple_spritesheet_render_task
 
 	#simple_velocity_system
+	transform_system
 
 	gtest_main
 )
@@ -80,6 +85,7 @@ target_link_libraries(batched_spritesheet_render_task_test
 	batched_spritesheet_render_task
 
 	#simple_velocity_system
+	transform_system
 
 	gtest_main
 )
@@ -101,6 +107,7 @@ target_link_libraries(blur_render_task_test
 	imgui_render_task
 
 	simple_velocity_system
+	transform_system
 
 	random
 
@@ -118,6 +125,8 @@ target_link_libraries(tilemap_render_task_test
 	organizer_scene
 	imgui_service
 	tilemap_render_task
+
+	transform_system
 
 	gtest_main
 )

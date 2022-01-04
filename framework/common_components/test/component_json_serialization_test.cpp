@@ -1,33 +1,37 @@
+#include "mm/components/position2d.hpp"
 #include <gtest/gtest.h>
 
 #include <mm/components/serialize/json_name.hpp>
 #include <mm/components/serialize/json_color.hpp>
-#include <mm/components/serialize/json_transform2d.hpp>
-#include <mm/components/serialize/json_transform3d.hpp>
-#include <mm/components/serialize/json_velocity2d.hpp>
+
+#include <mm/components/serialize/json_position2d.hpp>
+#include <mm/components/serialize/json_position2d_zoffset.hpp>
+#include <mm/components/serialize/json_position3d.hpp>
+#include <mm/components/serialize/json_rotation2d.hpp>
+#include <mm/components/serialize/json_scale2d.hpp>
+#include <mm/components/serialize/json_transform4x4.hpp>
+#include <mm/components/serialize/json_velocity2d_position.hpp>
+#include <mm/components/serialize/json_velocity2d_position_intent.hpp>
+#include <mm/components/serialize/json_velocity2d_rotation.hpp>
 #include <mm/components/serialize/json_view_dir2d.hpp>
 #include <mm/components/serialize/json_view_dir3d.hpp>
 
-/*#define PARSE_TEST_MACRO(type, json_string, comp_val) \
-TEST(common_components_json_serialization, type) { \
-	MM::Components::type comp; \
-	{ \
-		auto j = nlohmann::json::parse(json_string); \
-		EXPECT_NO_THROW({ comp = j; }); \
-		ASSERT_EQ(comp, (comp_val)); \
+#define TEST_JSON_SERL_EXPAND(x) x
+#define TEST_JSON_SERL_IN_OUT(TYPE, JSON_STR, TEST_CORPUS) \
+TEST(common_components_json_serialization, in_out_##TYPE) { \
+	MM::Components::TYPE comp; \
+	{ /* in */ \
+		auto j = nlohmann::json::parse(JSON_STR); \
+		comp = j; \
+		TEST_CORPUS \
 	} \
-	{ \
+	{ /* out */ \
 		nlohmann::json j; \
-		[>EXPECT_NO_THROW({ j = comp; });<] \
-		ASSERT_EQ(json_string, j.dump()); \
+		j = comp; \
+		ASSERT_EQ(JSON_STR, j.dump()); \
 	} \
 }
 
-PARSE_TEST_MACRO(
-	Name,
-	"{\"str\":\"test_name\"}",
-	MM::Components::Name{"test_name"}
-); */
 
 TEST(common_components_json_serialization, in_out_name) {
 	MM::Components::Name comp;
@@ -72,137 +76,113 @@ TEST(common_components_json_serialization, in_out_name_fail) {
 
 // ##############################################################
 
-TEST(common_components_json_serialization, in_out_color) {
-	MM::Components::Color comp;
-
-	const char* json_test_file = R"({"color":{"w":1337.0,"x":0.0,"y":1.0,"z":3.0}})";
-
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
-
-		EXPECT_NO_THROW({
-			comp = j;
-		});
-
-		glm::vec4 comp_val{0.f, 1.f, 3.f, 1337.f};
+TEST_JSON_SERL_IN_OUT(
+	Color,
+	R"({"color":{"w":1337.0,"x":0.0,"y":1.0,"z":3.0}})",
+	TEST_JSON_SERL_EXPAND({
+		glm::vec4 comp_val(0.f, 1.f, 3.f, 1337.f);
 		ASSERT_EQ(comp.color.x, comp_val.x);
 		ASSERT_EQ(comp.color.y, comp_val.y);
 		ASSERT_EQ(comp.color.z, comp_val.z);
 		ASSERT_EQ(comp.color.w, comp_val.w);
-	}
-
-	{ // out
-		nlohmann::json j;
-
-		EXPECT_NO_THROW({
-			j = comp;
-		});
-
-		ASSERT_EQ(json_test_file, j.dump());
-	}
-}
+	})
+)
 
 // ##############################################################
 
-TEST(common_components_json_serialization, in_out_transform2d) {
-	MM::Components::Transform2D comp;
-
-	const char* json_test_file = R"({"position":{"x":42.0,"y":6.0},"rotation":99.0,"scale":{"x":1337.0,"y":68.0}})";
-
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
-
-		EXPECT_NO_THROW({
-			comp = j;
-		});
-
-		ASSERT_EQ(comp.position.x, 42.f);
-		ASSERT_EQ(comp.position.y, 6.f);
-
-		ASSERT_EQ(comp.scale.x, 1337.f);
-		ASSERT_EQ(comp.scale.y, 68.f);
-
-		ASSERT_EQ(comp.rotation, 99.f);
-	}
-
-	{ // out
-		nlohmann::json j;
-
-		EXPECT_NO_THROW({
-			j = comp;
-		});
-
-		ASSERT_EQ(json_test_file, j.dump());
-	}
-}
+TEST_JSON_SERL_IN_OUT(
+	Position2D,
+	R"({"pos":{"x":42.0,"y":6.0}})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.pos.x, 42.f);
+		ASSERT_EQ(comp.pos.y, 6.f);
+	)
+)
 
 // ##############################################################
 
-TEST(common_components_json_serialization, in_out_transform3d) {
-	MM::Components::Transform3D comp;
-
-	const char* json_test_file = R"({"position":{"x":42.0,"y":6.0,"z":66.0},"rotation":99.0,"scale":{"x":1337.0,"y":68.0,"z":60.0}})";
-
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
-
-		EXPECT_NO_THROW({
-			comp = j;
-		});
-
-		ASSERT_EQ(comp.position.x, 42.f);
-		ASSERT_EQ(comp.position.y, 6.f);
-		ASSERT_EQ(comp.position.z, 66.f);
-
-		ASSERT_EQ(comp.scale.x, 1337.f);
-		ASSERT_EQ(comp.scale.y, 68.f);
-		ASSERT_EQ(comp.scale.z, 60.f);
-
-		// TODO: prob needs 3 rotations...
-		ASSERT_EQ(comp.rotation, 99.f);
-	}
-
-	{ // out
-		nlohmann::json j;
-
-		EXPECT_NO_THROW({
-			j = comp;
-		});
-
-		ASSERT_EQ(json_test_file, j.dump());
-	}
-}
+TEST_JSON_SERL_IN_OUT(
+	Position2D_ZOffset,
+	R"({"z_offset":3.0})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.z_offset, 3.f);
+	)
+)
 
 // ##############################################################
 
-TEST(common_components_json_serialization, in_out_velocity2d) {
-	MM::Components::Velocity2D comp;
+TEST_JSON_SERL_IN_OUT(
+	Position3D,
+	R"({"pos":{"x":42.0,"y":6.0,"z":44.0}})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.pos.x, 42.f);
+		ASSERT_EQ(comp.pos.y, 6.f);
+		ASSERT_EQ(comp.pos.z, 44.f);
+	)
+)
 
-	const char* json_test_file = R"({"rotation":99.0,"velocity":{"x":42.0,"y":6.0}})";
+// ##############################################################
 
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
+TEST_JSON_SERL_IN_OUT(
+	Rotation2D,
+	R"({"rot":42.0})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.rot, 42.f);
+	)
+)
 
-		EXPECT_NO_THROW({
-			comp = j;
-		});
+// ##############################################################
 
-		ASSERT_EQ(comp.velocity.x, 42.f);
-		ASSERT_EQ(comp.velocity.y, 6.f);
+TEST_JSON_SERL_IN_OUT(
+	Scale2D,
+	R"({"scale":{"x":42.0,"y":6.0}})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.scale.x, 42.f);
+		ASSERT_EQ(comp.scale.y, 6.f);
+	)
+)
 
-		ASSERT_EQ(comp.rotation, 99.f);
-	}
+// ##############################################################
 
-	{ // out
-		nlohmann::json j;
+TEST_JSON_SERL_IN_OUT(
+	Transform4x4,
+	R"({"trans":[{"w":0.0,"x":1.0,"y":0.0,"z":0.0},{"w":0.0,"x":0.0,"y":1.0,"z":0.0},{"w":0.0,"x":0.0,"y":0.0,"z":1.0},{"w":1.0,"x":0.0,"y":0.0,"z":0.0}]})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.trans, glm::mat4x4{1.f});
+	)
+)
 
-		EXPECT_NO_THROW({
-			j = comp;
-		});
+// ##############################################################
 
-		ASSERT_EQ(json_test_file, j.dump());
-	}
-}
+TEST_JSON_SERL_IN_OUT(
+	Velocity2DPosition,
+	R"({"pos_vel":{"x":42.0,"y":6.0}})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.pos_vel.x, 42.f);
+		ASSERT_EQ(comp.pos_vel.y, 6.f);
+	)
+)
+
+// ##############################################################
+
+TEST_JSON_SERL_IN_OUT(
+	Velocity2DPositionIntent,
+	R"({"intent":{"x":42.0,"y":6.0}})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.intent.x, 42.f);
+		ASSERT_EQ(comp.intent.y, 6.f);
+	)
+)
+
+// ##############################################################
+
+TEST_JSON_SERL_IN_OUT(
+	Velocity2DRotation,
+	R"({"rot_vel":42.0})",
+	TEST_JSON_SERL_EXPAND(
+		ASSERT_EQ(comp.rot_vel, 42.f);
+	)
+)
 
 // ##############################################################
 

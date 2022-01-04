@@ -1,8 +1,5 @@
 #include "./scene_tools.hpp"
-
-//#include <mm/services/opengl_renderer.hpp>
-
-//#include <mm/resource_manager.hpp>
+#include "mm/components/velocity2d_rotation.hpp"
 
 #include <mm/engine.hpp>
 
@@ -10,27 +7,24 @@
 
 #include <imgui/imgui.h>
 
-#include <mm/components/name.hpp>
-#include <mm/components/transform2d.hpp>
-#include <mm/components/velocity2d.hpp>
 #include <mm/components/time_delta.hpp>
 
-//#include <mm/imgui/widgets/texture_resource_manager.hpp>
 #include <mm/imgui/widgets/entity.hpp>
 
 #include <mm/imgui/widgets/components/name.hpp>
-#include <mm/imgui/widgets/components/transform2d.hpp>
-#include <mm/imgui/widgets/components/transform3d.hpp>
-#include <mm/imgui/widgets/components/velocity2d.hpp>
+#include <mm/imgui/widgets/components/position2d.hpp>
+#include <mm/imgui/widgets/components/position2d_zoffset.hpp>
+#include <mm/imgui/widgets/components/position3d.hpp>
+#include <mm/imgui/widgets/components/rotation2d.hpp>
+#include <mm/imgui/widgets/components/scale2d.hpp>
+#include <mm/imgui/widgets/components/velocity2d_position.hpp>
+#include <mm/imgui/widgets/components/velocity2d_rotation.hpp>
 #include <mm/imgui/widgets/components/view_dir2d.hpp>
 #include <mm/imgui/widgets/components/view_dir3d.hpp>
 #include <mm/imgui/widgets/components/color.hpp>
 #include <mm/imgui/widgets/components/texture.hpp>
 
 #include <mm/imgui/widgets/camera.hpp>
-
-//#include <mm/imgui/widgets/filesystem.hpp>
-//#include <mm/services/filesystem.hpp>
 
 #include <mm/logger.hpp>
 #define LOGIGS(x) LOG("ImGuiSceneToolsService", x)
@@ -48,9 +42,13 @@ namespace MM::Services {
 			_entity_editor.show_window = false;
 
 			_entity_editor.registerComponent<MM::Components::Name>("Name");
-			_entity_editor.registerComponent<MM::Components::Transform2D>("Transform2D");
-			_entity_editor.registerComponent<MM::Components::Transform3D>("Transform3D");
-			_entity_editor.registerComponent<MM::Components::Velocity2D>("Velocity2D");
+			_entity_editor.registerComponent<MM::Components::Position2D>("Position2D");
+			_entity_editor.registerComponent<MM::Components::Position2D_ZOffset>("Position2D_ZOffset");
+			_entity_editor.registerComponent<MM::Components::Position3D>("Position3D");
+			_entity_editor.registerComponent<MM::Components::Rotation2D>("Rotation2D");
+			_entity_editor.registerComponent<MM::Components::Scale2D>("Scale2D");
+			_entity_editor.registerComponent<MM::Components::Velocity2DPosition>("Velocity2DPosition");
+			_entity_editor.registerComponent<MM::Components::Velocity2DRotation>("Velocity2DRotation");
 			_entity_editor.registerComponent<MM::Components::ViewDir2D>("ViewDir2D");
 			_entity_editor.registerComponent<MM::Components::ViewDir3D>("ViewDir3D");
 			_entity_editor.registerComponent<MM::Components::Color>("Color");

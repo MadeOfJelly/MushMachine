@@ -1,6 +1,5 @@
 #include "./mm_logo_screen.hpp"
 
-#include <glm/gtc/constants.hpp>
 
 #include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
@@ -13,13 +12,23 @@
 #include <mm/opengl/texture_loader.hpp>
 #include <mm/opengl/camera_3d.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position2d_zoffset.hpp>
+#include <mm/components/position3d.hpp>
+#include <mm/components/scale2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
 #include <mm/components/time_delta.hpp>
 #include <mm/opengl/components/texture.hpp>
 
+#include <mm/systems/transform.hpp>
+
+#include <glm/gtc/constants.hpp>
+#include <glm/trigonometric.hpp>
+
 #include <mm/random/srng.hpp>
 #include <random>
+
 
 namespace MM::Screens {
 
@@ -51,8 +60,8 @@ namespace Systems {
 	}
 
 	// elastic scale easing
-	void elasic_scale_easing(entt::view<entt::get_t<MM::Components::Transform2D, Components::easing>> view, const MM::Components::TimeDelta& td) {
-		view.each([&td](auto& t, auto& easing_comp) {
+	void elasic_scale_easing(entt::view<entt::get_t<MM::Components::Scale2D, Components::easing>> view, const MM::Components::TimeDelta& td) {
+		view.each([&td](auto& s, auto& easing_comp) {
 			easing_comp.accumulator += td.tickDelta;
 
 			// taken from https://github.com/warrenm/AHEasing
@@ -61,8 +70,8 @@ namespace Systems {
 				return glm::sin(-13.f * glm::half_pi<float>() * (x + 1.f)) * glm::pow(2.f, -10.f * x) + 1.f;
 			};
 
-			t.scale.x = glm::mix(easing_comp.start.x, easing_comp.end.x, elasticOut(easing_comp.accumulator / easing_comp.duration));
-			t.scale.y = glm::mix(easing_comp.start.y, easing_comp.end.y, elasticOut(easing_comp.accumulator / easing_comp.duration));
+			s.scale.x = glm::mix(easing_comp.start.x, easing_comp.end.x, elasticOut(easing_comp.accumulator / easing_comp.duration));
+			s.scale.y = glm::mix(easing_comp.start.y, easing_comp.end.y, elasticOut(easing_comp.accumulator / easing_comp.duration));
 
 		});
 	}
@@ -117,9 +126,14 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 
 		scene.set<Components::screen_timer>(0.f, screen_duration, next_screen);
 
-		org.emplace<&Systems::screen_timer_system>("screen_timer_system");
+		org.emplace<Systems::screen_timer_system>("screen_timer_system");
 
-		org.emplace<&Systems::elasic_scale_easing>("elasic_scale_easing");
+		org.emplace<Systems::elasic_scale_easing>("elasic_scale_easing");
+		org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
+		org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");
+		//org.emplace<MM::Systems::transform3d_rotate2d>("transform3d_rotate2d");
+		org.emplace<MM::Systems::transform3d_scale2d>("transform3d_scale2d");
+		//org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");
 
 		auto& cam = scene.set<MM::OpenGL::Camera3D>();
 		cam.horizontalViewPortSize = 89.f;
@@ -128,8 +142,12 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 
 		{
 			auto e_logo = scene.create();
-			auto& t = scene.emplace<MM::Components::Transform2D>(e_logo);
-			t.scale = {0,0};
+			scene.emplace<MM::Components::Position2D>(e_logo);
+			scene.emplace<MM::Components::Position2D_ZOffset>(e_logo);
+			scene.emplace<MM::Components::Position3D>(e_logo);
+			scene.emplace<MM::Components::Scale2D>(e_logo, glm::vec2{0.f, 0.f});
+			scene.emplace<MM::Components::Transform4x4>(e_logo);
+			scene.emplace<MM::Components::DirtyTransformTag>(e_logo);
 
 			auto& easing_comp = scene.emplace<Components::easing>(e_logo);
 			easing_comp.start = {0.f, 0.f};
@@ -161,7 +179,6 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 				1.f,
 			};
 
-			//std::mt19937_64 mt{std::random_device{}()};
 			MM::Random::SRNG rng{std::random_device{}(), 0};
 
 			std::vector<glm::vec3> colors {color1, color2, color3};

@@ -8,13 +8,18 @@
 #include <mm/services/opengl_renderer.hpp>
 
 #include <entt/entity/registry.hpp>
+#include <entt/entity/organizer.hpp>
 
 #include <mm/opengl/camera_3d.hpp>
 #include <mm/opengl/render_tasks/tilemap.hpp>
 
 #include <mm/opengl/render_tasks/tilemap_renderable.hpp>
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position2d_zoffset.hpp>
+#include <mm/components/position3d.hpp>
+#include <mm/components/transform4x4.hpp>
 
+#include <mm/systems/transform.hpp>
 #include <mm/opengl/texture_loader.hpp>
 
 using namespace entt::literals;
@@ -48,11 +53,30 @@ TEST(tilemap_render_task_test, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::Tilemap>(engine);
 
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position2D_ZOffset>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position3D>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Transform4x4>>();
+	scene.on_construct<MM::Components::Position3D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>(); // fun
+
+	// "useless" in this example
+	scene.on_update<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position2D_ZOffset>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position3D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+
+	auto& org = scene.set<entt::organizer>();
+	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
+	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");
+	org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");
+
+	// HACK: instead you would switch to this scene
+	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
+
+
 	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 
 	{
 		auto e = scene.create();
-		scene.emplace<MM::Components::Transform2D>(e);
+		scene.emplace<MM::Components::Position2D>(e);
 
 		auto& tm = scene.emplace<MM::OpenGL::TilemapRenderable>(e);
 

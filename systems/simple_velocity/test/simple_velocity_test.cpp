@@ -12,7 +12,8 @@ TEST(simple_velocity_2d, basic_run) {
 
 	// setup v system
 	auto& org = scene.set<entt::organizer>();
-	org.emplace<&MM::Systems::simple_velocity>("simple_velocity");
+	org.emplace<&MM::Systems::simple_positional_velocity>("simple_positional_velocity");
+	org.emplace<&MM::Systems::simple_rotational_velocity>("simple_rotational_velocity");
 	auto graph = org.graph();
 
 	// setup delta
@@ -21,19 +22,21 @@ TEST(simple_velocity_2d, basic_run) {
 
 	// setup test entity
 	auto e = scene.create();
-	auto& t = scene.emplace<MM::Components::Transform2D>(e);
-	auto& v = scene.emplace<MM::Components::Velocity2D>(e);
-	t.position = { 0.f, 0.f };
-	t.rotation = 0.f;
+	auto& p = scene.emplace<MM::Components::Position2D>(e);
+	auto& r = scene.emplace<MM::Components::Rotation2D>(e);
+	auto& vp = scene.emplace<MM::Components::Velocity2DPosition>(e);
+	auto& vr = scene.emplace<MM::Components::Velocity2DRotation>(e);
+	p.pos = { 0.f, 0.f };
+	r.rot = 0.f;
 
-	v.velocity = { 1.f, 1.f };
-	v.rotation = 0.f;
+	vp.pos_vel = { 1.f, 1.f };
+	vr.rot_vel = 0.f;
 
 	// run all systems
 	for (auto&& vert : graph) {
 		vert.callback()(vert.data(), scene);
 	}
 
-	ASSERT_EQ(t.position.x, 1.f * 1.f/60.f);
+	ASSERT_EQ(p.pos.x, 1.f * 1.f/60.f);
 }
 

@@ -12,10 +12,17 @@
 
 #include <mm/opengl/render_tasks/simple_rect.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position2d_zoffset.hpp>
+#include <mm/components/scale2d.hpp>
+#include <mm/components/rotation2d.hpp>
+#include <mm/components/velocity2d_rotation.hpp>
+#include <mm/components/position3d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
 
 #include <mm/systems/simple_velocity_system2d.hpp>
+#include <mm/systems/transform.hpp>
 
 #include <mm/random/srng.hpp>
 
@@ -44,9 +51,25 @@ TEST(simple_rect_render_task, it) {
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::SimpleRect>(engine);
 
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position2D_ZOffset>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Position3D>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::Transform4x4>>();
+	scene.on_construct<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+
+	scene.on_update<MM::Components::Position2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position2D_ZOffset>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Position3D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Scale2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
+	scene.on_update<MM::Components::Rotation2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>(); // in this example only rotation is touched
+
 	// setup v system
 	auto& org = scene.set<entt::organizer>();
-	org.emplace<&MM::Systems::simple_velocity>("simple_velocity");
+	org.emplace<MM::Systems::simple_rotational_velocity_patching>("simple_rotational_velocity_patching");
+	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
+	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");
+	org.emplace<MM::Systems::transform3d_rotate2d>("transform3d_rotate2d");
+	org.emplace<MM::Systems::transform3d_scale2d>("transform3d_scale2d");
+	org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");
 
 	// HACK: instead you would switch to this scene
 	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
@@ -56,13 +79,19 @@ TEST(simple_rect_render_task, it) {
 	for (int y = 0; y < 10; y++) {
 		for (int i = 0; i < 10; i++) {
 			auto e = scene.create();
-			auto& t = scene.emplace<MM::Components::Transform2D>(e);
-			t.position.x = i * 9.f - 40;
-			t.position.y = -y * 6.f + 25;
-			t.scale = {5,5};
+			auto& p = scene.emplace<MM::Components::Position2D>(e);
+			p.pos.x = i * 9.f - 40;
+			p.pos.y = -y * 6.f + 25;
 
-			auto& v = scene.emplace<MM::Components::Velocity2D>(e);
-			v.rotation = i * 0.3f;
+			// zoffset is created by event
+
+			auto& s = scene.emplace<MM::Components::Scale2D>(e);
+			s.scale = {5,5};
+
+			scene.emplace<MM::Components::Rotation2D>(e);
+
+			auto& v = scene.emplace<MM::Components::Velocity2DRotation>(e);
+			v.rot_vel = i * 0.3f;
 
 			if (rng.roll(0.5f)) {
 				auto& col = scene.emplace<MM::Components::Color>(e);

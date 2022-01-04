@@ -1,7 +1,5 @@
 #include "./batched_spritesheet.hpp"
 
-#include <memory>
-
 #include <mm/opengl/shader.hpp>
 #include <mm/opengl/buffer.hpp>
 #include <mm/opengl/vertex_array_object.hpp>
@@ -13,11 +11,9 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
-
 #include "./spritesheet_renderable.hpp"
-#include <mm/services/opengl_renderer.hpp>
 
 #include <tracy/Tracy.hpp>
 #ifndef MM_OPENGL_3_GLES
@@ -67,18 +63,17 @@ BatchedSpriteSheet::~BatchedSpriteSheet(void) {
 void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::BatchedSpriteSheet::render");
 
-	auto* scene_ss = engine.tryService<MM::Services::SceneServiceInterface>();
-	// no scene
-	if (scene_ss == nullptr) {
-		return;
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
 	}
 
-	auto& scene = scene_ss->getScene();
+	auto& scene = ssi->getScene();
 
 	struct sp_data {
 		SpriteSheet sp;
 		struct instance_data {
-			MM::Components::Transform2D* trans = nullptr;
+			const MM::Components::Transform4x4* trans = nullptr;
 			glm::vec4* color = nullptr;
 			uint32_t tile_index = 0;
 		};
@@ -87,13 +82,11 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	// HACK: assume same sp for same texture
 	std::unordered_map<MM::OpenGL::Texture::handle_t, sp_data> batch_map;
 
-	auto view = scene.view<Components::Transform2D, SpriteSheetRenderable>();
-
-	view.each([&](auto e, Components::Transform2D& t, SpriteSheetRenderable& spr) {
-		// if off screen, early out
-		if (false) { // TODO:
-			return;
-		}
+	scene.view<const Components::Transform4x4, SpriteSheetRenderable>().each([this, &scene, &batch_map](entt::entity e, const auto& t, auto& spr) {
+		//// if off screen, early out
+		//if (false) { // TODO:
+			//return;
+		//}
 
 		assert(spr.sp.tex); // debug
 
@@ -139,7 +132,8 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 		auto* inst_memory = gl_inst_buffer->map(sp_ent.second.instances.size(), GL_DYNAMIC_DRAW);
 		for (auto& inst : sp_ent.second.instances) {
-			inst_memory->pos_trans = inst.trans->getTransform4(inst.trans->position.y/10.f + 500.f);
+			//inst_memory->pos_trans = inst.trans->getTransform4(inst.trans->position.y/10.f + 500.f);
+			inst_memory->pos_trans = inst.trans->trans; // TODO: this is ugly
 			inst_memory->color = *inst.color;
 			inst_memory->tile_index = inst.tile_index;
 
@@ -148,6 +142,8 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 		gl_inst_buffer->unmap();
 
 		static_assert(std::is_standard_layout<gl_instance_data>::value); // check if offsetof() is usable
+
+		// TODO: optimize, dont call attrib pointer each draw
 
 		// mat4, oof
 		// attptr 1-4

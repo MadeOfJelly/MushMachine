@@ -8,7 +8,9 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position2d_zoffset.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/name.hpp>
 
 #include <nlohmann/json.hpp>
@@ -95,9 +97,9 @@ bool Tilemap::parseTiled_LayerRenderable(MM::Engine&, MM::Scene& scene, nlohmann
 	uint32_t layer_width = jlayer["width"];
 	uint32_t layer_height = jlayer["height"];
 
-	auto& tilemap_rend = scene.emplace<OpenGL::TilemapRenderable>(e);
+	scene.get_or_emplace<Components::Position2D_ZOffset>(e).z_offset = Tiled_get_z_prop(jlayer) + 500.f; // TODO: magic
 
-	tilemap_rend.z = Tiled_get_z_prop(jlayer);
+	auto& tilemap_rend = scene.emplace<OpenGL::TilemapRenderable>(e);
 
 	// TODO: inefficient
 	for (auto& it : _sprite_sheet_map) {
@@ -165,10 +167,11 @@ bool Tilemap::parseTiled_Layer(MM::Engine& engine, MM::Scene& scene, nlohmann::j
 		name.str = jlayer["name"];
 	}
 
-	auto& t = scene.emplace<MM::Components::Transform2D>(e);
-	t.position = {0, 0};
-	t.scale = {1, 1};
+	scene.emplace<MM::Components::Position2D>(e);
 
+	// in case there is no auto system
+	scene.emplace_or_replace<MM::Components::Transform4x4>(e);
+	scene.emplace_or_replace<MM::Components::DirtyTransformTag>(e);
 
 	if (Tiled_is_collision_layer(jlayer)) {
 		return parseTiled_LayerCollision(engine, scene, jlayer, e);

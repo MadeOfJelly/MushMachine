@@ -2,11 +2,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include <mm/components/velocity3d.hpp>
+#include <mm/components/transform4x4.hpp>
 
 #include "./json_glm.hpp"
 
 namespace MM::Components {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Velocity3D, velocity, rotation)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform4x4, trans)
 } // MM::Components
 

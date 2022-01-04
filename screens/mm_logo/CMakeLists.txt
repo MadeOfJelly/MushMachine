@@ -21,6 +21,7 @@ target_link_libraries(mm_logo_screen
 	simple_sprite_render_task
 
 	common_components
+	transform_system
 
 	random
 )

@@ -11,7 +11,7 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/opengl/components/texture.hpp>
 #include <mm/components/color.hpp>
 
@@ -62,6 +62,13 @@ SimpleSprite::~SimpleSprite(void) {
 void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::SimpleSprite::render");
 
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
+	}
+
+	auto& scene = ssi->getScene();
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::W);
 
 	glEnable(GL_DEPTH_TEST);
@@ -72,8 +79,6 @@ void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vao->bind();
 
 
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
-
 	auto* cam = scene.try_ctx<Camera3D>();
 	if (!cam) {
 		cam = &default_cam;
@@ -81,14 +86,12 @@ void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto vp = cam->getViewProjection();
 
-	auto view = scene.view<Components::Transform2D, Components::OpenGL::Texture>();
-
-	view.each([&](auto e, Components::Transform2D& t, Components::OpenGL::Texture& tex) {
+	scene.view<const Components::Transform4x4, Components::OpenGL::Texture>().each([this, &scene, &vp](entt::entity e, const auto& t, auto& tex) {
 		assert(tex.tex); // debug
 
 		tex.tex->bind(0);
 
-		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(t.position.y/10.f + 500.f));
+		_shader->setUniformMat4f("_WVP", vp * t.trans);
 
 		if (scene.all_of<Components::Color>(e)) {
 			_shader->setUniform4f("_color", scene.get<Components::Color>(e).color);

@@ -11,7 +11,7 @@
 #include <mm/services/scene_service_interface.hpp>
 #include <entt/entity/registry.hpp>
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/transform4x4.hpp>
 #include <mm/components/color.hpp>
 
 #include <tracy/Tracy.hpp>
@@ -56,6 +56,13 @@ SimpleRect::~SimpleRect(void) {
 void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::SimpleRect::render");
 
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
+	}
+
+	auto& scene = ssi->getScene();
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::RW);
 
 	glEnable(GL_DEPTH_TEST);
@@ -64,8 +71,6 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_shader->bind();
 	_vao->bind();
 
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
-
 	Camera3D* cam = scene.try_ctx<Camera3D>();
 	if (!cam) {
 		cam = &default_cam;
@@ -73,12 +78,8 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto vp = cam->getViewProjection();
 
-	auto view = scene.view<MM::Components::Transform2D>();
-
-	for (auto& e : view) {
-		auto& t = view.get<Components::Transform2D>(e);
-
-		_shader->setUniformMat4f("_WVP", vp * t.getTransform4(t.position.y/10.f + 500.f));
+	scene.view<const Components::Transform4x4>().each([this, &scene, &vp](entt::entity e, const auto& t) {
+		_shader->setUniformMat4f("_WVP", vp * t.trans);
 
 		if (scene.all_of<Components::Color>(e)) {
 			_shader->setUniform4f("_color", scene.get<Components::Color>(e).color);
@@ -86,9 +87,8 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 			_shader->setUniform4f("_color", default_color);
 		}
 
-
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-	}
+	});
 
 	_vao->unbind();
 	_shader->unbind();
@@ -106,7 +106,7 @@ in vec2 _vertexPosition;
 uniform mat4 _WVP;
 
 void main() {
-	gl_Position = _WVP * vec4(_vertexPosition, 0, 1);
+	gl_Position = _WVP * vec4(_vertexPosition, 0.0, 1.0);
 })")
 
 	FS_CONST_MOUNT_FILE(fragmentPath,

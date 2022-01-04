@@ -42,7 +42,7 @@ struct TilemapRenderable {
 	};
 
 	std::vector<SpriteLayer> sprite_layer;
-	float z = 0.f;
+	//float z = 0.f; // TODO: use Components::Position2D_ZOffset instead
 };
 
 } // MM::OpenGL

@@ -4,7 +4,8 @@
 
 #include "./entity.hpp"
 
-#include <mm/components/transform2d.hpp>
+#include <mm/components/position2d.hpp>
+#include <mm/components/position3d.hpp>
 
 #include <entt/entity/registry.hpp>
 
@@ -37,10 +38,12 @@ void Camera3D(MM::Scene& scene) {
 
 			MM::ImGuiWidgets::Entity(tracking, scene);
 			if (scene.valid(tracking)) {
-				if (scene.all_of<MM::Components::Transform2D>(tracking)) {
-					camera->translation = {scene.get<MM::Components::Transform2D>(tracking).position, 0.f};
+				if (scene.all_of<MM::Components::Position2D>(tracking)) {
+					camera->translation = {scene.get<MM::Components::Position2D>(tracking).pos, 0.f};
+				} else if (scene.all_of<MM::Components::Position3D>(tracking)) { // "3d" fallback
+					camera->translation = scene.get<MM::Components::Position3D>(tracking).pos;
 				} else {
-					ImGui::TextUnformatted("error: Entity has no Transform");
+					ImGui::TextUnformatted("error: Entity has neither Position2D nor Position3D");
 				}
 			}
 		} else {
