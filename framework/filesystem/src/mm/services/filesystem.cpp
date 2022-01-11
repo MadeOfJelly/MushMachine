@@ -63,6 +63,7 @@ bool FilesystemService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&
 
 	// add base path to search tree
 	if (_try_mount_base) {
+		LOG_TRACE("mounting physfs base dir: {}", PHYSFS_getBaseDir());
 		if (!PHYSFS_mount(PHYSFS_getBaseDir(), NULL, 0)) {
 			LOG_ERROR("mounting physfs base dir: {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 		}
@@ -70,6 +71,7 @@ bool FilesystemService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&
 
 	// mount self (exec) :P
 	if (_try_mount_self) {
+		LOG_TRACE("mounting self");
 		if (PHYSFS_mount(_argv0, "/", 1)) {
 			LOG_INFO("mounted self!!");
 		}
@@ -86,6 +88,7 @@ bool FilesystemService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&
 	}
 
 	for (const auto&[archive, mount_point, append] : _try_mount_list) {
+		LOG_TRACE("mounting physfs userdefined archive: '{}' '{}' {}", archive, mount_point, append);
 		if (!PHYSFS_mount(archive.c_str(), mount_point.c_str(), append?1:0)) {
 			LOG_ERROR("mounting physfs userdefined archive: {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
 		}
