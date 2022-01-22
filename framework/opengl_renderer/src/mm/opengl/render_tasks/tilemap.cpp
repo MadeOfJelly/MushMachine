@@ -174,7 +174,8 @@ uniform sampler2D _tex0;
 
 //in vec4 _color;
 uniform vec3 _ambient_color;
-in vec2 _tex_pos;
+// centroid until i switch from atlas to array
+centroid in vec2 _tex_pos;
 
 out vec4 _out_color;
 
