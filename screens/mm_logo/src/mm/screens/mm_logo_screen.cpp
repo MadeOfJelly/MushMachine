@@ -52,10 +52,10 @@ namespace Components {
 
 namespace Systems {
 
-	void screen_timer_system(Components::screen_timer& sc_timer, const MM::Components::TimeDelta& td, const MM::Engine* engine) {
+	void screen_timer_system(Components::screen_timer& sc_timer, const MM::Components::TimeDelta& td, const MM::Engine& engine) {
 		sc_timer.accumulator += td.tickDelta;
 		if (sc_timer.accumulator >= sc_timer.duration) {
-			engine->getService<MM::Services::ScreenDirector>().queueChangeScreenTo(sc_timer.next_screen);
+			engine.getService<MM::Services::ScreenDirector>().queueChangeScreenTo(sc_timer.next_screen);
 		}
 	}
 
@@ -122,7 +122,7 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 
 		auto& org = scene.set<entt::organizer>();
 
-		scene.set<MM::Engine*>(&_engine);
+		scene.set<MM::Engine&>(_engine); // alias
 
 		scene.set<Components::screen_timer>(0.f, screen_duration, next_screen);
 
