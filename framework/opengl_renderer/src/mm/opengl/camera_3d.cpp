@@ -181,6 +181,19 @@ std::array<glm::vec4, 6> Camera3D::getFrustumPlanes(void) const {
 	return planes;
 }
 
+// example use:
+// const glm::vec4 screen {
+	// (
+		// glm::vec2{mouse_pos.x, window_size.y - mouse_pos.y}
+		// / (glm::vec2{window_size.x, window_size.y} * 0.5f)
+	// )
+	// - glm::vec2{1.f, 1.f}
+	// , 1.f, 1.f
+// };
+glm::vec4 Camera3D::screenToWorld(const glm::vec4& screen) const {
+	return glm::inverse(getViewProjection()) * screen;
+}
+
 template<typename T>
 static T dot34(glm::vec<3, T> lhs, glm::vec<4, T> rhs) {
 	return glm::dot(lhs, glm::vec<3, T>(rhs)) + rhs.w;

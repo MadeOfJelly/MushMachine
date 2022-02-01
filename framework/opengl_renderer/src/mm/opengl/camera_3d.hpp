@@ -49,6 +49,10 @@ namespace MM::OpenGL {
 
 			// call updateView beforehand, does not cache
 			std::array<glm::vec4, 6> getFrustumPlanes(void) const;
+
+			// uses getViewProjection(), does not cache
+			// screen has to be in NDC, xy -> [-1, 1]
+			glm::vec4 screenToWorld(const glm::vec4& screen) const;
 	};
 
 	// test if aabb in frustum
