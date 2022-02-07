@@ -85,6 +85,7 @@ target_link_libraries(imgui_sound_test
 	imgui_service
 	imgui_render_task
 	imgui_sound
+	soloud_json
 	imgui_tools
 	gtest_main
 )

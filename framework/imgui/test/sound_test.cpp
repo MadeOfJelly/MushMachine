@@ -20,12 +20,17 @@
 #include <mm/imgui/widgets/soloud.hpp>
 
 #include <imgui/imgui.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 #include <soloud_speech.h>
 #include <soloud_sfxr.h>
 #include <soloud_freeverbfilter.h>
 #include <soloud_echofilter.h>
 #include <soloud_lofifilter.h>
+
+#include <mm/soloud_json.hpp>
+
+#include <nlohmann/json.hpp>
 
 const char* argv0;
 
@@ -119,6 +124,12 @@ class ImGuiSpeechy : public MM::Services::Service {
 			if (ImGui::Begin("filter fancy freeverb")) {
 				ImGui::TextDisabled("Rev");
 				MM::ImGuiWidgets::SoLoudFilterLiveParamsFancy("filter fancy freeverb", &sound.engine, &freeverb, 2);
+			}
+			ImGui::End();
+
+			if (ImGui::Begin("Sfxr json")) {
+				std::string json_text = nlohmann::json(sfxr).dump(2);
+				ImGui::InputTextMultiline("json", &json_text);
 			}
 			ImGui::End();
 		}
