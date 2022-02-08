@@ -1,4 +1,5 @@
 #include "./organizer_scene.hpp"
+#include "mm/engine.hpp"
 
 #include <mm/components/time_delta.hpp>
 
@@ -51,7 +52,7 @@ bool OrganizerSceneService::enable(Engine& engine, std::vector<UpdateStrategies:
 	// default scene
 	if (!_scene) {
 		_scene = std::make_unique<Scene>();
-		_scene->set<MM::Engine*>(&engine);
+		_scene->set<MM::Engine&>(engine);
 		updateOrganizerVertices(*_scene);
 	}
 
@@ -98,7 +99,9 @@ void OrganizerSceneService::changeSceneFixedUpdate(Engine& engine) {
 	if (_next_scene) {
 		LOG_OSS("changing scene...");
 		_scene = std::move(_next_scene);
-		_scene->set<MM::Engine*>(&engine); // make engine accessible from scene
+		if (!_scene->try_ctx<MM::Engine>()) {
+			_scene->set<MM::Engine&>(engine); // make engine accessible from scene
+		}
 		updateOrganizerVertices(*_scene);
 	}
 }

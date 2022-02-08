@@ -26,7 +26,7 @@ TEST(player_velocity, basic_run) {
 	bool provide_ret = engine.provide<MM::Services::SceneServiceInterface, MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(provide_ret);
 
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
+	auto& scene = engine.getService<MM::Services::SceneServiceInterface>().getScene();
 
 	// setup v system
 	auto& org = scene.set<entt::organizer>();
