@@ -32,9 +32,9 @@ set(CPP_FILES
 	#soloud/src/backend/openal/soloud_openal.cpp
 	#soloud/src/backend/openal/soloud_openal_dll.c
 	soloud/src/backend/opensles/soloud_opensles.cpp
-	soloud/src/backend/oss/soloud_oss.cpp
-	soloud/src/backend/portaudio/soloud_portaudio.cpp
-	soloud/src/backend/portaudio/soloud_portaudio_dll.c
+	#soloud/src/backend/oss/soloud_oss.cpp
+	#soloud/src/backend/portaudio/soloud_portaudio.cpp
+	#soloud/src/backend/portaudio/soloud_portaudio_dll.c
 	#soloud/src/backend/sdl/soloud_sdl1.cpp
 	#soloud/src/backend/sdl/soloud_sdl1_dll.c
 	#soloud/src/backend/sdl/soloud_sdl2.cpp
@@ -160,7 +160,6 @@ target_compile_definitions(soloud PRIVATE WITH_NULL)
 target_compile_definitions(soloud PRIVATE WITH_SDL2_STATIC)
 
 target_include_directories(soloud SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/soloud/include")
-#target_include_directories(soloud PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 
 #if not android or emscripten
 if(VCPKG_TARGET_TRIPLET)
