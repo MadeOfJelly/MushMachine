@@ -320,6 +320,8 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertexShader, const st
 		return nullptr;
 	}
 
+#if 0
+	// TODO: validate validates agains the current ogl state, so this might fail
 	glValidateProgram(program);
 	GLint isValid = 0;
 	glGetProgramiv(program, GL_VALIDATE_STATUS, &isValid);
@@ -337,6 +339,7 @@ std::shared_ptr<Shader> Shader::create(const std::string& vertexShader, const st
 		return nullptr;
 
 	}
+#endif
 
 	//todo: make some check if linking and validating actually worked
 	return std::shared_ptr<Shader>(new Shader(program));
