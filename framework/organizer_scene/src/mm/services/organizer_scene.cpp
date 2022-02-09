@@ -68,19 +68,17 @@ void OrganizerSceneService::sceneFixedUpdate(Engine&) {
 	ZoneScoped;
 
 	auto newNow = clock::now();
-	auto deltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(newNow - _last_time);
+	std::chrono::duration<double, std::ratio<1, 1>> deltaTime = newNow - _last_time;
 	_last_time = newNow;
 	_accumulator += deltaTime.count();
-	const double dt = f_delta * 1'000'000'000.0;
 
 	size_t continuous_counter = 0;
 
 	auto& time_ctx = _scene->ctx_or_set<MM::Components::TimeDelta>(f_delta, initial_delta_factor);
 	time_ctx.tickDelta = f_delta * time_ctx.deltaFactor;
 
-	// TODO: this while is just cancer
-	while (_accumulator >= static_cast<decltype(_accumulator)>(dt)){
-		_accumulator -= static_cast<decltype(_accumulator)>(dt);
+	while (_accumulator >= f_delta){
+		_accumulator -= f_delta;
 		continuous_counter++;
 
 		for (auto&& v : _scene->ctx<std::vector<entt::organizer::vertex>>()) {
@@ -133,7 +131,7 @@ void OrganizerSceneService::updateOrganizerVertices(Scene& scene) {
 
 void OrganizerSceneService::resetTime(void) {
 	_last_time = clock::now();
-	_accumulator = 0;
+	_accumulator = 0.0;
 }
 
 } // MM::Services
