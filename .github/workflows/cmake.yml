@@ -41,6 +41,27 @@ jobs:
       ## See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       #run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
+  macos:
+    timeout-minutes: 10
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    # TODO: cache
+
+    - name: Install Dependencies
+      run: brew install sdl2
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+
   # TODO: for some reason vcpkg find sdl does not work, despite the find_package REQUIRE not failing
   #windows:
     #timeout-minutes: 10
