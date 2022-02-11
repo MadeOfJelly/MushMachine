@@ -19,10 +19,6 @@
 [submodule "external/ImGuiColorTextEdit"]
 	path = external/ImGuiColorTextEdit
 	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
-[submodule "external/physfs"]
-	path = external/physfs
-	url = https://github.com/Green-Sky/physfs.git
-	shallow = true
 [submodule "external/soloud/soloud"]
 	path = external/soloud/soloud
 	url = https://github.com/jarikomppa/soloud.git
@@ -37,3 +33,7 @@
 	path = external/tracy/tracy
 	url = https://github.com/wolfpld/tracy.git
 	shallow = true
+[submodule "external/physfs/physfs"]
+	path = external/physfs/physfs
+	url = https://github.com/icculus/physfs.git
+	branch = main
