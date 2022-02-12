@@ -1,7 +1,7 @@
 ![mm](res/mm_card.png)
 
 # MushMachine
-This is a Game Engine/Framework, originally developed for GH**deducted** (a 2D game), but has since expanded its scope to be more generic. For example it also includes 3D stuff, instead of just 2D. Furthermore it got stripped of some dependency heavy dependencies (yea that's a thing).
+This is a Game Engine/Framework, originally developed for GH**deducted** (a 2D game), but has since expanded it's scope to be more generic. For example it also includes 3D stuff, instead of just 2D. Furthermore it got stripped of some dependency heavy dependencies (yea that's a thing).
 
 The initial Developers are Erik Scholz and Felix Richter.
 Currently developed and maintained by Erik Scholz.
@@ -13,10 +13,10 @@ The private repo had over 900 commits, before the first public release.
 - [Github](https://github.com/MadeOfJelly/MushMachine)
 - [Setup](docs/setup.md)
 - [Example Game Setup](docs/basic_game.md)
-- The [Docs Directory](docs/) contains Documentation loosly based on the Source structure.
+- The [Docs Directory](docs/) contains Documentation loosely based on the Source structure.
 
 ## Platforms
-- PC (Linux, Windows and maybe APPLE(untested))
+- PC (Linux, Windows and maybe APPLE(compiles))
 - Android (untested)
 - Web (huh? yea! via Emscripten, wasm and WebGL2)
 - anything if you put your mind to it....
@@ -24,7 +24,7 @@ The private repo had over 900 commits, before the first public release.
 
 ## Roadmap
 - Rewrite the Input service (the code was ported in and is older than the Engine (2017))
-- Extend the SDL service with Vulkan support (it's 2020 so yea)
+- Extend the SDL service with Vulkan support (it's 2020 so yea)(man it's 2022 and not done)
 - Filesystem refactor (like a proper file type, with destructor and stuff)
 - l10n support
 - ImGui integration refactor (for making it usable as a game ui, not just for debugging)
