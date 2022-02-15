@@ -47,6 +47,8 @@ namespace MM::OpenGL {
 			glm::mat4 getView(void) const;
 			glm::mat4 getProjection(void) const;
 
+			glm::vec3 getViewDir(void) const;
+
 			// call updateView beforehand, does not cache
 			std::array<glm::vec4, 6> getFrustumPlanes(void) const;
 

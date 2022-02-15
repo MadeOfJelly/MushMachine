@@ -51,20 +51,7 @@ void Camera3D::updateView(void) {
 		pitch = glm::clamp(pitch, -(glm::pi<float>()/2 - 0.00001f), glm::pi<float>()/2 - 0.00001f);
 		yaw = glm::mod(yaw, 2*glm::pi<float>());
 
-		glm::vec3 front {0,0,0};
-		{ // TODO: optimize
-			// if y up/down
-			front.x += up.y * glm::cos(pitch) * glm::cos(-yaw); // TODO: y is yaw inverted??
-			front.y += up.y * glm::sin(pitch);
-			front.z += up.y * glm::cos(pitch) * glm::sin(-yaw);
-
-			// if z up/down
-			front.x += up.z * glm::cos(pitch) * glm::cos(yaw);
-			front.y += up.z * glm::cos(pitch) * glm::sin(yaw);
-			front.z += up.z * glm::sin(pitch);
-		}
-
-		front = glm::normalize(front);
+		glm::vec3 front = getViewDir();
 
 		_view = glm::lookAt(translation, translation + front, up);
 	}
@@ -80,6 +67,27 @@ glm::mat4 Camera3D::getView() const {
 
 glm::mat4 Camera3D::getProjection() const {
 	return _projection;
+}
+
+glm::vec3 Camera3D::getViewDir(void) const {
+	glm::vec3 front {0,0,0};
+	{ // TODO: optimize
+#if 0
+		// if y up/down
+		front.x += up.y * glm::cos(pitch) * glm::cos(-yaw); // TODO: y is yaw inverted??
+		front.y += up.y * glm::sin(pitch);
+		front.z += up.y * glm::cos(pitch) * glm::sin(-yaw);
+#else
+		// if z up/down
+		front.x += up.z * glm::cos(pitch) * glm::cos(yaw);
+		front.y += up.z * glm::cos(pitch) * glm::sin(yaw);
+		front.z += up.z * glm::sin(pitch);
+#endif
+	}
+
+	front = glm::normalize(front);
+
+	return front;
 }
 
 std::array<glm::vec4, 6> Camera3D::getFrustumPlanes(void) const {
