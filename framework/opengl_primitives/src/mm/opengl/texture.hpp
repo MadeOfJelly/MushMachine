@@ -20,7 +20,8 @@ namespace MM::OpenGL {
 			Texture(
 				uint32_t handle,
 				int32_t width_, int32_t height_,
-				int32_t internalFormat, int32_t format, int32_t type
+				int32_t internalFormat, int32_t format, int32_t type,
+				uint32_t samples = 0u
 			);
 
 		public:
@@ -33,6 +34,7 @@ namespace MM::OpenGL {
 			int32_t const _internalFormat;
 			int32_t const _format;
 			int32_t const _type;
+			uint32_t const _samples{0u}; // sample count, 0 == off
 
 		public:
 			~Texture();
@@ -45,6 +47,7 @@ namespace MM::OpenGL {
 			void resize(int32_t new_width, int32_t new_height);
 
 			static handle_t createEmpty(int32_t internalFormat, int32_t width, int32_t height, int32_t format, int32_t type);
+			static handle_t createEmptyMultiSampled(int32_t internalFormat, int32_t width, int32_t height, uint32_t samples);
 	};
 
 } // MM::OpenGL

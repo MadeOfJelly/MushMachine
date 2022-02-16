@@ -16,28 +16,41 @@ uint32_t Texture::getHandle(void) const {
 Texture::Texture(
 	uint32_t handle,
 	int32_t width_, int32_t height_,
-	int32_t internalFormat, int32_t format, int32_t type
+	int32_t internalFormat, int32_t format, int32_t type,
+	uint32_t samples
 ) : _handle(handle), width(width_), height(height_),
-	_internalFormat(internalFormat), _format(format), _type(type) {}
+	_internalFormat(internalFormat), _format(format), _type(type),
+	_samples(samples) {
+}
 
 Texture::~Texture(void) {
 	glDeleteTextures(1, &_handle);
 }
 
 void Texture::unbind(void) const {
+	// TODO: do i need ms variant?
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::bind(uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, _handle);
+	if (_samples == 0) {
+		glBindTexture(GL_TEXTURE_2D, _handle);
+	} else {
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
+	}
 }
 
 void Texture::resize(int32_t new_width, int32_t new_height) {
 	// if (glTexImage2D == true)
-	glBindTexture(GL_TEXTURE_2D, _handle);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, new_width, new_height, 0, _format, _type, NULL);
+	if (_samples == 0) {
+		glBindTexture(GL_TEXTURE_2D, _handle);
+		glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, new_width, new_height, 0, _format, _type, NULL);
+	} else {
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _samples, _internalFormat, new_width, new_height, 0);
+	}
 
 	// HACK: super dirty
 	*(const_cast<int32_t*>(&width)) = new_width;
@@ -55,6 +68,20 @@ Texture::handle_t Texture::createEmpty(int32_t internalFormat, int32_t width, in
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return handle_t(new Texture(id, width, height, internalFormat, format, type));
+}
+
+Texture::handle_t Texture::createEmptyMultiSampled(int32_t internalFormat, int32_t width, int32_t height, uint32_t samples) {
+	uint32_t id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
+
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+	// HACK: format + type?
+	return handle_t(new Texture(id, width, height, internalFormat, 0, 0, samples));
 }
 
 } // MM::OpenGL
