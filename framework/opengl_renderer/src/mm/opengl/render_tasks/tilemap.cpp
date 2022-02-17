@@ -43,6 +43,12 @@ Tilemap::Tilemap(MM::Engine& engine) {
 		-0.5f, 0.5f,
 	};
 
+	// bias to avoid cracks
+	const float vert_offset_fact = 1.001f;
+	for (size_t i = 0; i < 2 * 6; i++) {
+		vertices[i] *= vert_offset_fact;
+	}
+
 	_vertexBuffer = std::make_unique<MM::OpenGL::Buffer>(vertices, 2 * 6 * sizeof(float), GL_STATIC_DRAW);
 	_vao = std::make_unique<MM::OpenGL::VertexArrayObject>();
 	_vao->bind();
