@@ -31,5 +31,12 @@ namespace MM::OpenGL {
 		}
 	};
 
+	struct TextureLoaderEmptyMultiSampled final {
+		template<typename... Args>
+		std::shared_ptr<Texture> load(Args&& ... args) const {
+			return Texture::createEmptyMultiSampled(std::forward<Args>(args)...);
+		}
+	};
+
 } // MM::OpenGL
 

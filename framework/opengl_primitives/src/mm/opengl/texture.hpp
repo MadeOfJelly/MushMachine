@@ -30,11 +30,12 @@ namespace MM::OpenGL {
 			int32_t const width;
 			int32_t const height;
 			//int32_t const bpp; // bits per pixel
+			uint32_t const samples{0u}; // sample count, 0 == off
+
 		private:
 			int32_t const _internalFormat;
 			int32_t const _format;
 			int32_t const _type;
-			uint32_t const _samples{0u}; // sample count, 0 == off
 
 		public:
 			~Texture();

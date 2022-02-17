@@ -47,7 +47,11 @@ FBOBuilder& FBOBuilder::attachTexture(std::shared_ptr<Texture> tex, GLuint attac
 	}
 
 	//glFramebufferTexture2D(target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->getHandle(), 0);
-	glFramebufferTexture2D(target, attachment_type, GL_TEXTURE_2D, tex->getHandle(), 0);
+	if (tex->samples == 0u) {
+		glFramebufferTexture2D(target, attachment_type, GL_TEXTURE_2D, tex->getHandle(), 0);
+	} else {
+		glFramebufferTexture2D(target, attachment_type, GL_TEXTURE_2D_MULTISAMPLE, tex->getHandle(), 0);
+	}
 	_fbo->_texAttachments.push_back(tex); // keep a ref at the fbo
 
 	return *this;

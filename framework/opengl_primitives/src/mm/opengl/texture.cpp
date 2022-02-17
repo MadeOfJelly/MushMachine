@@ -17,10 +17,10 @@ Texture::Texture(
 	uint32_t handle,
 	int32_t width_, int32_t height_,
 	int32_t internalFormat, int32_t format, int32_t type,
-	uint32_t samples
+	uint32_t samples_
 ) : _handle(handle), width(width_), height(height_),
-	_internalFormat(internalFormat), _format(format), _type(type),
-	_samples(samples) {
+	samples(samples_),
+	_internalFormat(internalFormat), _format(format), _type(type) {
 }
 
 Texture::~Texture(void) {
@@ -34,7 +34,7 @@ void Texture::unbind(void) const {
 
 void Texture::bind(uint32_t slot) const {
 	glActiveTexture(GL_TEXTURE0 + slot);
-	if (_samples == 0) {
+	if (samples == 0) {
 		glBindTexture(GL_TEXTURE_2D, _handle);
 	} else {
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
@@ -44,12 +44,12 @@ void Texture::bind(uint32_t slot) const {
 void Texture::resize(int32_t new_width, int32_t new_height) {
 	// if (glTexImage2D == true)
 
-	if (_samples == 0) {
+	if (samples == 0) {
 		glBindTexture(GL_TEXTURE_2D, _handle);
 		glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, new_width, new_height, 0, _format, _type, NULL);
 	} else {
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _samples, _internalFormat, new_width, new_height, 0);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, _internalFormat, new_width, new_height, 0);
 	}
 
 	// HACK: super dirty
