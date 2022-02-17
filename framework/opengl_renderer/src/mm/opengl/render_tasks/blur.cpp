@@ -48,12 +48,13 @@ Blur::~Blur(void) {
 void Blur::render(Services::OpenGLRenderer& rs, Engine&) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::Blur::render");
 
-	rs.targets[io_fbo]->bind(FrameBufferObject::W);
+	//rs.targets[io_fbo]->bind(FrameBufferObject::W);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND); // TODO: test
+	glDisable(GL_BLEND);
 
 	auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
-	auto tex_io = rm_t.get(entt::hashed_string::value(io_tex.c_str())); // TODO: perf problems
+	auto tex_in = rm_t.get(entt::hashed_string::value(in_tex.c_str())); // TODO: perf problems
+	auto tex_out = rm_t.get(entt::hashed_string::value(out_tex.c_str())); // TODO: perf problems
 	auto tex_temp = rm_t.get(entt::hashed_string::value(temp_tex.c_str())); // TODO: perf problems
 
 	{ // horizontal
@@ -64,7 +65,7 @@ void Blur::render(Services::OpenGLRenderer& rs, Engine&) {
 		_vao->bind();
 
 		glViewport(0, 0, tex_temp->width, tex_temp->height);
-		tex_io->bind(0); // read
+		tex_in->bind(0); // read
 
 		_hShader->setUniform2f("tex_offset", tex_offset);
 
@@ -72,13 +73,13 @@ void Blur::render(Services::OpenGLRenderer& rs, Engine&) {
 	}
 
 	{ // vertical
-		rs.targets[io_fbo]->bind(FrameBufferObject::W);
+		rs.targets[out_fbo]->bind(FrameBufferObject::W);
 
 		_vShader->bind();
 		_vertexBuffer->bind(GL_ARRAY_BUFFER);
 		_vao->bind();
 
-		glViewport(0, 0, tex_io->width, tex_io->height);
+		glViewport(0, 0, tex_out->width, tex_out->height);
 		tex_temp->bind(0); // read
 
 		_vShader->setUniform2f("tex_offset", tex_offset);

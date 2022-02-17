@@ -72,9 +72,10 @@ TEST(blur_render_task, it) {
 	bsrr_rend.target_fbo = "blur_io";
 
 	MM::OpenGL::RenderTasks::Blur& blur_rend = rs.addRenderTask<MM::OpenGL::RenderTasks::Blur>(engine);
-	blur_rend.io_tex = "blur_io";
+	blur_rend.in_tex = "blur_io";
+	blur_rend.out_tex = "blur_io";
 	blur_rend.temp_tex = "blur_temp";
-	blur_rend.io_fbo = "blur_io";
+	blur_rend.out_fbo = "blur_io";
 	blur_rend.temp_fbo = "blur_temp";
 
 	// render to display

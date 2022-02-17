@@ -35,11 +35,12 @@ namespace MM::OpenGL::RenderTasks {
 			const char* fragmentHPath = "shader/blur_render_task/frag_h.glsl";
 			const char* fragmentVPath = "shader/blur_render_task/frag_v.glsl";
 
-			std::string io_fbo = "blur_io";
+			std::string out_fbo = "blur_io";
 			std::string temp_fbo = "blur_temp";
 
 			// bc of it beeing a 2 pass, we need to flipflop
-			std::string io_tex = "blur_io";
+			std::string in_tex = "blur_io";
+			std::string out_tex = "blur_io";
 			std::string temp_tex = "blur_temp";
 
 			// determines the kernel lookup offset. "ideal" is 1/tex_size
