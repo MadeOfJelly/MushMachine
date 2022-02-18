@@ -18,9 +18,29 @@ FBOBuilder FBOBuilder::start(void) {
 }
 
 std::shared_ptr<FrameBufferObject> FBOBuilder::finish(void) {
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+	const auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status == GL_FRAMEBUFFER_COMPLETE) {
 		return _fbo;
 	}
+
+	const char* error_str = "UNK";
+	switch (status) {
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			error_str = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+			break;
+#ifdef MM_OPENGL_3_GLES
+		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+			error_str = "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
+			break;
+#endif
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			error_str = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+			break;
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			error_str = "GL_FRAMEBUFFER_UNSUPPORTED";
+			break;
+	}
+	SPDLOG_ERROR("framebuffer status: {}", error_str);
 
 	return nullptr;
 }
