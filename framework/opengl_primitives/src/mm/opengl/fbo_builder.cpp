@@ -46,11 +46,14 @@ FBOBuilder& FBOBuilder::attachTexture(std::shared_ptr<Texture> tex, GLuint attac
 			break;
 	}
 
-	//glFramebufferTexture2D(target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->getHandle(), 0);
 	if (tex->samples == 0u) {
 		glFramebufferTexture2D(target, attachment_type, GL_TEXTURE_2D, tex->getHandle(), 0);
 	} else {
+#ifndef MM_OPENGL_3_GLES
 		glFramebufferTexture2D(target, attachment_type, GL_TEXTURE_2D_MULTISAMPLE, tex->getHandle(), 0);
+#else
+		assert(false && "GLES has no multisampling support");
+#endif
 	}
 	_fbo->_texAttachments.push_back(tex); // keep a ref at the fbo
 

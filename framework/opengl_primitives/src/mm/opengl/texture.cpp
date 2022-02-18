@@ -37,7 +37,11 @@ void Texture::bind(uint32_t slot) const {
 	if (samples == 0) {
 		glBindTexture(GL_TEXTURE_2D, _handle);
 	} else {
+#ifndef MM_OPENGL_3_GLES
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
+#else
+		assert(false && "GLES has no multisampling support");
+#endif
 	}
 }
 
@@ -48,8 +52,12 @@ void Texture::resize(int32_t new_width, int32_t new_height) {
 		glBindTexture(GL_TEXTURE_2D, _handle);
 		glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, new_width, new_height, 0, _format, _type, NULL);
 	} else {
+#ifndef MM_OPENGL_3_GLES
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _handle);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, _internalFormat, new_width, new_height, 0);
+#else
+		assert(false && "GLES has no multisampling support");
+#endif
 	}
 
 	// HACK: super dirty
@@ -71,6 +79,7 @@ Texture::handle_t Texture::createEmpty(int32_t internalFormat, int32_t width, in
 }
 
 Texture::handle_t Texture::createEmptyMultiSampled(int32_t internalFormat, int32_t width, int32_t height, uint32_t samples) {
+#ifndef MM_OPENGL_3_GLES
 	uint32_t id;
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
@@ -82,6 +91,13 @@ Texture::handle_t Texture::createEmptyMultiSampled(int32_t internalFormat, int32
 
 	// HACK: format + type?
 	return handle_t(new Texture(id, width, height, internalFormat, 0, 0, samples));
+#else
+	(void)internalFormat;
+	(void)width;
+	(void)height;
+	(void)samples;
+	assert(false && "GLES has no multisampling support");
+#endif
 }
 
 } // MM::OpenGL
