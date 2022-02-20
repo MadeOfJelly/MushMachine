@@ -9,6 +9,9 @@ add_library(opengl_renderer_s
 
 	src/mm/opengl/camera_3d.hpp
 	src/mm/opengl/camera_3d.cpp
+
+	src/mm/opengl/res/shaders_builtin.hpp
+	src/mm/opengl/res/shaders_builtin.cpp
 )
 
 target_include_directories(opengl_renderer_s PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

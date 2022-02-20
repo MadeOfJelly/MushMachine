@@ -9,6 +9,17 @@ add_test(NAME opengl_renderer_s_test COMMAND opengl_renderer_s_test)
 
 #################
 
+add_executable(opengl_builtins_test ./builtins.cpp)
+
+target_link_libraries(opengl_builtins_test
+	opengl_renderer_s
+	gtest_main
+)
+
+add_test(NAME opengl_builtins_test COMMAND opengl_builtins_test)
+
+#################
+
 add_executable(imgui_render_task_test imgui_render_task_test.cpp)
 
 target_link_libraries(imgui_render_task_test

@@ -10,6 +10,7 @@
 #include <mm/opengl/texture_loader.hpp>
 #include "../opengl/res/default_texture.h" // data
 #include "../opengl/res/errig_texture.h" // data
+#include "../opengl/res/shaders_builtin.hpp" // data-ish
 
 #include <tracy/Tracy.hpp>
 #ifndef MM_OPENGL_3_GLES
@@ -111,7 +112,7 @@ bool OpenGLRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskIn
 		return false;
 	}
 
-	{ // default texures
+	{ // default textures
 		auto& rm_t = MM::ResourceManager<MM::OpenGL::Texture>::ref();
 		if (!rm_t.contains("default"_hs)) {
 			if (!rm_t.load<MM::OpenGL::TextureLoaderConstBuffer>("default", default_png, default_png_len)) {
@@ -123,6 +124,10 @@ bool OpenGLRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskIn
 				LOG_WARN("couldn't load 'errig' texture!");
 			}
 		}
+	}
+
+	{ // builtin shaders
+		OpenGL::load_builtin_shaders_fs();
 	}
 
 	{ // add task
