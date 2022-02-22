@@ -43,7 +43,7 @@ void main() {
 )");
 
 	auto sb = MM::OpenGL::ShaderBuilder::start();
-	sb.addStageVertex("void main() {}");
+	sb.addStageVertex("void main() { gl_Position = vec4(0.0); }");
 	sb.addStageFragmentF(engine, "/shaders/test_frag.glsl");
 	auto shader = sb.finish();
 	ASSERT_TRUE(shader);
