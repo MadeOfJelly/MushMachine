@@ -27,9 +27,6 @@
 namespace MM::OpenGL::RenderTasks {
 
 BatchedSpriteSheet::BatchedSpriteSheet(Engine& engine) {
-	default_cam.setOrthographic();
-	default_cam.updateView();
-
 	float vertices[] = {
 		-0.5f, 0.5f,
 		-0.5f, -0.5f,
@@ -69,6 +66,10 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	}
 
 	auto& scene = ssi->getScene();
+
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
 
 	struct sp_data {
 		SpriteSheet sp;
@@ -116,12 +117,9 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-	auto* cam = scene.try_ctx<Camera3D>();
-	if (!cam) {
-		cam = &default_cam;
-	}
+	auto& cam = scene.ctx().at<Camera3D>();
 
-	auto vp = cam->getViewProjection();
+	auto vp = cam.getViewProjection();
 	_shader->setUniformMat4f("_VP", vp);
 
 	for (auto& sp_ent : batch_map) {

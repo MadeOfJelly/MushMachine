@@ -42,18 +42,18 @@ TEST(fast_sky_render_task, it) {
 	rs.addRenderTask<MM::OpenGL::RenderTasks::FastSky>(engine);
 
 	// setup systems
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<&MM::Systems::fast_sky_sun>("fast_sky_sun");
 
 	// HACK: instead you would switch to this scene
 	engine.getService<MM::Services::OrganizerSceneService>().updateOrganizerVertices(scene);
 
 
-	auto& cam = scene.set<MM::OpenGL::Camera3D>();
+	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
 	cam.setPerspective();
 	cam.updateView();
 
-	scene.set<MM::OpenGL::RenderTasks::FastSkyContext>();
+	scene.ctx().emplace<MM::OpenGL::RenderTasks::FastSkyContext>();
 
 	engine.run();
 }

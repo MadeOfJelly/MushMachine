@@ -11,13 +11,13 @@ TEST(simple_velocity_2d, basic_run) {
 	MM::Scene scene;
 
 	// setup v system
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<&MM::Systems::simple_positional_velocity>("simple_positional_velocity");
 	org.emplace<&MM::Systems::simple_rotational_velocity>("simple_rotational_velocity");
 	auto graph = org.graph();
 
 	// setup delta
-	auto& time_ctx = scene.ctx_or_set<MM::Components::TimeDelta>(1.f/60.f, 1.f);
+	auto& time_ctx = scene.ctx().emplace<MM::Components::TimeDelta>(1.f/60.f, 1.f);
 	time_ctx.tickDelta = 1.f/60.f * time_ctx.deltaFactor;
 
 	// setup test entity

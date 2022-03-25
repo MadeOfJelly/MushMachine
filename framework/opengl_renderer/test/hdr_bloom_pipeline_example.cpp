@@ -119,46 +119,6 @@ static void setup_fbos(MM::Engine& engine) {
 
 	const float render_scale = 1.f;
 
-#if 0
-	rs.targets["clear_opaque"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("albedo"_hs), GL_COLOR_ATTACHMENT0)
-		.attachTexture(rm_t.get("opaque_depth"_hs), GL_DEPTH_ATTACHMENT)
-		.setResize(true)
-		.finish();
-	assert(rs.targets["clear_opaque"]);
-
-	rs.targets["clear_opaque_normal"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("normal"_hs), GL_COLOR_ATTACHMENT0)
-		.setResize(true)
-		.finish();
-	assert(rs.targets["clear_opaque"]);
-
-	rs.targets["opaque"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("albedo"_hs), GL_COLOR_ATTACHMENT0)
-		.attachTexture(rm_t.get("normal"_hs), GL_COLOR_ATTACHMENT1)
-		.attachTexture(rm_t.get("opaque_depth"_hs), GL_DEPTH_ATTACHMENT)
-		.setResize(true)
-		.finish();
-	assert(rs.targets["opaque"]);
-
-	rs.targets["tmp_read"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("normal"_hs), GL_COLOR_ATTACHMENT0)
-		.setResize(false)
-		.finish();
-	assert(rs.targets["tmp_read"]);
-
-	rs.targets["depth_read"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("opaque_depth"_hs), GL_DEPTH_ATTACHMENT)
-		.setResize(false)
-		.finish();
-	assert(rs.targets["depth_read"]);
-
-	rs.targets["deferred_shading"] = MM::OpenGL::FBOBuilder::start()
-		.attachTexture(rm_t.get("hdr_color"_hs), GL_COLOR_ATTACHMENT0)
-		.setResize(true)
-		.finish();
-	assert(rs.targets["deferred_shading"]);
-#endif
 	rs.targets["game_view"] = MM::OpenGL::FBOBuilder::start()
 		.attachTexture(rm_t.get("hdr_color"_hs), GL_COLOR_ATTACHMENT0)
 		.attachTexture(rm_t.get("depth"_hs), GL_DEPTH_ATTACHMENT)
@@ -230,9 +190,12 @@ TEST(hdr_bloom_pipeline, it) {
 	scene.on_update<MM::Components::Scale2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
 	scene.on_update<MM::Components::Rotation2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>(); // in this example only rotation is touched
 
+	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
+	cam.setOrthographic();
+	cam.updateView();
 
 	// setup v system
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<MM::Systems::simple_rotational_velocity_patching>("simple_rotational_velocity_patching");
 	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
 	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");

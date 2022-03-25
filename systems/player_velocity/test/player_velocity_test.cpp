@@ -29,7 +29,7 @@ TEST(player_velocity, basic_run) {
 	auto& scene = engine.getService<MM::Services::SceneServiceInterface>().getScene();
 
 	// setup v system
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<&MM::Systems::player_velocity2d>("player_velocity2d");
 
 	// HACK: instead you would switch to this scene

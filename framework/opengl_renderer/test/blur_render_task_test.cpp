@@ -129,9 +129,12 @@ TEST(blur_render_task, it) {
 	scene.on_update<MM::Components::Scale2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
 	scene.on_update<MM::Components::Rotation2D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>(); // in this example only rotation is touched
 
+	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
+	cam.setOrthographic();
+	cam.updateView();
 
 	// setup v system
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<MM::Systems::simple_rotational_velocity_patching>("simple_rotational_velocity_patching");
 	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
 	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");

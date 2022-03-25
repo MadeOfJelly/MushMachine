@@ -26,8 +26,6 @@ namespace MM::OpenGL::RenderTasks {
 		public:
 			glm::vec4 default_color {1.f, 1.f, 1.f, 1.f};
 
-			Camera3D default_cam;
-
 			SimpleSpriteSheet(Engine& engine);
 			~SimpleSpriteSheet(void);
 

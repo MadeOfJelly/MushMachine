@@ -120,11 +120,11 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 		auto new_scene = std::make_unique<MM::Scene>();
 		auto& scene = *new_scene;
 
-		auto& org = scene.set<entt::organizer>();
+		auto& org = scene.ctx().emplace<entt::organizer>();
 
-		scene.set<MM::Engine&>(_engine); // alias
+		scene.ctx().emplace<MM::Engine&>(_engine); // alias
 
-		scene.set<Components::screen_timer>(0.f, screen_duration, next_screen);
+		scene.ctx().emplace<Components::screen_timer>(0.f, screen_duration, next_screen);
 
 		org.emplace<Systems::screen_timer_system>("screen_timer_system");
 
@@ -135,7 +135,7 @@ void create_mm_logo(MM::Engine& engine, MM::Services::ScreenDirector::Screen& sc
 		org.emplace<MM::Systems::transform3d_scale2d>("transform3d_scale2d");
 		//org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");
 
-		auto& cam = scene.set<MM::OpenGL::Camera3D>();
+		auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
 		cam.horizontalViewPortSize = 89.f;
 		cam.setOrthographic();
 		cam.updateView();

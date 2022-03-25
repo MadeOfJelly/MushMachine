@@ -71,14 +71,13 @@ namespace MM::Services {
 		};
 
 		menu_bar.menu_tree["Scene"]["TimeCtx"] = [this](Engine& e) {
-			MM::Components::TimeDelta* td_ptr = nullptr;
+			bool have_ctx = false;
 
 			if (auto* ssi_ptr = e.tryService<MM::Services::SceneServiceInterface>()) {
-				auto& scene = ssi_ptr->getScene();
-				td_ptr = scene.try_ctx<MM::Components::TimeDelta>();
+				have_ctx = ssi_ptr->getScene().ctx().contains<MM::Components::TimeDelta>();
 			}
 
-			ImGui::MenuItem("TimeDelta Context", NULL, &_show_time_delta_ctx, td_ptr);
+			ImGui::MenuItem("TimeDelta Context", NULL, &_show_time_delta_ctx, have_ctx);
 		};
 
 		// add task
@@ -157,10 +156,13 @@ namespace MM::Services {
 
 		if (_show_time_delta_ctx) {
 			if (ImGui::Begin("Scene TimeDelta Context", &_show_time_delta_ctx)) {
-				auto* td_ptr = scene.try_ctx<MM::Components::TimeDelta>();
-				ImGui::Value("tickDelta", td_ptr->tickDelta);
-				ImGui::SliderFloat("deltaFactor", &td_ptr->deltaFactor, 0.f, 10.f, "%.5f", ImGuiSliderFlags_Logarithmic);
-
+				if (scene.ctx().contains<MM::Components::TimeDelta>()) {
+					auto& td = scene.ctx().at<MM::Components::TimeDelta>();
+					ImGui::Value("tickDelta", td.tickDelta);
+					ImGui::SliderFloat("deltaFactor", &td.deltaFactor, 0.f, 10.f, "%.5f", ImGuiSliderFlags_Logarithmic);
+				} else {
+					ImGui::TextUnformatted("No TimeDelta");
+				}
 			}
 			ImGui::End();
 		}
