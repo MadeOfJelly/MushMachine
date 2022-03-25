@@ -22,9 +22,6 @@
 namespace MM::OpenGL::RenderTasks {
 
 SimpleRect::SimpleRect(Engine& engine) {
-	default_cam.setOrthographic();
-	default_cam.updateView();
-
 	float vertices[] = {
 		-0.5f, 0.5f,
 		-0.5f, -0.5f,
@@ -63,6 +60,10 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto& scene = ssi->getScene();
 
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::RW);
 
 	glEnable(GL_DEPTH_TEST);
@@ -71,12 +72,8 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_shader->bind();
 	_vao->bind();
 
-	Camera3D* cam = scene.try_ctx<Camera3D>();
-	if (!cam) {
-		cam = &default_cam;
-	}
-
-	auto vp = cam->getViewProjection();
+	Camera3D& cam = scene.ctx().at<Camera3D>();
+	auto vp = cam.getViewProjection();
 
 	scene.view<const Components::Transform4x4>().each([this, &scene, &vp](entt::entity e, const auto& t) {
 		_shader->setUniformMat4f("_WVP", vp * t.trans);

@@ -28,9 +28,6 @@
 namespace MM::OpenGL::RenderTasks {
 
 SimpleSprite::SimpleSprite(Engine& engine) {
-	default_cam.setOrthographic();
-	default_cam.updateView();
-
 	float vertices[] = {
 		-0.5f, 0.5f,
 		-0.5f, -0.5f,
@@ -69,6 +66,10 @@ void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto& scene = ssi->getScene();
 
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::W);
 
 	glEnable(GL_DEPTH_TEST);
@@ -79,12 +80,8 @@ void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vao->bind();
 
 
-	auto* cam = scene.try_ctx<Camera3D>();
-	if (!cam) {
-		cam = &default_cam;
-	}
-
-	auto vp = cam->getViewProjection();
+	Camera3D& cam = scene.ctx().at<Camera3D>();
+	auto vp = cam.getViewProjection();
 
 	scene.view<const Components::Transform4x4, Components::OpenGL::Texture>().each([this, &scene, &vp](entt::entity e, const auto& t, auto& tex) {
 		assert(tex.tex); // debug

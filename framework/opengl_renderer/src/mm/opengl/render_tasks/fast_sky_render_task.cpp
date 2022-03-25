@@ -47,7 +47,6 @@ FastSky::FastSky(MM::Engine& engine) {
 
 	_vertexBuffer->unbind(GL_ARRAY_BUFFER);
 	_vao->unbind();
-
 }
 
 FastSky::~FastSky(void) {
@@ -55,6 +54,17 @@ FastSky::~FastSky(void) {
 
 void FastSky::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::FastSky::render");
+
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
+	}
+
+	auto& scene = ssi->getScene();
+
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
 
 	rs.targets[target_fbo]->bind(MM::OpenGL::FrameBufferObject::W);
 
@@ -67,9 +77,8 @@ void FastSky::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 	{
-		auto& cam = scene.ctx<MM::OpenGL::Camera3D>();
+		auto& cam = scene.ctx().at<MM::OpenGL::Camera3D>();
 		MM::OpenGL::Camera3D tmp_cam = cam;
 		// create cam with y up, bc shader says so
 		tmp_cam.up = {0, 1, 0};
@@ -80,9 +89,13 @@ void FastSky::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	}
 
 	{
-		auto* ctx_ptr =  scene.try_ctx<FastSkyContext>();
-		if (!ctx_ptr) {
-			ctx_ptr = &_default_context;
+		//auto* ctx_ptr =  scene.try_ctx<FastSkyContext>();
+		//if (!ctx_ptr) {
+			//ctx_ptr = &_default_context;
+		//}
+		auto* ctx_ptr = &_default_context;
+		if (scene.ctx().contains<FastSkyContext>()) {
+			ctx_ptr = &scene.ctx().at<FastSkyContext>();
 		}
 
 		_shader->setUniform1f("time", ctx_ptr->time);

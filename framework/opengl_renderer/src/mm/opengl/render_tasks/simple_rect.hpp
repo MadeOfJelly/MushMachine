@@ -5,7 +5,6 @@
 
 #include <mm/opengl/camera_3d.hpp>
 
-//#include <glm/fwd.hpp>
 #include <glm/vec4.hpp>
 
 // fwd
@@ -25,8 +24,6 @@ namespace MM::OpenGL::RenderTasks {
 
 		public:
 			glm::vec4 default_color {1,1,1,1};
-
-			Camera3D default_cam;
 
 			SimpleRect(Engine& engine);
 			~SimpleRect(void);

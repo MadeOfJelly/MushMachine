@@ -39,7 +39,7 @@ TEST(tilemap_render_task_test, it) {
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
-	auto& cam = scene.set<MM::OpenGL::Camera3D>();
+	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
 	cam.translation = {2.f, -2.f, 0.f};
 	cam.horizontalViewPortSize = 20.f;
 	cam.setOrthographic();
@@ -63,7 +63,7 @@ TEST(tilemap_render_task_test, it) {
 	scene.on_update<MM::Components::Position2D_ZOffset>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
 	scene.on_update<MM::Components::Position3D>().connect<&entt::registry::emplace_or_replace<MM::Components::DirtyTransformTag>>();
 
-	auto& org = scene.set<entt::organizer>();
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
 	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");
 	org.emplace<MM::Systems::transform_clear_dirty>("transform_clear_dirty");

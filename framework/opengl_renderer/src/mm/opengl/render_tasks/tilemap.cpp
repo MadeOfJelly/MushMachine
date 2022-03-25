@@ -75,6 +75,17 @@ Tilemap::~Tilemap(void) {
 void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	ZoneScopedN("MM::OpenGL::Renderers::TilemapRenderer::render");
 
+	auto* ssi = engine.tryService<MM::Services::SceneServiceInterface>();
+	if (ssi == nullptr) {
+		return; // nothing to draw
+	}
+
+	auto& scene = ssi->getScene();
+
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
+
 	rs.targets[target_fbo]->bind(MM::OpenGL::FrameBufferObject::W);
 
 	glEnable(GL_DEPTH_TEST);
@@ -85,17 +96,13 @@ void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-
-	auto& scene = engine.tryService<Services::SceneServiceInterface>()->getScene();
-
-	MM::OpenGL::Camera3D& cam = scene.ctx<MM::OpenGL::Camera3D>();
+	MM::OpenGL::Camera3D& cam = scene.ctx().at<MM::OpenGL::Camera3D>();
 	auto vp = cam.getViewProjection();
 
 	_shader->setUniform3f("_ambient_color", ambient_color);
 
 	scene.view<MM::Components::Transform4x4, OpenGL::TilemapRenderable>()
 		.each([&](auto, MM::Components::Transform4x4& t, OpenGL::TilemapRenderable& tilemap) {
-		//_shader->setUniformMat4f("_WVP", vp * t.getTransform4(tilemap.z + 500.f));
 		_shader->setUniformMat4f("_WVP", vp * t.trans);
 
 		// for each sprite layer

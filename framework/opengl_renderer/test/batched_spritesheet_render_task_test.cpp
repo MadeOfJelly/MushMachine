@@ -68,7 +68,7 @@ TEST(batched_spritesheet_render_task, it) {
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
 
-	auto& cam = scene.set<MM::OpenGL::Camera3D>();
+	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
 	cam.horizontalViewPortSize = 5;
 	cam.setOrthographic();
 	cam.updateView();
@@ -87,8 +87,8 @@ TEST(batched_spritesheet_render_task, it) {
 
 
 	// setup systems
-	scene.set<float>(0.f); // accu
-	auto& org = scene.set<entt::organizer>();
+	scene.ctx().emplace<float>(0.f); // accu
+	auto& org = scene.ctx().emplace<entt::organizer>();
 	org.emplace<&update_spritesheet_animation>("update_spritesheet_animation");
 	org.emplace<MM::Systems::position3d_from_2d>("position3d_from_2d");
 	org.emplace<MM::Systems::transform3d_translate>("transform3d_translate");

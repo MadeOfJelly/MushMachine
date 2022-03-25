@@ -30,9 +30,6 @@
 namespace MM::OpenGL::RenderTasks {
 
 SimpleSpriteSheet::SimpleSpriteSheet(Engine& engine) {
-	default_cam.setOrthographic();
-	default_cam.updateView();
-
 	float vertices[] = {
 		-0.5f, 0.5f,
 		-0.5f, -0.5f,
@@ -56,11 +53,6 @@ SimpleSpriteSheet::SimpleSpriteSheet(Engine& engine) {
 	setupShaderFiles();
 	_shader = Shader::createF(engine, vertexPath, fragmentPath);
 	assert(_shader != nullptr);
-
-	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
-	if (!scene.try_ctx<Camera3D>()) {
-		LOG_SSSR("warn: scene has no Camera!");
-	}
 }
 
 SimpleSpriteSheet::~SimpleSpriteSheet(void) {
@@ -76,6 +68,10 @@ void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 
 	auto& scene = ssi->getScene();
 
+	if (!scene.ctx().contains<Camera3D>()) {
+		return; // nothing to draw
+	}
+
 	rs.targets[target_fbo]->bind(FrameBufferObject::W);
 
 	glEnable(GL_DEPTH_TEST);
@@ -85,12 +81,8 @@ void SimpleSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-	auto* cam = scene.try_ctx<Camera3D>();
-	if (!cam) {
-		cam = &default_cam;
-	}
-
-	auto vp = cam->getViewProjection();
+	Camera3D& cam = scene.ctx().at<Camera3D>();
+	auto vp = cam.getViewProjection();
 
 	scene.view<const Components::Transform4x4, SpriteSheetRenderable>().each([this, &scene, &vp](entt::entity e, const auto& t, auto& spr) {
 		assert(spr.sp.tex); // debug

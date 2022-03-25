@@ -52,7 +52,7 @@ bool OrganizerSceneService::enable(Engine& engine, std::vector<UpdateStrategies:
 	// default scene
 	if (!_scene) {
 		_scene = std::make_unique<Scene>();
-		_scene->set<MM::Engine&>(engine);
+		_scene->ctx().emplace<MM::Engine&>(engine);
 		updateOrganizerVertices(*_scene);
 	}
 
@@ -74,14 +74,14 @@ void OrganizerSceneService::sceneFixedUpdate(Engine&) {
 
 	size_t continuous_counter = 0;
 
-	auto& time_ctx = _scene->ctx_or_set<MM::Components::TimeDelta>(f_delta, initial_delta_factor);
+	auto& time_ctx = _scene->ctx().emplace<MM::Components::TimeDelta>(f_delta, initial_delta_factor);
 	time_ctx.tickDelta = f_delta * time_ctx.deltaFactor;
 
 	while (_accumulator >= f_delta){
 		_accumulator -= f_delta;
 		continuous_counter++;
 
-		for (auto&& v : _scene->ctx<std::vector<entt::organizer::vertex>>()) {
+		for (auto&& v : _scene->ctx().at<std::vector<entt::organizer::vertex>>()) {
 			v.callback()(v.data(), *_scene);
 		}
 
@@ -97,8 +97,8 @@ void OrganizerSceneService::changeSceneFixedUpdate(Engine& engine) {
 	if (_next_scene) {
 		LOG_OSS("changing scene...");
 		_scene = std::move(_next_scene);
-		if (!_scene->try_ctx<MM::Engine>()) {
-			_scene->set<MM::Engine&>(engine); // make engine accessible from scene
+		if (!_scene->ctx().contains<MM::Engine>()) {
+			_scene->ctx().emplace<MM::Engine&>(engine); // make engine accessible from scene
 		}
 		updateOrganizerVertices(*_scene);
 	}
@@ -119,14 +119,14 @@ void OrganizerSceneService::changeSceneNow(std::unique_ptr<Scene>&& new_scene) {
 }
 
 void OrganizerSceneService::updateOrganizerVertices(Scene& scene) {
-	scene.ctx_or_set<std::vector<entt::organizer::vertex>>() =
-		scene.ctx_or_set<entt::organizer>().graph();
+	scene.ctx().emplace<std::vector<entt::organizer::vertex>>() =
+		scene.ctx().emplace<entt::organizer>().graph();
 
-	if (!scene.try_ctx<MM::Components::TimeDelta>()) {
-		scene.set<MM::Components::TimeDelta>();
+	if (!scene.ctx().contains<MM::Components::TimeDelta>()) {
+		scene.ctx().emplace<MM::Components::TimeDelta>();
 	}
 
-	SPDLOG_DEBUG("graph:\n{}", scene.ctx<std::vector<entt::organizer::vertex>>());
+	SPDLOG_DEBUG("graph:\n{}", scene.ctx().at<std::vector<entt::organizer::vertex>>());
 }
 
 void OrganizerSceneService::resetTime(void) {
