@@ -160,3 +160,30 @@ target_link_libraries(fast_sky_render_task_test
 
 add_test(NAME fast_sky_render_task_test COMMAND fast_sky_render_task_test)
 
+################# hdr bloom example
+
+add_executable(hdr_bloom_pipeline_example ./hdr_bloom_pipeline_example.cpp)
+
+target_link_libraries(hdr_bloom_pipeline_example
+	opengl_renderer_s
+	organizer_scene
+	clear_render_task
+	blit_fb_render_task
+	simple_rect_render_task
+
+	#bloom_extraction_render_task
+	#blur_render_task
+	#bloom_combine_render_task
+	bloom
+	composition_render_task
+
+	simple_velocity_system
+	transform_system
+
+	random
+
+	gtest_main
+)
+
+add_test(NAME hdr_bloom_pipeline_example COMMAND hdr_bloom_pipeline_example)
+

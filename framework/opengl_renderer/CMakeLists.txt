@@ -179,6 +179,49 @@ target_link_libraries(blur_render_task
 	engine
 )
 
+############# bloom_extraction render task ###########
+
+add_library(bloom_extraction_render_task
+	src/mm/opengl/render_tasks/bloom_extraction.hpp
+	src/mm/opengl/render_tasks/bloom_extraction.cpp
+)
+
+target_include_directories(bloom_extraction_render_task PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_link_libraries(bloom_extraction_render_task
+	opengl_renderer_s
+	engine
+)
+
+############# bloom_combine render task ###########
+
+add_library(bloom_combine_render_task
+	src/mm/opengl/render_tasks/bloom_combine.hpp
+	src/mm/opengl/render_tasks/bloom_combine.cpp
+)
+
+target_include_directories(bloom_combine_render_task PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_link_libraries(bloom_combine_render_task
+	opengl_renderer_s
+	engine
+)
+
+############# composition render task ###########
+# intendet for bloom compositing and tonemapping
+
+add_library(composition_render_task
+	src/mm/opengl/render_tasks/composition.hpp
+	src/mm/opengl/render_tasks/composition.cpp
+)
+
+target_include_directories(composition_render_task PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_link_libraries(composition_render_task
+	opengl_renderer_s
+	engine
+)
+
 ############# tilemap renderer ###########
 
 add_library(tilemap_render_task
@@ -208,6 +251,21 @@ target_include_directories(fast_sky_render_task PUBLIC "${CMAKE_CURRENT_SOURCE_D
 target_link_libraries(fast_sky_render_task
 	opengl_renderer_s
 	engine
+)
+
+############# bloom ###########
+
+add_library(bloom
+	src/mm/opengl/bloom.hpp
+	src/mm/opengl/bloom.cpp
+)
+
+target_include_directories(bloom PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_link_libraries(bloom
+	bloom_extraction_render_task
+	blur_render_task
+	bloom_combine_render_task
 )
 
 ########################

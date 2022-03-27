@@ -30,5 +30,5 @@ namespace MM::OpenGL {
 			//virtual void reload(void) {} // TODO: remove
 			//virtual std::vector<const char*> getShaderPaths(void) {return {};} // TODO: remove
 	};
-}
+} // MM:OpenGL
 

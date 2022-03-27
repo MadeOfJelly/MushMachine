@@ -36,10 +36,8 @@ Blur::Blur(Engine& engine) {
 	_vao->unbind();
 
 	setupShaderFiles();
-	_hShader = Shader::createF(engine, vertexPath, fragmentHPath);
-	assert(_hShader != nullptr);
-	_vShader = Shader::createF(engine, vertexPath, fragmentVPath);
-	assert(_vShader != nullptr);
+	_shader = Shader::createF(engine, vertexPath, fragmentPath);
+	assert(_shader != nullptr);
 }
 
 Blur::~Blur(void) {
@@ -57,17 +55,19 @@ void Blur::render(Services::OpenGLRenderer& rs, Engine&) {
 	auto tex_out = rm_t.get(entt::hashed_string::value(out_tex.c_str())); // TODO: perf problems
 	auto tex_temp = rm_t.get(entt::hashed_string::value(temp_tex.c_str())); // TODO: perf problems
 
+	_shader->bind();
+	_vertexBuffer->bind(GL_ARRAY_BUFFER);
+	_vao->bind();
+
+	_shader->setUniform2f("tex_offset_factor", tex_offset_factor);
+
 	{ // horizontal
 		rs.targets[temp_fbo]->bind(FrameBufferObject::W);
-
-		_hShader->bind();
-		_vertexBuffer->bind(GL_ARRAY_BUFFER);
-		_vao->bind();
 
 		glViewport(0, 0, tex_temp->width, tex_temp->height);
 		tex_in->bind(0); // read
 
-		_hShader->setUniform2f("tex_offset", tex_offset);
+		_shader->setUniform1i("horizontal", 1);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
@@ -75,21 +75,15 @@ void Blur::render(Services::OpenGLRenderer& rs, Engine&) {
 	{ // vertical
 		rs.targets[out_fbo]->bind(FrameBufferObject::W);
 
-		_vShader->bind();
-		_vertexBuffer->bind(GL_ARRAY_BUFFER);
-		_vao->bind();
-
 		glViewport(0, 0, tex_out->width, tex_out->height);
 		tex_temp->bind(0); // read
 
-		_vShader->setUniform2f("tex_offset", tex_offset);
+		_shader->setUniform1i("horizontal", 0);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
 	_vao->unbind();
-	_vertexBuffer->unbind(GL_ARRAY_BUFFER);
-	_vShader->unbind();
 }
 
 void Blur::setupShaderFiles(void) {
@@ -108,9 +102,7 @@ void main() {
 	_tex_uv = _vertexPosition * 0.5 + 0.5;
 })")
 
-	// TODO: deduplicate
-
-	FS_CONST_MOUNT_FILE(fragmentHPath,
+	FS_CONST_MOUNT_FILE(fragmentPath,
 GLSL_VERSION_STRING
 R"(
 #ifdef GL_ES
@@ -120,54 +112,19 @@ R"(
 uniform sampler2D tex0;
 in vec2 _tex_uv;
 
-//uniform bool horizontal;
-const bool horizontal = true;
-uniform vec2 tex_offset;
+uniform bool horizontal;
+//const bool horizontal = true;
+uniform vec2 tex_offset_factor;
 
 const float weight[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
 
 out vec4 _out_color;
 
 void main() {
-	//vec2 tex_offset = vec2(1.0) / vec2(textureSize(tex0, 0)); // gets size of single texel
 	vec3 result = texture(tex0, _tex_uv).rgb * weight[0]; // current fragment's contribution
 
-	if (horizontal) {
-		for (int i = 1; i < 5; i++) {
-			result += texture(tex0, _tex_uv + vec2(tex_offset.x * float(i), 0.0)).rgb * weight[i];
-			result += texture(tex0, _tex_uv - vec2(tex_offset.x * float(i), 0.0)).rgb * weight[i];
-		}
-	} else {
-		for (int i = 1; i < 5; i++) {
-			result += texture(tex0, _tex_uv + vec2(0.0, tex_offset.y * float(i))).rgb * weight[i];
-			result += texture(tex0, _tex_uv - vec2(0.0, tex_offset.y * float(i))).rgb * weight[i];
-		}
-	}
-
-	_out_color = vec4(result, 1.0);
-})")
-
-	FS_CONST_MOUNT_FILE(fragmentVPath,
-GLSL_VERSION_STRING
-R"(
-#ifdef GL_ES
-	precision mediump float;
-#endif
-
-uniform sampler2D tex0;
-in vec2 _tex_uv;
-
-//uniform bool horizontal;
-const bool horizontal = false;
-uniform vec2 tex_offset;
-
-const float weight[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
-
-out vec4 _out_color;
-
-void main() {
-	//vec2 tex_offset = vec2(1.0) / vec2(textureSize(tex0, 0)); // gets size of single texel
-	vec3 result = texture(tex0, _tex_uv).rgb * weight[0]; // current fragment's contribution
+	vec2 tex_offset = vec2(1.0) / vec2(textureSize(tex0, 0).xy); // gets size of single texel
+	tex_offset *= tex_offset_factor;
 
 	if (horizontal) {
 		for (int i = 1; i < 5; i++) {
