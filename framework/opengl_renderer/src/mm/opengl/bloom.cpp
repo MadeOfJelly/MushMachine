@@ -26,14 +26,16 @@ void setup_bloom(
 #ifdef MM_OPENGL_3_GLES
 	#if 0 // NOPE!!
 	// TODO: caps at 1, invest in half float?
-	const auto bloom_internal_format = GL_RGB565; // prolly fine
+	const auto bloom_internal_format = GL_RGB565; // prolly fine. NOPE its not. it causes green pixely halos
 	const auto bloom_format_type = GL_UNSIGNED_BYTE;
 	#else
-	const auto bloom_internal_format = GL_RGB16F;
+	//const auto bloom_internal_format = GL_RGBA16F;
+	const auto bloom_internal_format = GL_R11F_G11F_B10F;
 	const auto bloom_format_type = GL_FLOAT;
 	#endif
 #else
-	const auto bloom_internal_format = GL_RGB16F;
+	//const auto bloom_internal_format = GL_RGB16F;
+	const auto bloom_internal_format = GL_R11F_G11F_B10F;
 	const auto bloom_format_type = GL_FLOAT;
 #endif
 
