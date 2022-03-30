@@ -1,5 +1,4 @@
 #include "./scene_tools.hpp"
-#include "mm/components/velocity2d_rotation.hpp"
 
 #include <mm/engine.hpp>
 
@@ -32,10 +31,11 @@
 namespace MM::Services {
 
 	bool ImGuiSceneToolsService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
-		if (!engine.tryService<MM::Services::SceneServiceInterface>()) {
-			LOGIGS("error: no SceneServiceInterface");
-			return false;
-		}
+		// enable anyway
+		//if (!engine.tryService<MM::Services::SceneServiceInterface>()) {
+			//LOGIGS("error: no SceneServiceInterface");
+			//return false;
+		//}
 
 		// setup entity editor defaults
 		{
@@ -102,6 +102,10 @@ namespace MM::Services {
 	}
 
 	void ImGuiSceneToolsService::renderImGui(Engine& engine) {
+		if (engine.tryService<MM::Services::SceneServiceInterface>() == nullptr) {
+			return; // no scene, nothing to see
+		}
+
 		auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
 		if (_show_scene_metrics) {
