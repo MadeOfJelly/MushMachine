@@ -37,6 +37,7 @@ R"(
 
 #include "/shaders/builtin/sampling.glsl"
 #include "/shaders/builtin/tonemapping.glsl"
+#include "/shaders/builtin/hashing.glsl"
 
 void main() {
 }

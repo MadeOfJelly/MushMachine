@@ -90,6 +90,7 @@ void Shader::setUniformMat3f(const std::string& name, const glm::mat3& matrix) {
 }
 
 // TODO: refactor this whole thing out
+// FIXME: hangs if trailing whitespace
 std::string Shader::parse(Engine& engine, const std::string& filePath) {
 	auto& fs = engine.getService<MM::Services::FilesystemService>();
 
