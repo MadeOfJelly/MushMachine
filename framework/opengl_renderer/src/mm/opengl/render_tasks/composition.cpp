@@ -125,6 +125,7 @@ R"(
 #endif
 
 #include "/shaders/builtin/tonemapping.glsl"
+#include "/shaders/builtin/hashing.glsl"
 
 uniform sampler2D color_tex;
 uniform sampler2D bloom_tex;
@@ -157,6 +158,9 @@ void main() {
 	_out_color = tonemapACESFilm(comp); // looks right
 	//_out_color = pow(tonemapACESFilm(pow(comp, vec3(2.2))), vec3(1.0/2.2)); // insane saturation o.O
 	//_out_color = pow(tonemapACESFilm(comp), vec3(1.0/2.2)); // looks just wrong
+
+	// noise dither for 8bit displays
+	_out_color += (hash32(gl_FragCoord.xy) * vec3(2.0) - vec3(1.0)) / vec3(255.0);
 })")
 }
 
