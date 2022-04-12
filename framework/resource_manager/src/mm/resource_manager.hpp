@@ -85,7 +85,8 @@ class ResourceManager {
 			discard(entt::hashed_string{id}.value());
 		}
 
-		void each(std::function<void(res_id_type, std::shared_ptr<Resource>)>& fn) {
+		template<typename FN>
+		void each(FN&& fn) {
 			for (auto& it : _storage) {
 				fn(it.first, it.second);
 			}
