@@ -21,15 +21,20 @@ namespace MM::OpenGL {
 		private:
 			GLuint _handle = 0;
 			std::size_t _size = 0;
+			GLenum _target;
 
 		public:
-			Buffer(const void* data, std::size_t size, GLenum usage);
+			Buffer(const void* data, std::size_t size, GLenum usage, GLenum target = GL_ARRAY_BUFFER);
 			~Buffer(void);
 
+			void bind(void) const;
 			void bind(GLenum target) const;
+			void unbind(void) const;
 			void unbind(GLenum target) const;
 
 			std::size_t getSize(void) const;
+
+			GLuint getHandle(void) const;
 	};
 } // MM::OpenGL
 

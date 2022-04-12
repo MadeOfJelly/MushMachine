@@ -6,18 +6,26 @@
 
 namespace MM::OpenGL {
 
-Buffer::Buffer(const void* data, std::size_t size, GLenum usage) : _size(size) {
+Buffer::Buffer(const void* data, std::size_t size, GLenum usage, GLenum target) : _size(size), _target(target) {
 	glGenBuffers(1, &_handle);
-	glBindBuffer(GL_ARRAY_BUFFER, _handle);
-	glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+	glBindBuffer(_target, _handle);
+	glBufferData(_target, size, data, usage);
 }
 
 Buffer::~Buffer(void) {
-	glDeleteBuffers(1,&_handle);
+	glDeleteBuffers(1, &_handle);
+}
+
+void Buffer::bind(void) const {
+	glBindBuffer(_target, _handle);
 }
 
 void Buffer::bind(GLenum target) const {
 	glBindBuffer(target, _handle);
+}
+
+void Buffer::unbind(void) const {
+	glBindBuffer(_target, 0);
 }
 
 void Buffer::unbind(GLenum target) const {
@@ -26,6 +34,10 @@ void Buffer::unbind(GLenum target) const {
 
 std::size_t Buffer::getSize(void) const {
 	return _size;
+}
+
+GLuint Buffer::getHandle(void) const {
+	return _handle;
 }
 
 } // MM::OpenGL
