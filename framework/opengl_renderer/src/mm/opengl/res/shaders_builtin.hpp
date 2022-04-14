@@ -7,6 +7,7 @@ namespace MM::OpenGL {
 // - sampling.glsl
 // - tonemapping.glsl
 // - hashing.glsl
+// - noise.glsl
 void load_builtin_shaders_fs(void);
 
 } // MM::OpenGL

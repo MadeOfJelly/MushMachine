@@ -95,6 +95,7 @@ R"(
 // Hash without Sine
 // MIT License...
 /* Copyright (c)2014 David Hoskins.
+   modified by Erik Scholz 2022
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -256,6 +257,139 @@ vec4 hash44(vec4 p4)
 #endif
 )")
 	// ==================== hashing.glsl ==================== END
+
+	// ==================== noise.glsl ==================== START
+	FS_CONST_MOUNT_FILE("/shaders/builtin/noise.glsl",
+R"(
+#ifndef INCLUDE_BUILTIN_NOISE
+#define INCLUDE_BUILTIN_NOISE
+
+#include "/shaders/builtin/hashing.glsl"
+
+// value noise based on Inigo Quilez value noise shaders.
+// https://www.youtube.com/c/InigoQuilez
+// https://iquilezles.org/
+// value noise 2d: https://www.shadertoy.com/view/lsf3WH
+// value noise 3d: https://www.shadertoy.com/view/4sfGzS
+
+float noise12(in vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	vec2 u = f * f * (3.0 - 2.0 * f);
+
+	return mix(mix(	hash12(i + vec2(0.0, 0.0)),
+					hash12(i + vec2(1.0, 0.0)), u.x),
+				mix(hash12(i + vec2(0.0, 1.0)),
+					hash12(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+
+vec2 noise22(in vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	vec2 u = f * f * (3.0 - 2.0 * f);
+
+	return mix(mix(	hash22(i + vec2(0.0, 0.0)),
+					hash22(i + vec2(1.0, 0.0)), u.x),
+				mix(hash22(i + vec2(0.0, 1.0)),
+					hash22(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+
+float noise13(in vec3 x) {
+	vec3 i = floor(x);
+	vec3 f = fract(x);
+	vec3 u  = f * f * (3.0 - 2.0 * f);
+
+	return mix(mix(mix(	hash13(i + vec3(0.0, 0.0, 0.0)),
+						hash13(i + vec3(1.0, 0.0, 0.0)), u.x),
+					mix(hash13(i + vec3(0.0, 1.0, 0.0)),
+						hash13(i + vec3(1.0, 1.0, 0.0)), u.x), u.y),
+				mix(mix(hash13(i + vec3(0.0, 0.0, 1.0)),
+						hash13(i + vec3(1.0, 0.0, 1.0)), u.x),
+					mix(hash13(i + vec3(0.0, 1.0, 1.0)),
+						hash13(i + vec3(1.0, 1.0, 1.0)), u.x), u.y), u.z);
+}
+
+float noise14(in vec4 x) {
+	vec4 i = floor(x);
+	vec4 f = fract(x);
+	vec4 u = f * f * (3.0 - 2.0 * f);
+
+	return
+		mix(mix(mix(mix(hash14(i + vec4(0.0, 0.0, 0.0, 0.0)),
+						hash14(i + vec4(1.0, 0.0, 0.0, 0.0)), u.x
+					),
+					mix(hash14(i + vec4(0.0, 1.0, 0.0, 0.0)),
+						hash14(i + vec4(1.0, 1.0, 0.0, 0.0)), u.x
+					), u.y
+				),
+				mix(mix(hash14(i + vec4(0.0, 0.0, 1.0, 0.0)),
+						hash14(i + vec4(1.0, 0.0, 1.0, 0.0)), u.x
+					),
+					mix(hash14(i + vec4(0.0, 1.0, 1.0, 0.0)),
+						hash14(i + vec4(1.0, 1.0, 1.0, 0.0)), u.x
+					), u.y
+				), u.z
+			),
+			mix(mix(mix(hash14(i + vec4(0.0, 0.0, 0.0, 1.0)),
+						hash14(i + vec4(1.0, 0.0, 0.0, 1.0)), u.x
+					),
+					mix(hash14(i + vec4(0.0, 1.0, 0.0, 1.0)),
+						hash14(i + vec4(1.0, 1.0, 0.0, 1.0)), u.x
+					), u.y
+				),
+				mix(mix(hash14(i + vec4(0.0, 0.0, 1.0, 1.0)),
+						hash14(i + vec4(1.0, 0.0, 1.0, 1.0)), u.x
+					),
+					mix(hash14(i + vec4(0.0, 1.0, 1.0, 1.0)),
+						hash14(i + vec4(1.0, 1.0, 1.0, 1.0)), u.x
+					), u.y
+				), u.z
+			), u.w
+		);
+}
+
+vec2 noise24(in vec4 x) {
+	vec4 i = floor(x);
+	vec4 f = fract(x);
+	vec4 u = f * f * (3.0 - 2.0 * f);
+
+	return
+		mix(mix(mix(mix(hash24(i + vec4(0.0, 0.0, 0.0, 0.0)),
+						hash24(i + vec4(1.0, 0.0, 0.0, 0.0)), u.x
+					),
+					mix(hash24(i + vec4(0.0, 1.0, 0.0, 0.0)),
+						hash24(i + vec4(1.0, 1.0, 0.0, 0.0)), u.x
+					), u.y
+				),
+				mix(mix(hash24(i + vec4(0.0, 0.0, 1.0, 0.0)),
+						hash24(i + vec4(1.0, 0.0, 1.0, 0.0)), u.x
+					),
+					mix(hash24(i + vec4(0.0, 1.0, 1.0, 0.0)),
+						hash24(i + vec4(1.0, 1.0, 1.0, 0.0)), u.x
+					), u.y
+				), u.z
+			),
+			mix(mix(mix(hash24(i + vec4(0.0, 0.0, 0.0, 1.0)),
+						hash24(i + vec4(1.0, 0.0, 0.0, 1.0)), u.x
+					),
+					mix(hash24(i + vec4(0.0, 1.0, 0.0, 1.0)),
+						hash24(i + vec4(1.0, 1.0, 0.0, 1.0)), u.x
+					), u.y
+				),
+				mix(mix(hash24(i + vec4(0.0, 0.0, 1.0, 1.0)),
+						hash24(i + vec4(1.0, 0.0, 1.0, 1.0)), u.x
+					),
+					mix(hash24(i + vec4(0.0, 1.0, 1.0, 1.0)),
+						hash24(i + vec4(1.0, 1.0, 1.0, 1.0)), u.x
+					), u.y
+				), u.z
+			), u.w
+		);
+}
+
+#endif
+)")
+	// ==================== noise.glsl ==================== END
 }
 
 } // MM::OpenGL
