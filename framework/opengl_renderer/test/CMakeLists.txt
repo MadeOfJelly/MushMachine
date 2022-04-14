@@ -168,7 +168,6 @@ target_link_libraries(hdr_bloom_pipeline_example
 	opengl_renderer_s
 	organizer_scene
 	clear_render_task
-	blit_fb_render_task
 	simple_rect_render_task
 
 	#bloom_extraction_render_task
@@ -186,4 +185,28 @@ target_link_libraries(hdr_bloom_pipeline_example
 )
 
 add_test(NAME hdr_bloom_pipeline_example COMMAND hdr_bloom_pipeline_example)
+
+################# lite_particles2d (the test uses bloom)
+
+add_executable(lite_particles2d_test ./lite_particles2d.cpp)
+
+target_link_libraries(lite_particles2d_test
+	opengl_renderer_s
+	organizer_scene
+	clear_render_task
+	#simple_rect_render_task
+	lite_particles2d # not only rendertask
+
+	bloom
+	composition_render_task
+
+	#simple_velocity_system
+	#transform_system
+
+	random
+
+	gtest_main
+)
+
+add_test(NAME lite_particles2d_test COMMAND lite_particles2d_test)
 
