@@ -268,6 +268,27 @@ target_link_libraries(bloom
 	bloom_combine_render_task
 )
 
+############# lite_particles2d ###########
+
+add_library(lite_particles2d
+	src/mm/opengl/lite_particles2d_type.hpp
+	src/mm/opengl/lite_particles2d_type_loader.hpp
+	src/mm/opengl/lite_particles2d_type_loader.cpp
+
+	src/mm/opengl/components/lite_particles2d.hpp
+
+	src/mm/opengl/render_tasks/lite_particles2d.hpp
+	src/mm/opengl/render_tasks/lite_particles2d.cpp
+)
+
+target_include_directories(lite_particles2d PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+target_link_libraries(lite_particles2d
+	engine
+	opengl_renderer_s
+	common_components_serialize_json # glm serl
+)
+
 ########################
 
 if (BUILD_TESTING)
