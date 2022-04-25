@@ -545,13 +545,13 @@ vec2 fetch_vec2(in uint offset, in uint type) {
 
 sim_config_type fetch_type_config(uint type) {
 	return sim_config_type(
-		texelFetch(_type_buffer, ivec2(0, type), 0).r,
+		texelFetch(_type_buffer, ivec2(0u, type), 0).r,
 		fetch_vec2(1u, type),
-		texelFetch(_type_buffer, ivec2(3, type), 0).r,
-		texelFetch(_type_buffer, ivec2(4, type), 0).r,
-		texelFetch(_type_buffer, ivec2(5, type), 0).r,
-		texelFetch(_type_buffer, ivec2(6, type), 0).r,
-		texelFetch(_type_buffer, ivec2(7, type), 0).r
+		texelFetch(_type_buffer, ivec2(3u, type), 0).r,
+		texelFetch(_type_buffer, ivec2(4u, type), 0).r,
+		texelFetch(_type_buffer, ivec2(5u, type), 0).r,
+		texelFetch(_type_buffer, ivec2(6u, type), 0).r,
+		texelFetch(_type_buffer, ivec2(7u, type), 0).r
 	);
 }
 
@@ -698,8 +698,8 @@ config_type fetch_config_type(uint type) {
 	return config_type(
 		fetch_vec4(0u, type),
 		fetch_vec4(4u, type),
-		texelFetch(_type_buffer, ivec2(8, type), 0).r,
-		texelFetch(_type_buffer, ivec2(9, type), 0).r
+		texelFetch(_type_buffer, ivec2(8u, type), 0).r,
+		texelFetch(_type_buffer, ivec2(9u, type), 0).r
 	);
 }
 
