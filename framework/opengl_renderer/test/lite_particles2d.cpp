@@ -238,13 +238,13 @@ R"({
 
 }
 
-TEST(hdr_bloom_pipeline, it) {
+TEST(lite_particles2d, it) {
 	MM::Engine engine;
 
 	auto& sdl_ss = engine.addService<MM::Services::SDLService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::SDLService>());
 
-	sdl_ss.createGLWindow("hdr_bloom_pipeline_example", 1280, 720);
+	sdl_ss.createGLWindow("lite_particles2d", 1280, 720);
 
 	engine.addService<MM::Services::OrganizerSceneService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OrganizerSceneService>());
@@ -253,7 +253,7 @@ TEST(hdr_bloom_pipeline, it) {
 	ASSERT_TRUE(provide_ret);
 	auto& scene = engine.tryService<MM::Services::SceneServiceInterface>()->getScene();
 
-	engine.addService<MM::Services::FilesystemService>(argv0, "hdr_bloom_pipeline_example");
+	engine.addService<MM::Services::FilesystemService>(argv0, "lite_particles2d");
 	ASSERT_TRUE(engine.enableService<MM::Services::FilesystemService>());
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
