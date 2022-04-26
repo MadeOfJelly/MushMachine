@@ -304,6 +304,12 @@ void LiteParticles2D::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	renderParticles(rs, scene);
 }
 
+void LiteParticles2D::setParticleBufferSize(uint32_t new_buffer_size) {
+	_particle_buffer_size = new_buffer_size;
+
+	resetBuffers();
+}
+
 void LiteParticles2D::resetBuffers(void) {
 	const auto gl_buffer_type = GL_DYNAMIC_COPY;
 	auto reset_buffer_0 = [this](size_t i) {

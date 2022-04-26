@@ -47,10 +47,8 @@ namespace MM::OpenGL::RenderTasks {
 			float _time {0};
 
 		public:
-			//glm::vec3 env_vec{0, 1, 0};
-			//float env_force{0.3};
-			//float noise_force{0.5};
-			//float dampening{0.99};
+			// TODO: impl some environment controlled force
+			//glm::vec2 env_vec{0, 1};
 
 			LiteParticles2D(Engine& engine);
 			~LiteParticles2D(void);
@@ -62,6 +60,7 @@ namespace MM::OpenGL::RenderTasks {
 			void renderParticles(Services::OpenGLRenderer& rs, Scene& scene);
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
 
+			void setParticleBufferSize(uint32_t new_buffer_size = 10'000);
 			void resetBuffers(void);
 			void resetTypeBuffers(void);
 
