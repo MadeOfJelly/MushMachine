@@ -13,7 +13,15 @@ The private repo had over 900 commits, before the first public release.
 - [Github](https://github.com/MadeOfJelly/MushMachine)
 - [Setup](docs/setup.md)
 - [Example Game Setup](docs/basic_game.md)
+- [mm_template](https://github.com/MadeOfJelly/mm_template) (a GitHub Template for quick starting MM game dev)
 - The [Docs Directory](docs/) contains Documentation loosely based on the Source structure.
+- Engine Extensions:
+  - [Box2D integration](https://github.com/Green-Sky/mushmachine_box2d)
+  - [fx_draw (simple line drawing rendertask)](https://github.com/Green-Sky/fx_draw)
+- Projects using the Engine:
+  - [miniTD](https://github.com/Green-Sky/miniTD)
+  - [LiteParticles2DDemo](https://github.com/MadeOfJelly/mm_lite_particles2d_demo)
+  - [mm_fireworks](https://github.com/Green-Sky/mm_fireworks)
 
 ## Platforms
 - PC (Linux, Windows and maybe APPLE(compiles))
