@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.8)
-project(systems CXX)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
+project(systems)
 
 add_subdirectory(transform)
 add_subdirectory(simple_velocity)

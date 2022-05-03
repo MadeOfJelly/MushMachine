@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.2)
-project(framework CXX)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
+project(framework)
 
 add_subdirectory(engine)
 add_subdirectory(logger)

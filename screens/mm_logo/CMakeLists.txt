@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
 project(mm_logo_screen CXX)
 
 add_library(mm_logo_screen

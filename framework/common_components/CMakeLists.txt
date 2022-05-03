@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
 project(common_components CXX)
 
 add_library(common_components INTERFACE)

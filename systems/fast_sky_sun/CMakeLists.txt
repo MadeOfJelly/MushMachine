@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
 project(fast_sky_sun_system CXX)
 
 add_library(fast_sky_sun_system

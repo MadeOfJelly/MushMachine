@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+
 project(resource_manager CXX)
 
 add_library(resource_manager INTERFACE)

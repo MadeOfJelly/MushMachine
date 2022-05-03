@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 # cmake setup begin
 project(MushMachine C CXX)
@@ -18,6 +18,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# add this to your projects cmake to enable ipo
+#include(CheckIPOSupported)
+#check_ipo_supported()
+#set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 
 # enable test
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

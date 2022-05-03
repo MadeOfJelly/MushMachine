@@ -13,7 +13,7 @@
 #  compile, using preprocessor checks for platform-specific bits instead of
 #  testing in here.
 
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 project(PhysicsFS)
 set(PHYSFS_VERSION 3.1.0)
