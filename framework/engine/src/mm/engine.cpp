@@ -30,6 +30,14 @@ void Engine::setup(void) {
 Engine::Engine(void) {
 	setup();
 
+	LOG_INFO(R"text(
+  __  __           _     __  __            _     _            
+ |  \/  |         | |   |  \/  |          | |   (_)           
+ | \  / |_   _ ___| |__ | \  / | __ _  ___| |__  _ _ __   ___ 
+ | |\/| | | | / __| '_ \| |\/| |/ _` |/ __| '_ \| | '_ \ / _ \
+ | |  | | |_| \__ \ | | | |  | | (_| | (__| | | | | | | |  __/
+ |_|  |_|\__,_|___/_| |_|_|  |_|\__,_|\___|_| |_|_|_| |_|\___|)text");
+
 	_update_strategy = std::make_unique<MM::UpdateStrategies::Sequential>();
 	LOG_INFO("defaulting to Sequential (single threaded) UpdateStrategy");
 	//_update_strategy = std::make_unique<MM::UpdateStrategies::Dummy>();
