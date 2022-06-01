@@ -40,6 +40,9 @@ else()
 	target_link_libraries(sdl_service glad)
 endif()
 
+# TODO: conditionaly
+target_link_libraries(sdl_service volk::volk)
+
 if(VCPKG_TARGET_TRIPLET)
 	target_link_libraries(sdl_service SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
 endif()

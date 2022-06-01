@@ -1,4 +1,7 @@
-add_executable(sdl_service_test start_test.cpp)
+add_executable(sdl_service_test
+	./start_test.cpp
+	./volk_test1.cpp
+)
 
 target_include_directories(sdl_service_test PRIVATE ".")
 

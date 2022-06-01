@@ -38,6 +38,13 @@ if(NOT MM_HEADLESS)
 		add_subdirectory("glad-debug")
 	endif()
 
+	# TODO: determain if we need this
+	#if (WIN32)
+		#set(VOLK_STATIC_DEFINES VK_USE_PLATFORM_WIN32_KHR)
+	#elseif()
+	#endif()
+	add_subdirectory("volk")
+
 	# stb utilies
 	add_subdirectory("stb")
 
@@ -53,5 +60,4 @@ if(NOT MM_HEADLESS)
 	# sound, uses sdl2-static backend
 	add_subdirectory("soloud")
 endif()
-
 
