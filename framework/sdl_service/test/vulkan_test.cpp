@@ -155,7 +155,10 @@ class VulkanRenderer : public Service {
 
 		VkQueue _graphics_queue{};
 		//VkQueue _present_queue{};
+
 		VkSwapchainKHR _swapchain{};
+		std::vector<VkImage> _swapchain_images{};
+		std::vector<VkImageView> _swapchain_image_views{};
 
 	public:
 		VulkanRenderer(void) {
@@ -214,6 +217,10 @@ class VulkanRenderer : public Service {
 			// cleanup
 			if (_device) {
 				vk::Device device{_device};
+
+				for (const auto& img_view : _swapchain_image_views) {
+					device.destroy(img_view);
+				}
 				device.destroy(_swapchain);
 				device.destroy();
 			}
@@ -371,8 +378,32 @@ class VulkanRenderer : public Service {
 				// TODO: fill in rest
 			});
 
-			auto images = device.getSwapchainImagesKHR(_swapchain);
-			SPDLOG_INFO("have {} swapchain images", images.size());
+			{
+				_swapchain_images.clear();
+				auto images = device.getSwapchainImagesKHR(_swapchain);
+				for (const auto& img : images) {
+					_swapchain_images.push_back(img);
+				}
+			}
+			SPDLOG_INFO("have {} swapchain images", _swapchain_images.size());
+
+			_swapchain_image_views.clear();
+			for (const auto& img : _swapchain_images) {
+				_swapchain_image_views.push_back(device.createImageView({
+					{},
+					img,
+					vk::ImageViewType::e2D,
+					swap_surf_format.format,
+					{}, // comp mapping
+					{ // subres
+						vk::ImageAspectFlagBits::eColor,
+						0,
+						1,
+						0,
+						1,
+					},
+				}));
+			}
 
 			return true;
 		}
