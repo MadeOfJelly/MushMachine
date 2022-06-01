@@ -37,3 +37,7 @@
 	path = external/physfs/physfs
 	url = https://github.com/icculus/physfs.git
 	branch = main
+[submodule "external/Vulkan-Headers"]
+	path = external/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+	shallow = true

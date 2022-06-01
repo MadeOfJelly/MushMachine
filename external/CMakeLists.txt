@@ -38,6 +38,8 @@ if(NOT MM_HEADLESS)
 		add_subdirectory("glad-debug")
 	endif()
 
+	add_subdirectory("Vulkan-Headers")
+
 	# stb utilies
 	add_subdirectory("stb")
 
