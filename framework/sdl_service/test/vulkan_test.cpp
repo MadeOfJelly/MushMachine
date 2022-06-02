@@ -159,6 +159,7 @@ class VulkanRenderer : public Service {
 		VkSwapchainKHR _swapchain{};
 		std::vector<VkImage> _swapchain_images{};
 		std::vector<VkImageView> _swapchain_image_views{};
+		std::vector<VkFramebuffer> _swapchain_framebuffers{};
 
 	public:
 		VulkanRenderer(void) {
@@ -218,6 +219,9 @@ class VulkanRenderer : public Service {
 			if (_device) {
 				vk::Device device{_device};
 
+				for (const auto& fb : _swapchain_framebuffers) {
+					device.destroy(fb);
+				}
 				for (const auto& img_view : _swapchain_image_views) {
 					device.destroy(img_view);
 				}
@@ -402,6 +406,22 @@ class VulkanRenderer : public Service {
 						0,
 						1,
 					},
+				}));
+			}
+
+			// TODO: move
+
+			_swapchain_framebuffers.clear();
+			for (const auto& img_view : _swapchain_image_views) {
+				vk::ImageView tmp_img_view = img_view;
+				_swapchain_framebuffers.push_back(device.createFramebuffer({
+					{},
+					{}, // rend
+					1,
+					&tmp_img_view,
+					surface_extent.width,
+					surface_extent.height,
+					1
 				}));
 			}
 
