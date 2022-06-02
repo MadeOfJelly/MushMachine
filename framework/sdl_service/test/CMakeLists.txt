@@ -1,6 +1,5 @@
 add_executable(sdl_service_test
 	./start_test.cpp
-	./vulkan_test.cpp
 )
 
 target_include_directories(sdl_service_test PRIVATE ".")
