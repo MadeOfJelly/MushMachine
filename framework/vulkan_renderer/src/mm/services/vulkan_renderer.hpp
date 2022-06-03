@@ -8,11 +8,11 @@
 #define MM_VK_DEFINE_HANDLE(object) typedef struct object##_T* object;
 // TODO: determain what we use
 //#ifndef VK_DEFINE_NON_DISPATCHABLE_HANDLE
-    //#if (VK_USE_64_BIT_PTR_DEFINES==1)
-        #define MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef struct object##_T *object;
-    //#else
-        //#define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef uint64_t object;
-    //#endif
+	//#if (VK_USE_64_BIT_PTR_DEFINES==1)
+		#define MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef struct object##_T *object;
+	//#else
+		//#define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object) typedef uint64_t object;
+	//#endif
 //#endif
 
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkBuffer)
@@ -21,6 +21,8 @@ MM_VK_DEFINE_HANDLE(VkInstance)
 MM_VK_DEFINE_HANDLE(VkPhysicalDevice)
 MM_VK_DEFINE_HANDLE(VkDevice)
 MM_VK_DEFINE_HANDLE(VkQueue)
+MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSemaphore)
+MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkFence)
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkImageView)
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkFramebuffer)
 
@@ -46,18 +48,26 @@ class VulkanRenderer : public Service {
 		//VkQueue _present_queue{};
 
 		VkSwapchainKHR _swapchain{};
+		uint32_t _swapchain_curr_idx{};
 		std::vector<VkImage> _swapchain_images{};
 		std::vector<VkImageView> _swapchain_image_views{};
 		std::vector<VkFramebuffer> _swapchain_framebuffers{};
+
+		VkSemaphore _swapchain_sem_image_available{};
+		VkSemaphore _swapchain_sem_render_finished{};
+		VkFence _swapchain_fence_in_flight{};
 
 	public:
 		VulkanRenderer(void);
 		~VulkanRenderer(void);
 
+	private: // Service interface
 		bool enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) override;
-		void disable(Engine&) override;
+		void disable(Engine& engine) override;
 
 		const char* name(void) override { return "VulkanRenderer"; }
+
+		void render(Engine& engine);
 
 	public:
 		bool createDevice(Engine& engine);

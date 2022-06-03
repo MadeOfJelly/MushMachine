@@ -5,6 +5,13 @@
 
 #include <vulkan/vulkan.hpp>
 
+// mf ycm, FIXME: remove before merge
+#include <vulkan/vulkan_handles.hpp>
+#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan_structs.hpp>
+#include <vulkan/vulkan_enums.hpp>
+#include <vulkan/vulkan_funcs.hpp>
+
 #include <SDL_vulkan.h>
 
 #include <mm/logger.hpp>
@@ -188,6 +195,14 @@ bool VulkanRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskIn
 
 	_debug_messenger = instance.createDebugUtilsMessengerEXT(debug_utils_messenger_create_info);
 
+	{ // add task
+		task_array.push_back(
+			UpdateStrategies::TaskInfo{"VulkanRenderer::render"}
+			.phase(UpdateStrategies::update_phase_t::POST) // *smirk*
+			.fn([this](Engine& e){ this->render(e); })
+		);
+	}
+
 	return true;
 }
 
@@ -196,6 +211,8 @@ void VulkanRenderer::disable(Engine&) {
 	if (_device) {
 		vk::Device device{_device};
 
+		device.waitIdle();
+
 		for (const auto& fb : _swapchain_framebuffers) {
 			device.destroy(fb);
 		}
@@ -203,6 +220,9 @@ void VulkanRenderer::disable(Engine&) {
 			device.destroy(img_view);
 		}
 		device.destroy(_swapchain);
+		device.destroy(_swapchain_sem_image_available);
+		device.destroy(_swapchain_sem_render_finished);
+		device.destroy(_swapchain_fence_in_flight);
 		device.destroy();
 	}
 
@@ -210,6 +230,55 @@ void VulkanRenderer::disable(Engine&) {
 	instance.destroy(_surface);
 	instance.destroy(_debug_messenger);
 	instance.destroy();
+}
+
+void VulkanRenderer::render(Engine&) {
+	vk::Device device{_device};
+	vk::SwapchainKHR swapchain{_swapchain};
+
+	// wait for next fb/img/img_view to be free again
+	// in most cases there are 2 but might be 1 or more
+	vk::Fence in_flight{_swapchain_fence_in_flight};
+	auto wait_in_flight_res = device.waitForFences(in_flight, true, UINT64_MAX);
+	device.resetFences(in_flight);
+
+	uint32_t next_img_index = device.acquireNextImageKHR(
+		_swapchain,
+		UINT64_MAX,
+		_swapchain_sem_image_available
+	).value;
+
+	{
+		auto g_queue = vk::Queue{_graphics_queue};
+		// do the commands n stuff
+
+		// queue submit
+		vk::Semaphore tmp_sem_wait{_swapchain_sem_image_available};
+		vk::PipelineStageFlags tmp_sem_wait_stages{vk::PipelineStageFlagBits::eColorAttachmentOutput};
+		vk::Semaphore tmp_sem_sig{_swapchain_sem_render_finished};
+		g_queue.submit({vk::SubmitInfo{
+			tmp_sem_wait,
+			tmp_sem_wait_stages,
+			{},
+			tmp_sem_sig
+		}}, _swapchain_fence_in_flight);
+	}
+
+	{ // queue present
+		auto p_queue = vk::Queue{_graphics_queue}; // TODO: present queue
+
+		vk::Semaphore tmp_sem_wait{_swapchain_sem_render_finished};
+		auto present_res = p_queue.presentKHR(vk::PresentInfoKHR{
+			tmp_sem_wait,
+			swapchain,
+			// _swapchain_curr_idx
+			next_img_index
+		});
+
+		// TODO: do i need this??
+		// next image
+		_swapchain_curr_idx = (_swapchain_curr_idx + 1) % _swapchain_images.size();
+	}
 }
 
 bool VulkanRenderer::createDevice(Engine& engine) {
@@ -304,6 +373,10 @@ bool VulkanRenderer::createDevice(Engine& engine) {
 	// we assume it also does present
 	_graphics_queue = device.getQueue(0, 0);
 
+	_swapchain_sem_image_available = device.createSemaphore(vk::SemaphoreCreateInfo{});
+	_swapchain_sem_render_finished = device.createSemaphore(vk::SemaphoreCreateInfo{});
+	_swapchain_fence_in_flight = device.createFence({vk::FenceCreateFlagBits::eSignaled});
+
 	return true;
 }
 
@@ -382,6 +455,7 @@ bool VulkanRenderer::createSwapchain(Engine& engine) {
 			},
 		}));
 	}
+
 
 	// TODO: move
 
