@@ -53,9 +53,9 @@ class VulkanRenderer : public Service {
 		std::vector<VkImageView> _swapchain_image_views{};
 		std::vector<VkFramebuffer> _swapchain_framebuffers{};
 
-		VkSemaphore _swapchain_sem_image_available{};
-		VkSemaphore _swapchain_sem_render_finished{};
-		VkFence _swapchain_fence_in_flight{};
+		std::vector<VkSemaphore> _swapchain_sem_image_available{};
+		std::vector<VkSemaphore> _swapchain_sem_render_finished{};
+		std::vector<VkFence> _swapchain_fence_in_flight{};
 
 	public:
 		VulkanRenderer(void);

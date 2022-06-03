@@ -21,8 +21,10 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 // create a dispatcher, based on additional vkDevice/vkGetDeviceProcAddr
 static void setup_dispacher(void) {
-#if 1
-	// investigate why this stopped working
+	// both should work
+	// but vk::DynamicLoader reloads the dll, so it will be open more then once
+	// and also might be a different one from sdl
+#if 0
 	static vk::DynamicLoader dl;
 	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = dl.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 #else
@@ -42,10 +44,6 @@ static bool can_use_layer(std::string_view layer_want) {
 	}
 
 	return false;
-}
-
-static bool can_use_validation(void) {
-	return can_use_layer("VK_LAYER_KHRONOS_validation");
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
@@ -162,12 +160,12 @@ VulkanRenderer::VulkanRenderer(void) {
 VulkanRenderer::~VulkanRenderer(void) {
 }
 
-bool VulkanRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo>& task_array) {
+bool VulkanRenderer::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>& task_array) {
 	assert(!VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceLayerProperties);
 	setup_dispacher();
 	assert(VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceLayerProperties);
 
-	// create vulkan instance
+	// TODO: user configurable
 	const vk::ApplicationInfo app_info {
 		"app_name",
 		VK_MAKE_VERSION(1, 0, 0), // app version
@@ -179,7 +177,8 @@ bool VulkanRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskIn
 
 	// TODO: make validation layer conditional
 	std::vector<const char*> layers{};
-	if (can_use_validation()) {
+
+	if (can_use_layer("VK_LAYER_KHRONOS_validation")) {
 		layers.push_back("VK_LAYER_KHRONOS_validation");
 		SPDLOG_INFO("ENABLED validation layer");
 	} else {
@@ -193,7 +192,10 @@ bool VulkanRenderer::enable(Engine& engine, std::vector<UpdateStrategies::TaskIn
 	);
 	_instance = instance;
 
+	// TODO: dont require this?
 	_debug_messenger = instance.createDebugUtilsMessengerEXT(debug_utils_messenger_create_info);
+
+	_swapchain_curr_idx = 0; // important
 
 	{ // add task
 		task_array.push_back(
@@ -211,18 +213,20 @@ void VulkanRenderer::disable(Engine&) {
 	if (_device) {
 		vk::Device device{_device};
 
+		auto device_destroy_each = [&device](auto& container) {
+			for (const auto& it : container) {
+				device.destroy(it);
+			}
+		};
+
 		device.waitIdle();
 
-		for (const auto& fb : _swapchain_framebuffers) {
-			device.destroy(fb);
-		}
-		for (const auto& img_view : _swapchain_image_views) {
-			device.destroy(img_view);
-		}
+		device_destroy_each(_swapchain_framebuffers);
+		device_destroy_each(_swapchain_image_views);
 		device.destroy(_swapchain);
-		device.destroy(_swapchain_sem_image_available);
-		device.destroy(_swapchain_sem_render_finished);
-		device.destroy(_swapchain_fence_in_flight);
+		device_destroy_each(_swapchain_sem_image_available);
+		device_destroy_each(_swapchain_sem_render_finished);
+		device_destroy_each(_swapchain_fence_in_flight);
 		device.destroy();
 	}
 
@@ -238,14 +242,14 @@ void VulkanRenderer::render(Engine&) {
 
 	// wait for next fb/img/img_view to be free again
 	// in most cases there are 2 but might be 1 or more
-	vk::Fence in_flight{_swapchain_fence_in_flight};
+	vk::Fence in_flight{_swapchain_fence_in_flight.at(_swapchain_curr_idx)};
 	auto wait_in_flight_res = device.waitForFences(in_flight, true, UINT64_MAX);
 	device.resetFences(in_flight);
 
 	uint32_t next_img_index = device.acquireNextImageKHR(
 		_swapchain,
 		UINT64_MAX,
-		_swapchain_sem_image_available
+		_swapchain_sem_image_available.at(_swapchain_curr_idx)
 	).value;
 
 	{
@@ -253,21 +257,21 @@ void VulkanRenderer::render(Engine&) {
 		// do the commands n stuff
 
 		// queue submit
-		vk::Semaphore tmp_sem_wait{_swapchain_sem_image_available};
+		vk::Semaphore tmp_sem_wait{_swapchain_sem_image_available.at(_swapchain_curr_idx)};
 		vk::PipelineStageFlags tmp_sem_wait_stages{vk::PipelineStageFlagBits::eColorAttachmentOutput};
-		vk::Semaphore tmp_sem_sig{_swapchain_sem_render_finished};
+		vk::Semaphore tmp_sem_sig{_swapchain_sem_render_finished.at(_swapchain_curr_idx)};
 		g_queue.submit({vk::SubmitInfo{
 			tmp_sem_wait,
 			tmp_sem_wait_stages,
 			{},
 			tmp_sem_sig
-		}}, _swapchain_fence_in_flight);
+		}}, _swapchain_fence_in_flight.at(_swapchain_curr_idx));
 	}
 
 	{ // queue present
 		auto p_queue = vk::Queue{_graphics_queue}; // TODO: present queue
 
-		vk::Semaphore tmp_sem_wait{_swapchain_sem_render_finished};
+		vk::Semaphore tmp_sem_wait{_swapchain_sem_render_finished.at(_swapchain_curr_idx)};
 		auto present_res = p_queue.presentKHR(vk::PresentInfoKHR{
 			tmp_sem_wait,
 			swapchain,
@@ -275,10 +279,9 @@ void VulkanRenderer::render(Engine&) {
 			next_img_index
 		});
 
-		// TODO: do i need this??
-		// next image
-		_swapchain_curr_idx = (_swapchain_curr_idx + 1) % _swapchain_images.size();
 	}
+	// next image (everything)
+	_swapchain_curr_idx = (_swapchain_curr_idx + 1) % _swapchain_images.size();
 }
 
 bool VulkanRenderer::createDevice(Engine& engine) {
@@ -373,9 +376,6 @@ bool VulkanRenderer::createDevice(Engine& engine) {
 	// we assume it also does present
 	_graphics_queue = device.getQueue(0, 0);
 
-	_swapchain_sem_image_available = device.createSemaphore(vk::SemaphoreCreateInfo{});
-	_swapchain_sem_render_finished = device.createSemaphore(vk::SemaphoreCreateInfo{});
-	_swapchain_fence_in_flight = device.createFence({vk::FenceCreateFlagBits::eSignaled});
 
 	return true;
 }
@@ -471,6 +471,16 @@ bool VulkanRenderer::createSwapchain(Engine& engine) {
 			surface_extent.height,
 			1
 		}));
+	}
+
+	// TODO: max simultanious frames
+	_swapchain_sem_image_available.clear();
+	_swapchain_sem_render_finished.clear();
+	_swapchain_fence_in_flight.clear();
+	for (size_t i = 0; i < _swapchain_images.size(); i++) {
+		_swapchain_sem_image_available.push_back(device.createSemaphore(vk::SemaphoreCreateInfo{}));
+		_swapchain_sem_render_finished.push_back(device.createSemaphore(vk::SemaphoreCreateInfo{}));
+		_swapchain_fence_in_flight.push_back(device.createFence({vk::FenceCreateFlagBits::eSignaled}));
 	}
 
 	return true;
