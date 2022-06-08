@@ -1,7 +1,9 @@
 #pragma once
 
+#include "entt/core/hashed_string.hpp"
 #include <mm/engine_fwd.hpp>
 #include <mm/services/service.hpp>
+#include <unordered_map>
 
 // fwd vk stuff
 
@@ -25,6 +27,7 @@ MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSemaphore)
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkFence)
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkImageView)
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkFramebuffer)
+MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkShaderModule)
 
 // extensions
 MM_VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkDebugUtilsMessengerEXT)
@@ -57,6 +60,9 @@ class VulkanRenderer : public Service {
 		std::vector<VkSemaphore> _swapchain_sem_render_finished{};
 		std::vector<VkFence> _swapchain_fence_in_flight{};
 
+		// resource cache
+		std::unordered_map<entt::hashed_string::hash_type, VkShaderModule> _r_shader_module{};
+
 	public:
 		VulkanRenderer(void);
 		~VulkanRenderer(void);
@@ -73,6 +79,14 @@ class VulkanRenderer : public Service {
 		bool createDevice(Engine& engine);
 
 		bool createSwapchain(Engine& engine);
+
+		//VkShaderModule getR_shader_module(const entt::hashed_string::value_type key) {
+			//return _r_shader_module.at(key);
+		//}
+
+		//VkShaderModule getR_shader_module(const char* key) {
+			//return getR_shader_module(entt::hashed_string::value(key));
+		//}
 };
 
 } // MM::Services

@@ -27,7 +27,7 @@ TEST(sdl_service, window_vulkan) {
 	ASSERT_TRUE(vk_rend.createDevice(engine));
 	ASSERT_TRUE(vk_rend.createSwapchain(engine));
 
-	engine.run();
+	//engine.run();
 
 	engine.disableService<MM::Services::VulkanRenderer>();
 	engine.disableService<MM::Services::SDLService>();

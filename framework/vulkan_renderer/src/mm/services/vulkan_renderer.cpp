@@ -14,7 +14,19 @@
 
 #include <SDL_vulkan.h>
 
+// HACK
+namespace { // dont leak linkage
+#include <mm/vulkan/res/tut1.vert.spv.h>
+#include <mm/vulkan/res/tut1.frag.spv.h>
+
+// meh, we dont have the type, only the value
+//static_assert(alignof(tut1_vert_spv) == alignof(uint32_t));
+//static_assert(alignof(tut1_frag_spv) == alignof(uint32_t));
+}
+
 #include <mm/logger.hpp>
+
+// https://youtu.be/eaKeeRngZBo
 
 // this needs to be defined only once
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
@@ -219,7 +231,16 @@ void VulkanRenderer::disable(Engine&) {
 			}
 		};
 
+		auto device_destroy_each_kv = [&device](auto& map) {
+			for (const auto& it : map) {
+				device.destroy(it.second);
+			}
+		};
+
 		device.waitIdle();
+
+		// resouce cache
+		device_destroy_each_kv(_r_shader_module);
 
 		device_destroy_each(_swapchain_framebuffers);
 		device_destroy_each(_swapchain_image_views);
@@ -458,6 +479,57 @@ bool VulkanRenderer::createSwapchain(Engine& engine) {
 
 
 	// TODO: move
+
+	// TODO: refactor, provide "primitive" wrapper like opengl
+	auto create_shader_module = [&](const uint8_t* data, const size_t size) -> vk::ShaderModule {
+		return device.createShaderModule(vk::ShaderModuleCreateInfo{
+			{},
+			size,
+			reinterpret_cast<const uint32_t*>(data)
+		});
+	};
+
+	using namespace entt::literals;
+
+	auto vert_module = create_shader_module(tut1_vert_spv, tut1_vert_spv_len);
+	_r_shader_module["tut1_vert"_hs] = vert_module;
+	auto frag_module = create_shader_module(tut1_frag_spv, tut1_frag_spv_len);
+	_r_shader_module["tut1_frag"_hs] = frag_module;
+
+	std::vector<vk::PipelineShaderStageCreateInfo> pl_shader_ci {
+		{
+			{},
+			vk::ShaderStageFlagBits::eVertex,
+			vert_module,
+			"main",
+		},
+		{
+			{},
+			vk::ShaderStageFlagBits::eFragment,
+			frag_module,
+			"main",
+		}
+	};
+
+	std::vector<vk::PipelineVertexInputStateCreateInfo> pl_vertex_input_ci {
+		// hardcoded in shader, so no actual data here
+		{},
+		{}, // do i need two?
+	};
+
+	vk::PipelineInputAssemblyStateCreateInfo pl_input_asm_ci {
+		{},
+		vk::PrimitiveTopology::eTriangleList,
+		VK_FALSE
+	};
+
+	device.createGraphicsPipeline({}, {
+		{},
+		static_cast<uint32_t>(pl_shader_ci.size()),
+		pl_shader_ci.data(),
+		pl_vertex_input_ci.data(),
+		&pl_input_asm_ci,
+	});
 
 	_swapchain_framebuffers.clear();
 	for (const auto& img_view : _swapchain_image_views) {
