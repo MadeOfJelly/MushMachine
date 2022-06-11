@@ -42,7 +42,7 @@ namespace MM::OpenGL::RenderTasks {
 			uint32_t _particle_buffer_size {10'000};
 			size_t _particle_buffer_next_index {0};
 
-			using clock = std::chrono::high_resolution_clock;
+			using clock = std::chrono::steady_clock;
 			std::chrono::time_point<clock> _last_time;
 			float _time {0};
 

@@ -13,7 +13,7 @@ namespace MM::Services {
 			std::unique_ptr<Scene> _scene;
 			std::unique_ptr<Scene> _next_scene; // enqueued next scene
 
-			using clock = std::chrono::high_resolution_clock;
+			using clock = std::chrono::steady_clock;
 			double _accumulator = 0.0;
 			std::chrono::time_point<clock> _last_time;
 
