@@ -523,12 +523,102 @@ bool VulkanRenderer::createSwapchain(Engine& engine) {
 		VK_FALSE
 	};
 
+	// rn whole screen
+	vk::Viewport viewport {
+		0.f, // x
+		0.f, // y
+		static_cast<float>(surface_extent.width),
+		static_cast<float>(surface_extent.height),
+		0.f, // min depth
+		1.f, // max depth
+	};
+
+	// whole screen
+	vk::Rect2D scissor {
+		{0, 0}, // offset
+		surface_extent
+	};
+
+	vk::PipelineViewportStateCreateInfo pl_viewport_state_ci {
+		{},
+		1,
+		&viewport,
+		1,
+		&scissor,
+	};
+
+	vk::PipelineRasterizationStateCreateInfo pl_raster_state_ci {
+		{},
+		VK_FALSE, // depth clamp
+		VK_FALSE, // discard
+		vk::PolygonMode::eFill,
+		//vk::CullModeFlagBits::eBack,
+		vk::CullModeFlagBits::eNone, // TODO: enable, just debug now
+		vk::FrontFace::eClockwise, // TODO: determain what the engine uses normally
+		VK_FALSE,
+		0.f, 0.f, 0.f,
+		1.f, // line width
+	};
+
+	// default for vkhpp is disabled
+	vk::PipelineMultisampleStateCreateInfo pl_ms_state_ci {};
+
+	vk::PipelineColorBlendAttachmentState pl_color_blend_attachment_state {
+		VK_FALSE,
+
+		vk::BlendFactor::eOne,
+		vk::BlendFactor::eZero,
+
+		vk::BlendOp::eAdd,
+
+		vk::BlendFactor::eOne,
+		vk::BlendFactor::eZero,
+
+		vk::BlendOp::eAdd,
+
+		vk::ColorComponentFlagBits::eR
+		| vk::ColorComponentFlagBits::eG
+		| vk::ColorComponentFlagBits::eB
+		| vk::ColorComponentFlagBits::eA,
+	};
+
+	vk::PipelineColorBlendStateCreateInfo pl_color_blend_state_ci {
+		{},
+		VK_FALSE,
+		vk::LogicOp::eCopy,
+		1,
+		&pl_color_blend_attachment_state,
+		{ 0.f, 0.f, 0.f, 0.f },
+	};
+
+	//std::vector<vk::DynamicState> pl_dyn_states {
+		//vk::DynamicState::eViewport,
+		//vk::DynamicState::eLineWidth,
+	//};
+
+	vk::PipelineLayout pl_layout = device.createPipelineLayout({
+		{},
+
+		0,
+		{},
+		0,
+		{}
+	});
+
 	device.createGraphicsPipeline({}, {
 		{},
 		static_cast<uint32_t>(pl_shader_ci.size()),
 		pl_shader_ci.data(),
 		pl_vertex_input_ci.data(),
 		&pl_input_asm_ci,
+		{},
+		&pl_viewport_state_ci,
+		&pl_raster_state_ci,
+		&pl_ms_state_ci,
+		{}, // d'n's
+		&pl_color_blend_state_ci,
+		{}, // dyn
+		pl_layout,
 	});
 
 	_swapchain_framebuffers.clear();
