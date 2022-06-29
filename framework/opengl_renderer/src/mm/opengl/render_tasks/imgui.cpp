@@ -27,7 +27,7 @@ void ImGuiRT::render(Services::OpenGLRenderer& rs, Engine&) {
 	ZoneScopedN("MM::OpenGL::RenderTasks::ImGuiRT::render");
 	TracyGpuZone("MM::OpenGL::RenderTasks::ImGuiRT::render");
 
-	rs.targets["display"]->bind(FrameBufferObject::W);
+	rs.targets[target_fbo]->bind(FrameBufferObject::W);
 
 	// render
 	ImGui::Render();

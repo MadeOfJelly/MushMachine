@@ -14,6 +14,9 @@ namespace MM::OpenGL::RenderTasks {
 			const char* name(void) override { return "ImGuiRT"; }
 
 			void render(Services::OpenGLRenderer& rs, Engine& engine) override;
+
+		public:
+			std::string target_fbo = "display";
 	};
 
 } // MM::OpenGL::RenderTasks
