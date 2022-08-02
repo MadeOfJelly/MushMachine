@@ -30,7 +30,7 @@ namespace MM::OpenGL::RenderTasks {
 			std::string color_tex {"hdr_color"};
 			std::string bloom_tex {"bloom"};
 
-			float bloom_factor {1.f};
+			float bloom_factor {0.8f};
 
 			void reloadShaders(MM::Engine& engine);
 
