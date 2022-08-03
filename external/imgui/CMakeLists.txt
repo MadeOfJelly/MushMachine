@@ -39,6 +39,8 @@ set(HPP_FILES
 
 add_library(imgui ${CPP_FILES} ${HPP_FILES})
 
+target_compile_features(imgui PUBLIC cxx_std_11)
+
 if(MM_OPENGL_3_GLES)
 	target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_ES3)
 	target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM) # bug?
