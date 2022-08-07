@@ -22,7 +22,7 @@ set(JSON_MultipleHeaders ON CACHE INTERNAL "")
 add_subdirectory("json") # link with "nlohmann_json::nlohmann_json"
 
 set(PHYSFS_BUILD_SHARED FALSE CACHE INTERNAL "")
-add_subdirectory("physfs")
+add_subdirectory("physfs/physfs")
 
 if(NOT MM_HEADLESS)
 	if(NOT EMSCRIPTEN)
