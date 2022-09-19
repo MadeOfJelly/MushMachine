@@ -38,6 +38,9 @@ if(NOT MM_HEADLESS)
 		add_subdirectory("glad-debug")
 	endif()
 
+	add_subdirectory("Vulkan-Headers")
+	target_compile_definitions(Vulkan-Headers INTERFACE VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
+
 	# stb utilies
 	add_subdirectory("stb")
 
