@@ -69,11 +69,11 @@ void Engine::cleanup(void) {
 }
 
 void Engine::update(void) {
-	FrameMarkStart("update")
+	FrameMarkStart("update");
 
 	_update_strategy->doUpdate(*this);
 
-	FrameMarkEnd("update")
+	FrameMarkEnd("update");
 }
 
 #ifdef __EMSCRIPTEN__

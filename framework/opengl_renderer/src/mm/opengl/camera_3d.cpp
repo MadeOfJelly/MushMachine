@@ -92,7 +92,7 @@ glm::vec3 Camera3D::getViewDir(void) const {
 }
 
 std::array<glm::vec4, 6> Camera3D::getFrustumPlanes(void) const {
-	ZoneScopedN("Camera3D::getFrustumPlanes")
+	ZoneScopedN("Camera3D::getFrustumPlanes");
 
 	std::array<glm::vec4, 6> planes;
 

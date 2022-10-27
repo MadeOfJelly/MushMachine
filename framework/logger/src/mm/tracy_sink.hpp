@@ -35,7 +35,7 @@ class tracy_sink : public ::spdlog::sinks::base_sink <Mutex> {
 			spdlog::memory_buf_t formatted;
 			base_sink<Mutex>::formatter_->format(msg, formatted);
 			auto string = fmt::to_string(formatted);
-			TracyMessageC(string.data(), string.size(), level_to_color(msg.level))
+			TracyMessageC(string.data(), string.size(), level_to_color(msg.level));
 		}
 
 		void flush_() override {

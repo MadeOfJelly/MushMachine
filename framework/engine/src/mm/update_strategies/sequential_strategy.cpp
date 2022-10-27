@@ -72,7 +72,7 @@ bool Sequential::disableService(const entt::id_type service_id) {
 }
 
 void Sequential::doUpdate(MM::Engine& engine) {
-	ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate")
+	ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate");
 	// TODO: caching
 	std::set<update_key_t> pre_tasks;
 	std::set<update_key_t> main_tasks;
@@ -93,22 +93,22 @@ void Sequential::doUpdate(MM::Engine& engine) {
 	}
 
 	{ // pre
-		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::pre")
+		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::pre");
 		doGraphSequential(engine, pre_tasks);
 	}
 
 	{ // main
-		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::main")
+		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::main");
 		doGraphSequential(engine, main_tasks);
 	}
 
 	{ // post
-		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::post")
+		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::post");
 		doGraphSequential(engine, post_tasks);
 	}
 
 	{ // simulate async
-		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::async")
+		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::async");
 		for (size_t i = 0; !_async_queue.empty() && i < _max_async_per_tick; i++) {
 			_async_queue.back()(engine);
 			_async_queue.pop_back();
@@ -116,7 +116,7 @@ void Sequential::doUpdate(MM::Engine& engine) {
 	}
 
 	{
-		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::deferred")
+		ZoneScopedN("MM::UpdateStrategies::Sequential::doUpdate::deferred");
 		if (!_deferred_queue.empty()) {
 			for (auto&& fn : _deferred_queue) {
 				fn(engine);
