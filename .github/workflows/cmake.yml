@@ -9,6 +9,8 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Debug
+  EM_VERSION: 2.0.24
+  EM_CACHE_FOLDER: 'emsdk-cache'
 
 jobs:
   linux:
@@ -77,6 +79,38 @@ jobs:
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DTRACY_ENABLE=ON
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+
+  emscripten:
+    timeout-minutes: 10
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    #- name: Install Dependencies
+      #run: sudo apt update && sudo apt -y install libsdl2-dev
+
+    - name: Setup emsdk
+      uses: mymindstorm/setup-emsdk@v11
+      with:
+        # Make sure to set a version number!
+        version: ${{env.EM_VERSION}}
+        # This is the name of the cache folder.
+        # The cache folder will be placed in the build directory,
+        #  so make sure it doesn't conflict with anything!
+        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+
+    - name: Verify
+      run: emcc --check
+
+    - name: Configure CMake
+      run: emcmake cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DMM_OPENGL_3_GLES=ON
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
