@@ -17,11 +17,6 @@ target_link_libraries(player_velocity_system
 	input_service
 )
 
-if(EMSCRIPTEN)
-	set_target_properties(player_velocity_system PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(player_velocity_system PROPERTIES LINK_FLAGS "-s USE_SDL=2")
-endif()
-
 if (BUILD_TESTING)
 	add_subdirectory(test)
 endif()

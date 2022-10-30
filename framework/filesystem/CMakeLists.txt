@@ -14,7 +14,7 @@ add_library(filesystem_service
 
 target_include_directories(filesystem_service PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-target_link_libraries(filesystem_service
+target_link_libraries(filesystem_service PUBLIC
 	engine
 	logger
 	entt
@@ -30,14 +30,20 @@ if(NOT MM_HEADLESS)
 	#endif
 
 	if(EMSCRIPTEN)
-		set_target_properties(filesystem_service PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-		set_target_properties(filesystem_service PROPERTIES LINK_FLAGS "-s USE_SDL=2")
+		target_compile_options(filesystem_service PUBLIC -sUSE_SDL=2)
+		target_link_libraries(filesystem_service PUBLIC -sUSE_SDL=2)
 	elseif(VCPKG_TARGET_TRIPLET)
-		target_link_libraries(filesystem_service SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
+		target_link_libraries(filesystem_service
+			PUBLIC
+				SDL2::SDL2
+			PRIVATE
+				SDL2::SDL2main
+				SDL2::SDL2-static
+		)
 	else()
 		#if not android or emscripten
 		target_include_directories(filesystem_service PUBLIC "${SDL2_INCLUDE_DIR}")
-		target_link_libraries(filesystem_service ${SDL2_LIBRARY})
+		target_link_libraries(filesystem_service PUBLIC ${SDL2_LIBRARY})
 		#endif
 	endif()
 endif()

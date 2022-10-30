@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 project(opengl_primitives CXX)
 
-file(GLOB_RECURSE CPP_FILES src/*.cpp)
-file(GLOB_RECURSE HPP_FILES src/*.hpp)
-
 add_library(opengl_primitives
 	src/mm/opengl/buffer.hpp
 	src/mm/opengl/buffer.cpp
@@ -31,7 +28,7 @@ add_library(opengl_primitives
 
 target_include_directories(opengl_primitives PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-target_link_libraries(opengl_primitives
+target_link_libraries(opengl_primitives PUBLIC
 	glm
 	stb_image
 	#sdl
@@ -43,14 +40,16 @@ target_link_libraries(opengl_primitives
 )
 
 if(MM_OPENGL_3_GLES)
-	target_link_libraries(opengl_primitives "GL") # TODO: make more specific
+	target_link_libraries(opengl_primitives PUBLIC "GL") # TODO: make more specific
 	if(EMSCRIPTEN)
-		set_target_properties(opengl_primitives PROPERTIES COMPILE_FLAGS "-s USE_WEBGL2=1 -s USE_SDL=2")
-		set_target_properties(opengl_primitives PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1 -s USE_SDL=2")
+		# USE_SDL=2 inherited from sdl_service
+		# TODO: USE_WEBGL2 -> MIN_WEBGL_VERSION=2 maybe
+		# technically only FULL_ES3 would be needed
+		target_link_libraries(opengl_primitives PUBLIC -sUSE_WEBGL2=1 -sFULL_ES3=1)
 	endif()
 
 else()
-	target_link_libraries(opengl_primitives glad)
+	target_link_libraries(opengl_primitives PUBLIC glad)
 endif()
 
 if (BUILD_TESTING)

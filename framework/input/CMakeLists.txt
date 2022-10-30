@@ -15,12 +15,9 @@ target_link_libraries(input_service
 	sdl_service
 )
 
-if(EMSCRIPTEN)
-	set_target_properties(input_service PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(input_service PROPERTIES LINK_FLAGS "-s USE_SDL=2")
-else()
-	target_include_directories(input_service PUBLIC "${SDL2_INCLUDE_DIR}")
-endif()
+#if(NOT EMSCRIPTEN)
+	#target_include_directories(input_service PUBLIC "${SDL2_INCLUDE_DIR}")
+#endif()
 
 if (BUILD_TESTING)
 	add_subdirectory(test)
