@@ -32,7 +32,7 @@ else() # EMSCRIPTEN
 
 	target_compile_features(tracy_client INTERFACE cxx_std_17)
 
-	target_include_directories(tracy_client INTERFACE "${CMAKE_CURRENT_LIST_DIR}")
+	target_include_directories(tracy_client INTERFACE "${CMAKE_CURRENT_LIST_DIR}/tracy/public")
 endif()
 
 
