@@ -17,7 +17,6 @@ add_library(opengl_renderer_s
 
 target_include_directories(opengl_renderer_s PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 target_link_libraries(opengl_renderer_s
 	engine
 	logger
@@ -25,11 +24,6 @@ target_link_libraries(opengl_renderer_s
 	opengl_primitives
 	sdl_service
 )
-
-if(EMSCRIPTEN)
-	set_target_properties(opengl_renderer_s PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(opengl_renderer_s PROPERTIES LINK_FLAGS "-s USE_SDL=2")
-endif()
 
 ############# imgui opengl renderer tools ###########
 

@@ -18,11 +18,6 @@ target_link_libraries(simple_sdl_renderer_service
 	sdl_service
 )
 
-if(EMSCRIPTEN)
-	set_target_properties(simple_sdl_renderer_service PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(simple_sdl_renderer_service PROPERTIES LINK_FLAGS "-s USE_SDL=2")
-endif()
-
 if (BUILD_TESTING)
 	add_subdirectory(test)
 endif()

@@ -15,8 +15,3 @@ target_link_libraries(fast_sky_sun_system
 	common_components
 )
 
-if(EMSCRIPTEN)
-	set_target_properties(fast_sky_sun_system PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(fast_sky_sun_system PROPERTIES LINK_FLAGS "-s USE_SDL=2")
-endif()
-

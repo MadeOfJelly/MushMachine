@@ -33,6 +33,7 @@ bool FilesystemService::enable(Engine&, std::vector<UpdateStrategies::TaskInfo>&
 		return false;
 	}
 
+	// TODO: why exclude EMSCRIPTEN here? also wrong macro
 #if !defined(MM_HEADLESS) && !defined(EMSCRIPTEN)
 	char* pref_path = SDL_GetPrefPath("made_of_jelly", _app_name);
 #else

@@ -12,7 +12,7 @@ add_library(sdl_service
 target_include_directories(sdl_service PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_include_directories(sdl_service PUBLIC "${SDL2_INCLUDE_DIR}")
 
-target_link_libraries(sdl_service
+target_link_libraries(sdl_service PUBLIC
 	entt
 	logger
 	#glm
@@ -25,23 +25,29 @@ target_link_libraries(sdl_service
 #endif
 
 if(EMSCRIPTEN)
-	set_target_properties(sdl_service PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
-	set_target_properties(sdl_service PROPERTIES LINK_FLAGS "-s USE_SDL=2")
+	target_compile_options(sdl_service PUBLIC -sUSE_SDL=2)
+	target_link_libraries(sdl_service PUBLIC -sUSE_SDL=2)
 else()
 	#if not android or emscripten
 	target_include_directories(sdl_service PUBLIC "${SDL2_INCLUDE_DIR}")
-	target_link_libraries(sdl_service ${SDL2_LIBRARY})
+	target_link_libraries(sdl_service PUBLIC ${SDL2_LIBRARY})
 	#endif
 endif()
 
 if(MM_OPENGL_3_GLES)
-	target_link_libraries(sdl_service "GL") # TODO: make more specific
+	target_link_libraries(sdl_service PRIVATE "GL") # TODO: make more specific
 else()
-	target_link_libraries(sdl_service glad)
+	target_link_libraries(sdl_service PRIVATE glad)
 endif()
 
 if(VCPKG_TARGET_TRIPLET)
-	target_link_libraries(sdl_service SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
+	target_link_libraries(sdl_service
+		PUBLIC
+			SDL2::SDL2
+		PRIVATE
+			SDL2::SDL2main
+			SDL2::SDL2-static
+	)
 endif()
 
 if(BUILD_TESTING)

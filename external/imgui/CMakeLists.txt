@@ -46,7 +46,7 @@ if(MM_OPENGL_3_GLES)
 	target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_CUSTOM) # bug?
 else()
 	target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
-	target_link_libraries(imgui glad)
+	target_link_libraries(imgui PUBLIC glad)
 endif()
 
 target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -56,15 +56,21 @@ target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/imgui") # i
 target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
 
 if(EMSCRIPTEN)
-	set_target_properties(imgui PROPERTIES COMPILE_FLAGS "-s USE_SDL=2 -s USE_WEBGL2=1 -s FULL_ES2=1 -s FULL_ES3=1")
-	set_target_properties(imgui PROPERTIES LINK_FLAGS "-s USE_SDL=2 -s USE_WEBGL2=1 -s FULL_ES2=1 -s FULL_ES3=1")
+	target_compile_options(imgui PUBLIC -sUSE_SDL=2)
+	target_link_libraries(imgui PUBLIC -sUSE_SDL=2 -sUSE_WEBGL2=1 -sFULL_ES3=1)
 elseif(ANDROID)
-	target_link_libraries(imgui SDL)
+	target_link_libraries(imgui PUBLIC SDL)
 elseif(VCPKG_TARGET_TRIPLET)
-	target_link_libraries(imgui SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
+	target_link_libraries(imgui
+		PUBLIC
+			SDL2::SDL2
+		PRIVATE
+			SDL2::SDL2main
+			SDL2::SDL2-static
+	)
 else()
 	target_include_directories(imgui PUBLIC "${SDL2_INCLUDE_DIR}")
-	target_link_libraries(imgui ${SDL2_LIBRARY})
+	target_link_libraries(imgui PUBLIC ${SDL2_LIBRARY})
 endif()
 
 target_compile_definitions(imgui PUBLIC ImTextureID=unsigned\ long)
