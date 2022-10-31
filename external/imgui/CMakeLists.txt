@@ -64,9 +64,9 @@ elseif(VCPKG_TARGET_TRIPLET)
 	target_link_libraries(imgui
 		PUBLIC
 			SDL2::SDL2
-		PRIVATE
-			SDL2::SDL2main
-			SDL2::SDL2-static
+		#PRIVATE
+			#SDL2::SDL2main
+			#SDL2::SDL2-static
 	)
 else()
 	target_include_directories(imgui PUBLIC "${SDL2_INCLUDE_DIR}")

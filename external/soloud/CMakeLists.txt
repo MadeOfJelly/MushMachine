@@ -161,28 +161,27 @@ target_compile_definitions(soloud PRIVATE WITH_SDL2_STATIC)
 
 target_include_directories(soloud SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/soloud/include")
 
-#if not android or emscripten
-if(VCPKG_TARGET_TRIPLET)
+if(EMSCRIPTEN)
+	target_compile_options(soloud PUBLIC -sUSE_SDL=2)
+	target_link_libraries(soloud PUBLIC -sUSE_SDL=2)
+elseif(VCPKG_TARGET_TRIPLET)
 	target_link_libraries(soloud
 		PUBLIC
 			SDL2::SDL2
-		PRIVATE
-			SDL2::SDL2main
-			SDL2::SDL2-static
+		#PRIVATE
+			#SDL2::SDL2main
+			#SDL2::SDL2-static
 	)
 else()
 	target_include_directories(soloud PUBLIC "${SDL2_INCLUDE_DIR}")
 	target_link_libraries(soloud PUBLIC ${SDL2_LIBRARY})
 endif()
 
+#if not android or emscripten
 #if android
 #target_link_libraries(soloud SDL)
 #endif
 
-if(EMSCRIPTEN)
-	target_compile_options(soloud PUBLIC -sUSE_SDL=2)
-	target_link_libraries(soloud PUBLIC -sUSE_SDL=2)
-endif()
 
 
 # TODO: remove
