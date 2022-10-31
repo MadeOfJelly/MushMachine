@@ -26,6 +26,7 @@ add_subdirectory("physfs")
 
 if(NOT MM_HEADLESS)
 	if(NOT EMSCRIPTEN)
+		# TODO: move into imgui and soload, since they are the one requireing this
 		if(VCPKG_TARGET_TRIPLET)
 			find_package(SDL2 CONFIG REQUIRED)
 		else() # HACK: fix sdl find module

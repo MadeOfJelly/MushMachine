@@ -27,8 +27,19 @@ target_link_libraries(sdl_service PUBLIC
 if(EMSCRIPTEN)
 	target_compile_options(sdl_service PUBLIC -sUSE_SDL=2)
 	target_link_libraries(sdl_service PUBLIC -sUSE_SDL=2)
+elseif(VCPKG_TARGET_TRIPLET)
+	find_package(SDL2 CONFIG REQUIRED)
+
+	target_link_libraries(sdl_service
+		PUBLIC
+			SDL2::SDL2
+		#PRIVATE
+			#SDL2::SDL2main
+			#SDL2::SDL2-static
+	)
 else()
 	#if not android or emscripten
+	find_package(SDL2 REQUIRED)
 	target_include_directories(sdl_service PUBLIC "${SDL2_INCLUDE_DIR}")
 	target_link_libraries(sdl_service PUBLIC ${SDL2_LIBRARY})
 	#endif
@@ -38,16 +49,6 @@ if(MM_OPENGL_3_GLES)
 	target_link_libraries(sdl_service PRIVATE "GL") # TODO: make more specific
 else()
 	target_link_libraries(sdl_service PRIVATE glad)
-endif()
-
-if(VCPKG_TARGET_TRIPLET)
-	target_link_libraries(sdl_service
-		PUBLIC
-			SDL2::SDL2
-		PRIVATE
-			SDL2::SDL2main
-			SDL2::SDL2-static
-	)
 endif()
 
 if(BUILD_TESTING)
