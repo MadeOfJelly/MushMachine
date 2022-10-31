@@ -311,8 +311,8 @@ void LiteParticles2D::setParticleBufferSize(uint32_t new_buffer_size) {
 }
 
 void LiteParticles2D::resetBuffers(void) {
-	const auto gl_buffer_type = GL_DYNAMIC_COPY;
 	auto reset_buffer_0 = [this](size_t i) {
+		static const auto gl_buffer_type = GL_DYNAMIC_COPY;
 		auto* data = _particles_0_buffers[i]->map(_particle_buffer_size, gl_buffer_type);
 		for (size_t x = 0; x < _particle_buffer_size; x++) {
 			data[x] = glm::vec4{
