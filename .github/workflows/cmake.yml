@@ -137,29 +137,29 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
   # TODO: for some reason vcpkg find sdl does not work, despite the find_package REQUIRE not failing
-  #windows:
-    #timeout-minutes: 10
+  windows:
+    timeout-minutes: 10
 
-    #runs-on: windows-latest
+    runs-on: windows-latest
 
-    #steps:
-    #- uses: actions/checkout@v3
-      #with:
-        #submodules: recursive
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
 
-    ## TODO: cache
+    # TODO: cache
 
-    #- name: Install Dependencies
-      #run: vcpkg install sdl2:x64-windows
+    - name: Install Dependencies
+      run: vcpkg install sdl2[core,vulkan]:x64-windows
 
-    ## setup vs env
-    #- uses: ilammy/msvc-dev-cmd@v1
-      #with:
-        #arch: amd64
+    # setup vs env
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64
 
-    #- name: Configure CMake
-      #run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+    - name: Configure CMake
+      run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-    #- name: Build
-      #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
