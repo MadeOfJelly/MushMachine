@@ -33,8 +33,7 @@ elseif(VCPKG_TARGET_TRIPLET)
 	target_link_libraries(sdl_service
 		PUBLIC
 			SDL2::SDL2
-		#PRIVATE
-			#SDL2::SDL2main
+			SDL2::SDL2main
 			#SDL2::SDL2-static
 	)
 else()

@@ -38,8 +38,7 @@ if(NOT MM_HEADLESS)
 		target_link_libraries(filesystem_service
 			PUBLIC
 				SDL2::SDL2
-			#PRIVATE
-				#SDL2::SDL2main
+				SDL2::SDL2main
 				#SDL2::SDL2-static
 		)
 	else()
