@@ -4,6 +4,8 @@
 //#include <physfs.h>
 #include <nlohmann/json.hpp>
 
+#include <SDL.h> // SDL_main
+
 #include <mm/fs_const_archiver.hpp>
 
 #include <mm/logger.hpp>

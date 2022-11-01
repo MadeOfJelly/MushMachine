@@ -136,3 +136,8 @@ TEST(simple_spritesheet_render_task, it) {
 	engine.run();
 }
 
+int main(int argc, char** argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+

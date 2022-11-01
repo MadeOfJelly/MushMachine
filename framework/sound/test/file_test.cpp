@@ -4,6 +4,8 @@
 #include <mm/services/filesystem.hpp>
 #include <mm/soloud_filesystem_file_impl.hpp>
 
+#include <SDL.h> // SDL_main
+
 #include <soloud_wav.h>
 #include <soloud_wavstream.h>
 #include <soloud_monotone.h>

@@ -115,3 +115,8 @@ TEST(sdl_service, event_handle_reg) {
 	engine.disableService<MM::Services::SDLService>();
 }
 
+int main(int argc, char** argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+

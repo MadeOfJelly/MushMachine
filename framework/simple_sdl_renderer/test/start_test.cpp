@@ -36,3 +36,8 @@ TEST(simple_sdl_renderer, basic) {
 	engine.run();
 }
 
+int main(int argc, char** argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+

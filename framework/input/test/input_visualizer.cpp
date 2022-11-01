@@ -146,3 +146,8 @@ TEST(input_service, input_visualizer) {
 	sdl_ss.destroyWindow();
 }
 
+int main(int argc, char** argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+
