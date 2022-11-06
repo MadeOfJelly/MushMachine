@@ -10,6 +10,7 @@
 #include <mm/services/imgui_s.hpp>
 #include <mm/services/imgui_menu_bar.hpp>
 #include <mm/services/engine_tools.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
@@ -53,6 +54,11 @@ TEST(imgui_scene_tools, it) {
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
 
 	ASSERT_TRUE(engine.enableService<MM::Services::ImGuiSceneToolsService>());
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
 

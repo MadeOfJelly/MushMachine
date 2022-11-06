@@ -1,4 +1,3 @@
-#include <functional>
 #include <gtest/gtest.h>
 
 #include <mm/resource_manager.hpp>
@@ -11,6 +10,7 @@
 #include <mm/services/imgui_s.hpp>
 #include <mm/services/imgui_menu_bar.hpp>
 #include <mm/services/engine_tools.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <mm/opengl/render_tasks/imgui.hpp>
 
@@ -18,6 +18,8 @@
 
 #include <mm/imgui/file_text_editor.hpp>
 #include <mm/imgui/file_shader_editor.hpp>
+
+#include <functional>
 
 static char* argv0;
 
@@ -35,7 +37,7 @@ class TemplateUpdateMainService : public MM::Services::Service {
 				MM::UpdateStrategies::TaskInfo{"TemplateUpdateMainService::fn"}
 				.fn(_fn)
 			);
-			return true; 
+			return true;
 		}
 
 		void disable(MM::Engine&) override {}
@@ -71,6 +73,11 @@ TEST(imgui_text_edit, it) {
 		fte.renderImGui();
 	});
 	ASSERT_TRUE(engine.enableService<TemplateUpdateMainService>());
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	engine.run();
 
@@ -112,6 +119,12 @@ TEST(imgui_text_edit, shader) {
 	});
 	ASSERT_TRUE(engine.enableService<TemplateUpdateMainService>());
 
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
+
+	// TODO: fix non existant files
 	fte.open("shader/quad_renderer/vert.glsl");
 	fse.open("shader/quad_renderer/frag.glsl");
 

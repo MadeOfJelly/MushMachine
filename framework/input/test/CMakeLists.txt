@@ -29,5 +29,7 @@ target_link_libraries(input_service_visualizer_test
 	gtest_main
 )
 
-add_test(NAME input_service_visualizer_test COMMAND input_service_visualizer_test)
+if(NOT MM_AUTOTEST)
+	add_test(NAME input_service_visualizer_test COMMAND input_service_visualizer_test)
+endif()
 

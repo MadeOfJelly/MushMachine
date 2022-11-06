@@ -6,6 +6,7 @@
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <mm/fs_const_archiver.hpp>
 
@@ -258,6 +259,11 @@ TEST(lite_particles2d, it) {
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	// load particle types
 	// before addRenderTask<LiteParticle2D>

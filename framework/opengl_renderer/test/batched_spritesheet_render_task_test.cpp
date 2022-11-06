@@ -6,6 +6,7 @@
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/organizer_scene.hpp>
 #include <mm/services/opengl_renderer.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/organizer.hpp>
@@ -67,6 +68,11 @@ TEST(batched_spritesheet_render_task, it) {
 
 	auto& rs = engine.addService<MM::Services::OpenGLRenderer>();
 	ASSERT_TRUE(engine.enableService<MM::Services::OpenGLRenderer>());
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	auto& cam = scene.ctx().emplace<MM::OpenGL::Camera3D>();
 	cam.horizontalViewPortSize = 5;
