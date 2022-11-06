@@ -55,14 +55,15 @@ FBOBuilder& FBOBuilder::setTarget(FrameBufferObject::Target target) {
 FBOBuilder& FBOBuilder::attachTexture(std::shared_ptr<Texture> tex, GLuint attachment_type) {
 	GLenum target;
 	switch (_currTarget) {
-		case FrameBufferObject::Target::RW:
-			target = GL_FRAMEBUFFER;
-			break;
 		case FrameBufferObject::Target::R:
 			target = GL_READ_FRAMEBUFFER;
 			break;
 		case FrameBufferObject::Target::W:
 			target = GL_DRAW_FRAMEBUFFER;
+			break;
+		//case FrameBufferObject::Target::RW:
+		default:
+			target = GL_FRAMEBUFFER;
 			break;
 	}
 
