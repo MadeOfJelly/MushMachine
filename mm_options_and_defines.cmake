@@ -5,6 +5,7 @@ if(NOT MM_INTERNAL_OPTIONS)
 
 	# MM options
 	option(BUILD_TESTING "Enable testing with ctest." OFF)
+	option(MM_AUTOTEST "Quits tests after some frames. for ci." ON)
 	option(MM_HEADLESS "Headless mode for MM, disables all kind of rendering stuff." OFF)
 	option(MM_NETWORKING "control networking implementations for MM." OFF)
 
@@ -25,6 +26,7 @@ if(NOT MM_INTERNAL_OPTIONS)
 		endif()
 	endmacro()
 
+	gen_compile_definition(MM_AUTOTEST)
 	gen_compile_definition(MM_HEADLESS)
 	gen_compile_definition(MM_NETWORKING)
 	gen_compile_definition(MM_OPENGL_3)

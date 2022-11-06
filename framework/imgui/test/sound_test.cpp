@@ -10,6 +10,7 @@
 #include <mm/services/imgui_s.hpp>
 #include <mm/services/imgui_menu_bar.hpp>
 #include <mm/services/engine_tools.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <mm/opengl/render_tasks/imgui.hpp>
 
@@ -170,6 +171,11 @@ TEST(imgui_sound, basic) {
 
 	engine.addService<ImGuiSpeechy>();
 	ASSERT_TRUE(engine.enableService<ImGuiSpeechy>());
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	engine.run();
 

@@ -29,6 +29,7 @@ set(CPP_FILES
 	soloud/src/backend/alsa/soloud_alsa.cpp
 	soloud/src/backend/coreaudio/soloud_coreaudio.cpp
 	soloud/src/backend/null/soloud_null.cpp
+	soloud/src/backend/nosound/soloud_nosound.cpp
 	#soloud/src/backend/openal/soloud_openal.cpp
 	#soloud/src/backend/openal/soloud_openal_dll.c
 	soloud/src/backend/opensles/soloud_opensles.cpp
@@ -156,6 +157,7 @@ set(HPP_FILES
 add_library(soloud ${CPP_FILES} ${HPP_FILES})
 
 target_compile_definitions(soloud PRIVATE WITH_NULL)
+target_compile_definitions(soloud PRIVATE WITH_NOSOUND)
 #target_compile_definitions(soloud PRIVATE WITH_SDL2)
 target_compile_definitions(soloud PRIVATE WITH_SDL2_STATIC)
 

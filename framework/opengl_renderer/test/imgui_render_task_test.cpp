@@ -6,6 +6,7 @@
 #include <mm/services/opengl_renderer.hpp>
 #include <mm/services/imgui_s.hpp>
 #include <mm/opengl/render_tasks/imgui.hpp>
+#include <mm/services/count_down.hpp>
 
 #include <imgui/imgui.h>
 
@@ -42,6 +43,11 @@ TEST(imgui_render_task, demowindow) {
 	ASSERT_TRUE(engine.enableService<ImGuiDemoWindowService>());
 
 	rs.addRenderTask<MM::OpenGL::RenderTasks::ImGuiRT>(engine);
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	engine.run();
 }

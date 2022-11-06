@@ -5,6 +5,8 @@
 #include <mm/services/sdl_service.hpp>
 #include <mm/services/simple_sdl_renderer.hpp>
 
+#include <mm/services/count_down.hpp>
+
 TEST(simple_sdl_renderer, basic) {
 	srand(1);
 	MM::Engine engine;
@@ -32,6 +34,11 @@ TEST(simple_sdl_renderer, basic) {
 			SDL_RenderFillRect(r.renderer, &rect);
 		}
 	);
+
+#ifdef MM_AUTOTEST
+	engine.addService<MM::Services::CountDown>(50); // 50 frames
+	ASSERT_TRUE(engine.enableService<MM::Services::CountDown>());
+#endif
 
 	engine.run();
 }

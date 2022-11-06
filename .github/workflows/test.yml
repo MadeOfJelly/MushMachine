@@ -39,9 +39,7 @@ jobs:
         DISPLAY: :0
       run: |
         sudo Xorg :0 -config ${{github.workspace}}/.github/workflows/x/dummy-1920x1080.conf -noautoBindGPU &
-        #export DISPLAY=:4
         sleep 20s
-        #bin/sdl_service_test
         ctest --output-on-failure --timeout 20
         sudo pkill -15 Xorg
 
