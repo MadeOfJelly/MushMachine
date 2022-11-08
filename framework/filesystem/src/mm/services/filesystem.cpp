@@ -198,7 +198,7 @@ FilesystemService::fs_file_t FilesystemService::open(const char* filepath, Files
 			phys_file = PHYSFS_openAppend(filepath);
 			break;
 		default:
-			LOG_ERROR("invalid fopen mode {} for '{}'", t, filepath);
+			LOG_ERROR("invalid fopen mode {} for '{}'", static_cast<int>(t), filepath);
 			return nullptr;
 	}
 

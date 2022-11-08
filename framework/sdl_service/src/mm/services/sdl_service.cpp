@@ -152,7 +152,7 @@ bool SDLService::createGLContext(SDL_Window* win_ptr) {
 
 	TracyGpuContext;
 
-	LOG_INFO("gl: {}", glGetString(GL_VERSION));
+	LOG_INFO("gl: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
 	return true;
 }
