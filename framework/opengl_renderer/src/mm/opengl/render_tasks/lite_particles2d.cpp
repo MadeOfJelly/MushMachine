@@ -138,7 +138,7 @@ void LiteParticles2D::uploadParticles(Services::OpenGLRenderer&, Scene& scene) {
 		return; // nothing to upload
 	}
 
-	auto& queue = scene.ctx().at<Components::LiteParticles2DUploadQueue>();
+	auto& queue = scene.ctx().get<Components::LiteParticles2DUploadQueue>();
 
 	while (!queue.queue.empty()) {
 		// get range
@@ -200,7 +200,7 @@ void LiteParticles2D::computeParticles(Services::OpenGLRenderer&, Scene& scene) 
 		std::chrono::duration<double, std::ratio<1, 1>> deltaTime = newNow - _last_time;
 		_last_time = newNow;
 
-		float time_delta = deltaTime.count() * scene.ctx().at<MM::Components::TimeDelta>().deltaFactor;
+		float time_delta = deltaTime.count() * scene.ctx().get<MM::Components::TimeDelta>().deltaFactor;
 		_time += time_delta;
 		_tf_shader->setUniform1f("_time_delta", time_delta);
 		_tf_shader->setUniform1f("_time", _time);
@@ -269,7 +269,7 @@ void LiteParticles2D::renderParticles(Services::OpenGLRenderer& rs, Scene& scene
 	auto& rm_t = MM::ResourceManager<Texture>::ref();
 	rm_t.get("MM::LiteParticles2DTypes::Render"_hs)->bind(0);
 
-	Camera3D& cam = scene.ctx().at<Camera3D>();
+	Camera3D& cam = scene.ctx().get<Camera3D>();
 	_points_shader->setUniformMat4f("_vp", cam.getViewProjection());
 
 	GLint view_port[4];

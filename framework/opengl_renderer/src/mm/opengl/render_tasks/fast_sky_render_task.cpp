@@ -78,7 +78,7 @@ void FastSky::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	_vao->bind();
 
 	{
-		auto& cam = scene.ctx().at<MM::OpenGL::Camera3D>();
+		auto& cam = scene.ctx().get<MM::OpenGL::Camera3D>();
 		MM::OpenGL::Camera3D tmp_cam = cam;
 		// create cam with y up, bc shader says so
 		tmp_cam.up = {0, 1, 0};
@@ -95,7 +95,7 @@ void FastSky::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 		//}
 		auto* ctx_ptr = &_default_context;
 		if (scene.ctx().contains<FastSkyContext>()) {
-			ctx_ptr = &scene.ctx().at<FastSkyContext>();
+			ctx_ptr = &scene.ctx().get<FastSkyContext>();
 		}
 
 		_shader->setUniform1f("time", ctx_ptr->time);

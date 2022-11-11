@@ -157,7 +157,7 @@ namespace MM::Services {
 		if (_show_time_delta_ctx) {
 			if (ImGui::Begin("Scene TimeDelta Context", &_show_time_delta_ctx)) {
 				if (scene.ctx().contains<MM::Components::TimeDelta>()) {
-					auto& td = scene.ctx().at<MM::Components::TimeDelta>();
+					auto& td = scene.ctx().get<MM::Components::TimeDelta>();
 					ImGui::Value("tickDelta", td.tickDelta);
 					ImGui::SliderFloat("deltaFactor", &td.deltaFactor, 0.f, 10.f, "%.5f", ImGuiSliderFlags_Logarithmic);
 				} else {

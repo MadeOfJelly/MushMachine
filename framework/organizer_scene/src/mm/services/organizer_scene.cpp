@@ -81,7 +81,7 @@ void OrganizerSceneService::sceneFixedUpdate(Engine&) {
 		_accumulator -= f_delta;
 		continuous_counter++;
 
-		for (auto&& v : _scene->ctx().at<std::vector<entt::organizer::vertex>>()) {
+		for (auto&& v : _scene->ctx().get<std::vector<entt::organizer::vertex>>()) {
 			v.callback()(v.data(), *_scene);
 		}
 
@@ -126,7 +126,8 @@ void OrganizerSceneService::updateOrganizerVertices(Scene& scene) {
 		scene.ctx().emplace<MM::Components::TimeDelta>();
 	}
 
-	SPDLOG_DEBUG("graph:\n{}", scene.ctx().at<std::vector<entt::organizer::vertex>>());
+	// TODO: use entt::dot instead
+	SPDLOG_DEBUG("graph:\n{}", scene.ctx().get<std::vector<entt::organizer::vertex>>());
 }
 
 void OrganizerSceneService::resetTime(void) {

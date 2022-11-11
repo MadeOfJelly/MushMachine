@@ -75,13 +75,13 @@ class ResourceManager {
 			return reload<Loader>(entt::hashed_string{id}.value(), std::forward<Args>(args)...);
 		}
 
-		void discard(const res_id_type id) ENTT_NOEXCEPT {
+		void discard(const res_id_type id) noexcept {
 			if (auto it = _storage.find(id); it != _storage.end()) {
 				_storage.erase(it);
 			}
 		}
 
-		void discard(const char* id) ENTT_NOEXCEPT {
+		void discard(const char* id) noexcept {
 			discard(entt::hashed_string{id}.value());
 		}
 
@@ -100,11 +100,11 @@ class ResourceManager {
 			return _storage.empty();
 		}
 
-		void clear(void) ENTT_NOEXCEPT {
+		void clear(void) noexcept {
 			_storage.clear();
 		}
 
-		bool contains(const res_id_type id) const ENTT_NOEXCEPT {
+		bool contains(const res_id_type id) const noexcept {
 			return (_storage.find(id) != _storage.cend());
 		}
 

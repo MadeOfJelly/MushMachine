@@ -20,7 +20,7 @@ void Camera3D(MM::Scene& scene) {
 		ImGui::TextUnformatted("NO CAMERA!");
 		return;
 	}
-	auto& camera = scene.ctx().at<MM::OpenGL::Camera3D>();
+	auto& camera = scene.ctx().get<MM::OpenGL::Camera3D>();
 
 	static bool follow_entity = false;
 	static MM::Entity tracking = entt::null;

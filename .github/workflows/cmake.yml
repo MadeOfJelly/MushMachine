@@ -26,8 +26,6 @@ jobs:
       with:
         submodules: recursive
 
-    # TODO: cache
-
     - name: Install Dependencies
       run: sudo apt update && sudo apt -y install libsdl2-dev xserver-xorg-video-dummy
 
@@ -61,8 +59,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-
-    # TODO: cache
 
     - name: Install Dependencies
       run: sudo apt update && sudo apt -y install libsdl2-dev
@@ -102,9 +98,6 @@ jobs:
       with:
         submodules: recursive
 
-    #- name: Install Dependencies
-      #run: sudo apt update && sudo apt -y install libsdl2-dev
-
     - name: Setup emsdk
       uses: mymindstorm/setup-emsdk@v11
       with:
@@ -134,8 +127,6 @@ jobs:
       with:
         submodules: recursive
 
-    # TODO: cache
-
     - name: Install Dependencies
       run: brew install sdl2
 
@@ -156,7 +147,6 @@ jobs:
         submodules: recursive
 
     # TODO: cache
-
     - name: Install Dependencies
       run: vcpkg install sdl2[core,vulkan]:x64-windows
 
