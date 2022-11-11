@@ -80,7 +80,7 @@ void SimpleSprite::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vao->bind();
 
 
-	Camera3D& cam = scene.ctx().at<Camera3D>();
+	Camera3D& cam = scene.ctx().get<Camera3D>();
 	auto vp = cam.getViewProjection();
 
 	scene.view<const Components::Transform4x4, Components::OpenGL::Texture>().each([this, &scene, &vp](entt::entity e, const auto& t, auto& tex) {

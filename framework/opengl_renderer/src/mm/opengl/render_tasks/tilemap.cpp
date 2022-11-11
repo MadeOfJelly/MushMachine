@@ -96,7 +96,7 @@ void Tilemap::render(MM::Services::OpenGLRenderer& rs, MM::Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-	MM::OpenGL::Camera3D& cam = scene.ctx().at<MM::OpenGL::Camera3D>();
+	MM::OpenGL::Camera3D& cam = scene.ctx().get<MM::OpenGL::Camera3D>();
 	auto vp = cam.getViewProjection();
 
 	_shader->setUniform3f("_ambient_color", ambient_color);

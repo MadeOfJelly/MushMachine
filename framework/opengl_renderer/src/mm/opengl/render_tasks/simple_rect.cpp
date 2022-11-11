@@ -72,7 +72,7 @@ void SimpleRect::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_shader->bind();
 	_vao->bind();
 
-	Camera3D& cam = scene.ctx().at<Camera3D>();
+	Camera3D& cam = scene.ctx().get<Camera3D>();
 	auto vp = cam.getViewProjection();
 
 	scene.view<const Components::Transform4x4>().each([this, &scene, &vp](entt::entity e, const auto& t) {

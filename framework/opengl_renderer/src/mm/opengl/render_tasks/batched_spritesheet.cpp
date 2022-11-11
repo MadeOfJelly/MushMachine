@@ -117,7 +117,7 @@ void BatchedSpriteSheet::render(Services::OpenGLRenderer& rs, Engine& engine) {
 	_vertexBuffer->bind(GL_ARRAY_BUFFER);
 	_vao->bind();
 
-	auto& cam = scene.ctx().at<Camera3D>();
+	auto& cam = scene.ctx().get<Camera3D>();
 
 	auto vp = cam.getViewProjection();
 	_shader->setUniformMat4f("_VP", vp);
