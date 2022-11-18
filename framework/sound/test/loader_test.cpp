@@ -5,9 +5,11 @@
 #include <physfs.h>
 #include <mm/soloud_filesystem_file_impl.hpp>
 #include <mm/sound_loader_wav.hpp>
+#include <mm/sound_loader_sfxr.hpp>
 
 #include <mm/resource_manager.hpp>
 
+#include <soloud_sfxr.h>
 #include <soloud_wav.h>
 #include <soloud_wavstream.h>
 #include <soloud_monotone.h>
@@ -21,7 +23,7 @@ using namespace entt::literals;
 
 extern char* argv0;
 
-TEST(soloud_fs_loader, basic) {
+TEST(soloud_fs_loader, wav) {
 	MM::Engine engine;
 
 	// setup
@@ -54,6 +56,41 @@ TEST(soloud_fs_loader, basic) {
 	while (sound.engine.getActiveVoiceCount()) {
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(5ms);
+	}
+
+	rm.clear();
+}
+
+TEST(soloud_fs_loader, sfxr) {
+	MM::Engine engine;
+
+	// setup
+	auto& sound = engine.addService<MM::Services::SoundService>();
+	ASSERT_TRUE(engine.enableService<MM::Services::SoundService>());
+
+	engine.addService<MM::Services::FilesystemService>(argv0, "soloud_filesystem_loader_test");
+	ASSERT_TRUE(engine.enableService<MM::Services::FilesystemService>());
+
+	auto& rm = MM::ResourceManager<SoLoud::Sfxr>::ref();
+
+	sound.engine.setGlobalVolume(0.4f);
+
+	ASSERT_FALSE(rm.contains("test_preset"_hs));
+	rm.load<MM::SoundLoaderSfxrPreset>("test_preset", ::SoLoud::Sfxr::SFXR_PRESETS::EXPLOSION, 0);
+	ASSERT_TRUE(rm.contains("test_preset"_hs));
+
+	// TODO: add load from json
+	// TODO: add load from json from file
+
+	{
+		auto sh = rm.get("test_preset"_hs);
+
+		sound.engine.play(*sh);
+
+		while (sound.engine.getActiveVoiceCount()) {
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(5ms);
+		}
 	}
 
 	rm.clear();

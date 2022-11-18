@@ -9,8 +9,10 @@ namespace MM {
 std::shared_ptr<::SoLoud::Wav> SoundLoaderWavFile::load(const std::string& path, Engine& engine) const {
 	auto& fs = engine.getService<Services::FilesystemService>();
 
-	if (!fs.isFile(path.c_str()))
+	if (!fs.isFile(path.c_str())) {
+		// TODO: log error
 		return nullptr;
+	}
 
 	auto h = fs.open(path.c_str());
 
@@ -19,7 +21,7 @@ std::shared_ptr<::SoLoud::Wav> SoundLoaderWavFile::load(const std::string& path,
 	auto ptr = std::make_shared<::SoLoud::Wav>();
 	auto r = ptr->loadFile(&sl_f);
 	if (r != ::SoLoud::SO_NO_ERROR) {
-		// log error
+		// TODO: log error
 		return nullptr;
 	}
 
