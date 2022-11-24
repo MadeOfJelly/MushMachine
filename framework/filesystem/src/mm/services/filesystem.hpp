@@ -78,6 +78,9 @@ class FilesystemService : public Service {
 		nlohmann::json readJson(fs_file_t file) const;
 		nlohmann::json readJson(const char* filepath) const;
 
+		nlohmann::ordered_json readJsonOrdered(fs_file_t file) const;
+		nlohmann::ordered_json readJsonOrdered(const char* filepath) const;
+
 		bool writeJson(fs_file_t file, nlohmann::json& j, const int indent = -1, const char indent_char = ' ') const;
 		bool writeJson(const char* filepath, nlohmann::json& j, const int indent = -1, const char indent_char = ' ') const;
 

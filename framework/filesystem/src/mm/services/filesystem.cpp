@@ -316,6 +316,31 @@ nlohmann::json FilesystemService::readJson(const char* filepath) const {
 	return r;
 }
 
+nlohmann::ordered_json FilesystemService::readJsonOrdered(fs_file_t file) const {
+	if (!file)
+		return {};
+
+	seek(file, 0);
+
+	std::string buffer;
+	readString(file, buffer);
+
+	// disable exeptions
+	// TODO: use callback instead of readString()
+	return nlohmann::ordered_json::parse(buffer, nullptr, false);
+}
+
+nlohmann::ordered_json FilesystemService::readJsonOrdered(const char* filepath) const {
+	if (!isFile(filepath)) {
+		return {};
+	}
+
+	auto h = open(filepath, READ);
+	auto r = readJsonOrdered(h);
+	close(h);
+	return r;
+}
+
 bool FilesystemService::writeJson(fs_file_t file, nlohmann::json& j, const int indent, const char indent_char) const {
 	if (!file) {
 		LOG_ERROR("writing json to invalid file");
