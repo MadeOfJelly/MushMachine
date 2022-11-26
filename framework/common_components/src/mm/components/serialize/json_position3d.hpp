@@ -7,6 +7,6 @@
 #include "./json_glm.hpp"
 
 namespace MM::Components {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Position3D, pos)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Position3D, pos)
 } // MM::Components
 

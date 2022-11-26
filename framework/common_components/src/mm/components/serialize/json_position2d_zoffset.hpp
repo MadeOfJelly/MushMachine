@@ -7,6 +7,6 @@
 #include "./json_glm.hpp"
 
 namespace MM::Components {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Position2D_ZOffset, z_offset)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Position2D_ZOffset, z_offset)
 } // MM::Components
 

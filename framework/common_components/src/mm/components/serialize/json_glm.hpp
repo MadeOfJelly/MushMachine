@@ -9,12 +9,12 @@
 
 namespace glm {
 
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(vec2, x, y)
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(vec3, x, y, z)
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(vec4, x, y, z, w)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(vec2, x, y)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(vec3, x, y, z)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(vec4, x, y, z, w)
 
 	//NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(mat4x4, [0], y, z, w)
-    inline void to_json(nlohmann::json& nlohmann_json_j, const mat4x4& nlohmann_json_t) {
+	inline void to_json(nlohmann::json& nlohmann_json_j, const mat4x4& nlohmann_json_t) {
 		// TODO: make 2d array?
 		nlohmann_json_j = nlohmann::json::array_t{};
 		nlohmann_json_j[0] = nlohmann_json_t[0];
@@ -22,7 +22,7 @@ namespace glm {
 		nlohmann_json_j[2] = nlohmann_json_t[2];
 		nlohmann_json_j[3] = nlohmann_json_t[3];
 	}
-    inline void from_json(const nlohmann::json& nlohmann_json_j, mat4x4& nlohmann_json_t) {
+	inline void from_json(const nlohmann::json& nlohmann_json_j, mat4x4& nlohmann_json_t) {
 		if (!nlohmann_json_j.is_array()) {
 			//throw nlohmann::json::type_error::create(0, "", nlohmann_json_j);
 			assert(false && "expected array");

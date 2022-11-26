@@ -7,6 +7,6 @@
 #include "./json_glm.hpp"
 
 namespace MM::Components {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Rotation2D, rot)
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Rotation2D, rot)
 } // MM::Components
 
