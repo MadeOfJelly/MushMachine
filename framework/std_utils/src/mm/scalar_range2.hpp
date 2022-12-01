@@ -7,14 +7,14 @@ struct ScalarRange2 {
 	T v_min {};
 	T v_max {};
 
-	ScalarRange2(void) = default;
+	constexpr ScalarRange2(void) = default;
 
-	ScalarRange2(const T& both) noexcept {
+	constexpr ScalarRange2(const T& both) noexcept {
 		v_min = both;
 		v_max = both;
 	}
 
-	ScalarRange2(const T& min, const T& max) noexcept {
+	constexpr ScalarRange2(const T& min, const T& max) noexcept {
 		if (min <= max) {
 			v_min = min;
 			v_max = max;
@@ -24,19 +24,19 @@ struct ScalarRange2 {
 		}
 	}
 
-	bool operator==(const ScalarRange2<T>& rhs) const {
+	constexpr bool operator==(const ScalarRange2<T>& rhs) const {
 		return min() == rhs.min() && max() == rhs.max();
 	}
 
-	bool operator!=(const ScalarRange2<T>& rhs) const {
+	constexpr bool operator!=(const ScalarRange2<T>& rhs) const {
 		return !(*this == rhs);
 	}
 
-	[[nodiscard]] T& min(void) { return v_min; }
-	[[nodiscard]] T& max(void) { return v_max; }
+	[[nodiscard]] constexpr T& min(void) { return v_min; }
+	[[nodiscard]] constexpr T& max(void) { return v_max; }
 
-	[[nodiscard]] const T& min(void) const { return v_min; }
-	[[nodiscard]] const T& max(void) const { return v_max; }
+	[[nodiscard]] constexpr const T& min(void) const { return v_min; }
+	[[nodiscard]] constexpr const T& max(void) const { return v_max; }
 
 	void setMin(const T& new_min) {
 		min() = new_min;
@@ -57,7 +57,7 @@ struct ScalarRange2 {
 		}
 	}
 
-	[[nodiscard]] bool inRange(T&& value) const {
+	[[nodiscard]] constexpr bool inRange(T&& value) const {
 		return value >= min() && value <= max();
 	}
 };
