@@ -1,19 +1,23 @@
 #include <gtest/gtest.h>
 
-#include <mm/components/serialize/json_name.hpp>
-#include <mm/components/serialize/json_color.hpp>
+#include <array>
 
-#include <mm/components/serialize/json_position2d.hpp>
-#include <mm/components/serialize/json_position2d_zoffset.hpp>
-#include <mm/components/serialize/json_position3d.hpp>
-#include <mm/components/serialize/json_rotation2d.hpp>
-#include <mm/components/serialize/json_scale2d.hpp>
-#include <mm/components/serialize/json_transform4x4.hpp>
-#include <mm/components/serialize/json_velocity2d_position.hpp>
-#include <mm/components/serialize/json_velocity2d_position_intent.hpp>
-#include <mm/components/serialize/json_velocity2d_rotation.hpp>
-#include <mm/components/serialize/json_view_dir2d.hpp>
-#include <mm/components/serialize/json_view_dir3d.hpp>
+#include <mm/s6zer/serialize.hpp>
+
+//#include <mm/components/serialize/json_name.hpp>
+#include <mm/components/serialize/s6zer_color.hpp>
+
+//#include <mm/components/serialize/json_position2d.hpp>
+//#include <mm/components/serialize/json_position2d_zoffset.hpp>
+//#include <mm/components/serialize/json_position3d.hpp>
+//#include <mm/components/serialize/json_rotation2d.hpp>
+//#include <mm/components/serialize/json_scale2d.hpp>
+//#include <mm/components/serialize/json_transform4x4.hpp>
+//#include <mm/components/serialize/json_velocity2d_position.hpp>
+//#include <mm/components/serialize/json_velocity2d_position_intent.hpp>
+//#include <mm/components/serialize/json_velocity2d_rotation.hpp>
+//#include <mm/components/serialize/json_view_dir2d.hpp>
+//#include <mm/components/serialize/json_view_dir3d.hpp>
 
 #define TEST_JSON_SERL_EXPAND(x) x
 #define TEST_JSON_SERL_IN_OUT(TYPE, JSON_STR, TEST_CORPUS) \
@@ -32,60 +36,94 @@ TEST(common_components_json_serialization, in_out_##TYPE) { \
 }
 
 
-TEST(common_components_json_serialization, in_out_name) {
-	MM::Components::Name comp;
+//TEST(common_components_json_serialization, in_out_name) {
+	//MM::Components::Name comp;
 
-	const char* json_test_file = "{\"str\":\"test_name\"}";
+	//const char* json_test_file = "{\"str\":\"test_name\"}";
 
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
+	//{ // in
+		//auto j = nlohmann::json::parse(json_test_file);
 
-		EXPECT_NO_THROW({
-			comp = j;
-		});
+		//EXPECT_NO_THROW({
+			//comp = j;
+		//});
 
-		ASSERT_EQ(comp.str, "test_name");
-	}
+		//ASSERT_EQ(comp.str, "test_name");
+	//}
 
-	{ // out
-		nlohmann::json j;
+	//{ // out
+		//nlohmann::json j;
 
-		EXPECT_NO_THROW({
-			j = comp;
-		});
+		//EXPECT_NO_THROW({
+			//j = comp;
+		//});
 
-		ASSERT_EQ(json_test_file, j.dump());
-	}
-}
+		//ASSERT_EQ(json_test_file, j.dump());
+	//}
+//}
 
-TEST(common_components_json_serialization, in_out_name_fail) {
-	MM::Components::Name name_comp;
+//TEST(common_components_json_serialization, in_out_name_fail) {
+	//MM::Components::Name name_comp;
 
-	// intentional malformed json string
-	const char* json_test_file = "{\"strasdf\":\"test_name\"}";
+	//// intentional malformed json string
+	//const char* json_test_file = "{\"strasdf\":\"test_name\"}";
 
-	{ // in
-		auto j = nlohmann::json::parse(json_test_file);
+	//{ // in
+		//auto j = nlohmann::json::parse(json_test_file);
 
-		ASSERT_ANY_THROW({
-			name_comp = j;
-		});
-	}
-}
+		//ASSERT_ANY_THROW({
+			//name_comp = j;
+		//});
+	//}
+//}
 
 // ##############################################################
 
-TEST_JSON_SERL_IN_OUT(
-	Color,
-	R"({"color":{"w":1337.0,"x":0.0,"y":1.0,"z":3.0}})",
-	TEST_JSON_SERL_EXPAND({
-		glm::vec4 comp_val(0.f, 1.f, 3.f, 1337.f);
-		ASSERT_EQ(comp.color.x, comp_val.x);
-		ASSERT_EQ(comp.color.y, comp_val.y);
-		ASSERT_EQ(comp.color.z, comp_val.z);
-		ASSERT_EQ(comp.color.w, comp_val.w);
-	})
-)
+//TEST_S6ZER_SERL_IN_OUT(
+	//Color,
+	//R"({"color":{"w":1337.0,"x":0.0,"y":1.0,"z":3.0}})",
+	//TEST_JSON_SERL_EXPAND({
+		//glm::vec4 comp_val(0.f, 1.f, 3.f, 1337.f);
+		//ASSERT_EQ(comp.color.x, comp_val.x);
+		//ASSERT_EQ(comp.color.y, comp_val.y);
+		//ASSERT_EQ(comp.color.z, comp_val.z);
+		//ASSERT_EQ(comp.color.w, comp_val.w);
+	//})
+//)
+
+TEST(common_components_s6zer_serialization, out_in_color) {
+	const MM::Components::Color comp_out{
+		{1337.f, 0.f, 1.f, 3.f}
+	};
+
+	std::array<uint32_t, 128> buffer;
+	size_t buffer_size = buffer.size()*sizeof(uint32_t);
+
+	{ // to bits
+		MM::s6zer::StreamWriter writer{buffer.data(), buffer_size};
+		ASSERT_TRUE(MM::Components::mm_serialize(writer, comp_out));
+
+		ASSERT_TRUE(writer.flush());
+		buffer_size = writer.bytesWritten();
+	}
+
+	MM::Components::Color comp_in;
+
+	{ // from bits
+		MM::s6zer::StreamReader reader{buffer.data(), buffer_size};
+
+		ASSERT_TRUE(MM::Components::mm_serialize(reader, comp_in));
+
+		ASSERT_EQ(reader.bytesRead(), buffer_size);
+	}
+
+	ASSERT_EQ(comp_out.color.x, comp_in.color.x);
+	ASSERT_EQ(comp_out.color.y, comp_in.color.y);
+	ASSERT_EQ(comp_out.color.z, comp_in.color.z);
+	ASSERT_EQ(comp_out.color.w, comp_in.color.w);
+}
+
+#if 0
 
 // ##############################################################
 
@@ -240,6 +278,8 @@ TEST(common_components_json_serialization, in_out_view_dir3d) {
 		ASSERT_EQ(json_test_file, j.dump());
 	}
 }
+
+#endif
 
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);
