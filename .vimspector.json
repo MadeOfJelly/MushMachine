@@ -1,0 +1,28 @@
+{
+	"configurations": {
+		"run_ctest_native": {
+			"default": true,
+			"adapter": "CodeLLDB",
+			"configuration": {
+				"request": "launch",
+				"stopOnEntry": true,
+				"console": "integratedTerminal",
+				"program": "ctest",
+				"cwd": "${workspaceRoot}/build"
+			}
+		},
+		"run_native": {
+			"adapter": "CodeLLDB",
+			"variables": {
+				"Executable": "s6zer_test"
+			},
+			"configuration": {
+				"request": "launch",
+				"stopOnEntry": true,
+				"console": "integratedTerminal",
+				"program": "${workspaceRoot}/build/bin/${Executable}",
+				"cwd": "${workspaceRoot}/build"
+			}
+		}
+	}
+}
