@@ -194,10 +194,6 @@ struct StreamWriter {
 	}
 
 	[[nodiscard]] size_t bytesWritten(void) noexcept {
-		// TODO: is this assert valid?
-		assert(_scratch_bits == 0);
-
-		//return _bits_written/8 + ((_bits_written % 8) ? 1 : 0);
 		return (_bits_written+7) / 8;
 	}
 
