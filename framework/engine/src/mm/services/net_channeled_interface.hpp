@@ -50,11 +50,11 @@ namespace MM::Services {
 		public: // send/recv
 
 			// sends a packet of max getMaxPacketSize() bytes
-			virtual bool sendPacket(peer_id peer, channel_id channel, uint8_t* data, size_t data_size) = 0;
+			virtual bool sendPacket(peer_id peer, channel_id channel, const uint8_t* data, size_t data_size) = 0;
 
 			// sends a packet, automatically split if too big
 			// !! only on lossless channels
-			virtual bool sendPacketLarge(peer_id peer, channel_id channel, uint8_t* data, size_t data_size) = 0;
+			virtual bool sendPacketLarge(peer_id peer, channel_id channel, const uint8_t* data, size_t data_size) = 0;
 
 			// TODO: broadcast?
 			// has any?
