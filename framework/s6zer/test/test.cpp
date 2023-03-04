@@ -391,7 +391,7 @@ struct TestStruct {
 	double		f64 {0.};
 
 	// float compressed [0; 1] range
-	constexpr static float c0_f32_resolution = 0.001;
+	constexpr static float c0_f32_resolution = 0.001f;
 	constexpr static MM::ScalarRange2<float> c0_f32_r{0.f, 1.f};
 	float		c0_f32_0 {0.f};
 	float		c0_f32_1 {0.f};
@@ -399,7 +399,7 @@ struct TestStruct {
 	float		c0_f32_3 {0.f};
 
 	// float compressed [-1; 1] range
-	constexpr static float c1_f32_resolution = 0.05;
+	constexpr static float c1_f32_resolution = 0.05f;
 	constexpr static MM::ScalarRange2<float> c1_f32_r{-1.f, 1.f};
 	float		c1_f32_0 {0.f};
 	float		c1_f32_1 {0.f};
@@ -407,7 +407,7 @@ struct TestStruct {
 	float		c1_f32_3 {0.f};
 
 	// float compressed [-1000; 1000] range
-	constexpr static float c2_f32_resolution = 0.01;
+	constexpr static float c2_f32_resolution = 0.01f;
 	constexpr static MM::ScalarRange2<float> c2_f32_r{-1000.f, 1000.f};
 	float		c2_f32_0 {0.f};
 	float		c2_f32_1 {0.f};
