@@ -2,42 +2,30 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 project(imgui C CXX)
 
-set(CPP_FILES
+add_library(imgui
+	"imgui/imgui.h"
 	"imgui/imgui.cpp"
 	"imgui/imgui_draw.cpp"
 	"imgui/imgui_widgets.cpp"
 	"imgui/imgui_tables.cpp"
 	"imgui/imgui_demo.cpp"
 
-	"imgui/misc/cpp/imgui_stdlib.cpp"
-
-	"imgui_plot_var.cpp"
-
-	#"imgui_impl_sdl_gl3.cpp" # very old
-	#"imgui_impl_sdl.cpp" # old
-	#"imgui_impl_opengl3.cpp" # old
-	"imgui/backends/imgui_impl_sdl.cpp"
-	"imgui/backends/imgui_impl_opengl3.cpp"
-)
-
-set(HPP_FILES
-	"imgui/imgui.h"
 	"imgui/imstb_rectpack.h"
 	"imgui/imstb_textedit.h"
 	"imgui/imstb_truetype.h"
 
 	"imgui/misc/cpp/imgui_stdlib.h"
+	"imgui/misc/cpp/imgui_stdlib.cpp"
 
 	"imgui_plot_var.hpp"
+	"imgui_plot_var.cpp"
 
-	#"imgui_impl_sdl_gl3.h" # very old
-	#"imgui_impl_sdl.h" # old
-	#"imgui_impl_opengl3.h" # old
-	"imgui/backends/imgui_impl_sdl.h"
+	# TODO: seperate backends into libs
+	"imgui/backends/imgui_impl_sdl2.h"
+	"imgui/backends/imgui_impl_sdl2.cpp"
 	"imgui/backends/imgui_impl_opengl3.h"
+	"imgui/backends/imgui_impl_opengl3.cpp"
 )
-
-add_library(imgui ${CPP_FILES} ${HPP_FILES})
 
 target_compile_features(imgui PUBLIC cxx_std_11)
 

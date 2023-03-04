@@ -1,7 +1,7 @@
 #include "./imgui_s.hpp"
 
 #include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_sdl.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
 
 #ifdef MM_OPENGL_3
 #include <imgui/backends/imgui_impl_opengl3.h>
