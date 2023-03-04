@@ -10,6 +10,8 @@ if(NOT EMSCRIPTEN)
 		"${CMAKE_CURRENT_LIST_DIR}/tracy/public/TracyClient.cpp"
 	)
 
+	option(TRACY_ENABLE "Enable tracy profiling" OFF)
+
 	if(TRACY_ENABLE)
 		target_compile_definitions(tracy_client PUBLIC TRACY_ENABLE)
 		#target_compile_definitions(tracy_client PUBLIC TRACY_NO_SYSTEM_TRACING)
