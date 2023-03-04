@@ -60,6 +60,16 @@ struct ScalarRange2 {
 	[[nodiscard]] constexpr bool inRange(T&& value) const {
 		return value >= min() && value <= max();
 	}
+
+	// lerp between min and max
+	[[nodiscard]] constexpr T map(const float a) const {
+		return min() * (1.f-a) + max() * a;
+	}
+
+	// reverse map
+	[[nodiscard]] constexpr float unmap(const T& v) const {
+		return (v - min()) / static_cast<float>(max() - min());
+	}
 };
 
 } // MM
