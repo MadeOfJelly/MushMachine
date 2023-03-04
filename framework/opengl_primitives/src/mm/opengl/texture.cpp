@@ -97,6 +97,7 @@ Texture::handle_t Texture::createEmptyMultiSampled(int32_t internalFormat, int32
 	(void)height;
 	(void)samples;
 	assert(false && "GLES has no multisampling support");
+	return nullptr;
 #endif
 }
 
