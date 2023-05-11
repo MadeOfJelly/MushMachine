@@ -129,8 +129,9 @@ static void setup_fbos(MM::Engine& engine) {
 	assert(rs.targets["game_view"]);
 }
 
+static MM::Engine engine;
+
 TEST(hdr_bloom_pipeline, it) {
-	MM::Engine engine;
 
 	auto& sdl_ss = engine.addService<MM::Services::SDLService>();
 	ASSERT_TRUE(engine.enableService<MM::Services::SDLService>());
@@ -228,7 +229,7 @@ TEST(hdr_bloom_pipeline, it) {
 		col.color = {3.f, 3.f, 3.f, 1.f};
 	}
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		auto e = scene.create();
 		auto& p = scene.emplace<MM::Components::Position2D>(e);
 		p.pos.x = i * 9.f - 40;
@@ -247,7 +248,43 @@ TEST(hdr_bloom_pipeline, it) {
 		col.color = {rng.zeroToOne()*2.f, rng.zeroToOne()*2.f, rng.zeroToOne()*2.f, 1.f};
 	}
 
+	for (int i = 5; i < 10; i++) {
+		auto e = scene.create();
+		auto& p = scene.emplace<MM::Components::Position2D>(e);
+		p.pos.x = i * 9.f - 40;
+
+		// zoffset is created by event
+
+		auto& s = scene.emplace<MM::Components::Scale2D>(e);
+		s.scale = {5,5};
+
+		scene.emplace<MM::Components::Rotation2D>(e);
+
+		auto& v = scene.emplace<MM::Components::Velocity2DRotation>(e);
+		v.rot_vel = i * 0.3f;
+
+		auto& col = scene.emplace<MM::Components::Color>(e);
+		col.color = {rng.zeroToOne()*-2.f, rng.zeroToOne()*-2.f, rng.zeroToOne()*-2.f, 1.f};
+	}
+
+	{ // white background for negatives
+		auto e = scene.create();
+		auto& p = scene.emplace<MM::Components::Position2D>(e);
+		p.pos.y = 30.f;
+		p.pos.x = 25.f;
+
+		auto& s = scene.emplace<MM::Components::Scale2D>(e);
+		s.scale = {50,150};
+
+		auto& col = scene.emplace<MM::Components::Color>(e);
+		col.color = {1.f, 1.f, 1.f, 1.f};
+	}
+
 	engine.run();
+
+#ifndef __EMSCRIPTEN__
+	engine.cleanup();
+#endif
 }
 
 int main(int argc, char** argv) {

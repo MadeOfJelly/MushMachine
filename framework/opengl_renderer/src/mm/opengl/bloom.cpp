@@ -29,14 +29,20 @@ void setup_bloom(
 	const auto bloom_internal_format = GL_RGB565; // prolly fine. NOPE its not. it causes green pixely halos
 	const auto bloom_format_type = GL_UNSIGNED_BYTE;
 	#else
-	//const auto bloom_internal_format = GL_RGBA16F;
-	const auto bloom_internal_format = GL_R11F_G11F_B10F;
-	const auto bloom_format_type = GL_FLOAT;
+	const auto bloom_format_type = GL_RGBA;
+	const auto bloom_internal_format = GL_RGBA16F;
+	//const auto bloom_internal_format = GL_R11F_G11F_B10F;
+	const auto bloom_data_type = GL_FLOAT;
+
+	//const auto bloom_format_type = GL_RGBA_INTEGER;
+	//const auto bloom_internal_format = GL_RGBA16I;
+	//const auto bloom_data_type = GL_SHORT;
 	#endif
 #else
-	//const auto bloom_internal_format = GL_RGB16F;
-	const auto bloom_internal_format = GL_R11F_G11F_B10F;
-	const auto bloom_format_type = GL_FLOAT;
+	const auto bloom_format_type = GL_RGB;
+	const auto bloom_internal_format = GL_RGB16F; // opengl silently upgrades to RGBA
+	//const auto bloom_internal_format = GL_R11F_G11F_B10F; // no sign
+	const auto bloom_data_type = GL_FLOAT;
 #endif
 
 	{ // bloom in (bloom extraction)
@@ -44,7 +50,7 @@ void setup_bloom(
 			"bloom_in",
 			bloom_internal_format,
 			w * bloom_in_scale, h * bloom_in_scale,
-			GL_RGB, bloom_format_type
+			bloom_format_type, bloom_data_type
 		);
 		{ // filter
 			rm_t.get("bloom_in"_hs)->bind(0);
@@ -72,7 +78,7 @@ void setup_bloom(
 			tex_out_id,
 			bloom_internal_format,
 			w * bloom_in_scale * glm::pow(bloom_phase_scale, i), h * bloom_in_scale * glm::pow(bloom_phase_scale, i),
-			GL_RGB, bloom_format_type
+			bloom_format_type, bloom_data_type
 		);
 		{ // filter
 			rm_t.get(tex_out_id)->bind(0);
@@ -89,7 +95,7 @@ void setup_bloom(
 			tex_tmp_id,
 			bloom_internal_format,
 			w * bloom_in_scale * glm::pow(bloom_phase_scale, i), h * bloom_in_scale * glm::pow(bloom_phase_scale, i),
-			GL_RGB, bloom_format_type
+			bloom_format_type, bloom_data_type
 		);
 		{ // filter
 			rm_t.get(tex_tmp_id)->bind(0);

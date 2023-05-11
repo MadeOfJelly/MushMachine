@@ -106,7 +106,15 @@ void main() {
 	vec3 color = texture(color_tex, _uv).rgb;
 
 	// TODO: expose threshold
-	_out_color = max(vec3(0.0), color - vec3(1.0));
+	//_out_color = max(vec3(0.0), color - vec3(1.0));
+
+	//_out_color = mix(
+		//color, // < 0.0
+		//max(vec3(0.0), color - vec3(1.0)), // > 0.0
+		//step(vec3(0.0), color)
+	//);
+
+	_out_color = max(min(color, vec3(0.0)), color - vec3(1.0));
 })")
 }
 

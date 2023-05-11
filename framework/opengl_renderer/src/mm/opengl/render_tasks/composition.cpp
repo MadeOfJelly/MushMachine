@@ -141,7 +141,7 @@ void main() {
 	vec3 color = texture(color_tex, _uv).rgb;
 	vec3 bloom = texture(bloom_tex, _uv).rgb;
 
-	vec3 comp = color + bloom * vec3(bloom_factor);
+	vec3 comp = max(vec3(0.0), color + bloom * vec3(bloom_factor));
 
 #if 0
 	const vec3 tint = vec3(1.5, 0.8, 1.1);
