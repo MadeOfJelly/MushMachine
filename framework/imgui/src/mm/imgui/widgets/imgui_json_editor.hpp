@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <nlohmann/json.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
+#include <cinttypes>
 
 namespace MM::ImGuiWidgets {
 
@@ -55,16 +56,16 @@ void JsonViewerSimple(const char* name, const JsonObjectType& json) {
 			}
 			break;
 		case JsonObjectType::value_t::number_integer:
-			ImGui::TextColored(int_color, "%ld", json.template get<int64_t>());
+			ImGui::TextColored(int_color, "%" PRId64, json.template get<int64_t>());
 			break;
 		case JsonObjectType::value_t::number_unsigned:
-			ImGui::TextColored(unsigned_color, "%lu", json.template get<uint64_t>());
+			ImGui::TextColored(unsigned_color, "%" PRIu64, json.template get<uint64_t>());
 			break;
 		case JsonObjectType::value_t::number_float:
 			ImGui::TextColored(float_color, "%f", json.template get<float>());
 			break;
 		case JsonObjectType::value_t::object:
-			ImGui::TextDisabled("{%d}", json.size());
+			ImGui::TextDisabled("{%zu}", json.size());
 
 			ImGui::Indent();
 			for (auto& [key, value] : json.items()) {
@@ -74,7 +75,7 @@ void JsonViewerSimple(const char* name, const JsonObjectType& json) {
 
 			break;
 		case JsonObjectType::value_t::array:
-			ImGui::TextDisabled("[%d]", json.size());
+			ImGui::TextDisabled("[%zu]", json.size());
 
 			ImGui::Indent();
 			for (auto& [key, value] : json.items()) {
@@ -103,9 +104,9 @@ void JsonViewerTree(const char* name, const JsonObjectType& json) {
 
 		ImGui::SameLine();
 		if (json.is_object()) {
-			ImGui::TextDisabled("{%d}", json.size());
+			ImGui::TextDisabled("{%zu}", json.size());
 		} else { // is_array()
-			ImGui::TextDisabled("[%d]", json.size());
+			ImGui::TextDisabled("[%zu]", json.size());
 		}
 
 		if (tree_open) {
@@ -143,10 +144,10 @@ void JsonViewerTree(const char* name, const JsonObjectType& json) {
 				}
 				break;
 			case JsonObjectType::value_t::number_integer:
-				ImGui::TextColored(int_color, "%ld", json.template get<int64_t>());
+				ImGui::TextColored(int_color, "%" PRId64, json.template get<int64_t>());
 				break;
 			case JsonObjectType::value_t::number_unsigned:
-				ImGui::TextColored(unsigned_color, "%lu", json.template get<uint64_t>());
+				ImGui::TextColored(unsigned_color, "%" PRIu64, json.template get<uint64_t>());
 				break;
 			case JsonObjectType::value_t::number_float:
 				ImGui::TextColored(float_color, "%f", json.template get<float>());
@@ -200,9 +201,9 @@ void JsonEditor(const char* name, JsonObjectType& json) {
 
 		ImGui::SameLine();
 		if (json.is_object()) {
-			ImGui::TextDisabled("{%d}", json.size());
+			ImGui::TextDisabled("{%zu}", json.size());
 		} else { // is_array()
-			ImGui::TextDisabled("[%d]", json.size());
+			ImGui::TextDisabled("[%zu]", json.size());
 		}
 
 		if (tree_open) {
