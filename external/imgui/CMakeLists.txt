@@ -41,7 +41,7 @@ target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 #target_include_directories(imgui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 target_include_directories(imgui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/imgui") # im sad
 
-target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+#target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1) # more sad
 
 if(EMSCRIPTEN)
 	target_compile_options(imgui PUBLIC -sUSE_SDL=2)
