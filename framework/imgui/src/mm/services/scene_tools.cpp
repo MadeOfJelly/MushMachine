@@ -1,4 +1,5 @@
 #include "./scene_tools.hpp"
+#include "mm/engine_fwd.hpp"
 
 #include <mm/engine.hpp>
 
@@ -109,16 +110,19 @@ namespace MM::Services {
 
 		if (_show_scene_metrics) {
 			if (ImGui::Begin("Scene Metrics##ImGuiSceneToolsService", &_show_scene_metrics)) {
-				ImGui::Text("capacity: %lu", scene.capacity());
-				ImGui::Text("size: %lu", scene.size());
-				ImGui::Text("alive: %lu", scene.alive());
-				size_t orphans = 0;
-				scene.each([&orphans, &scene](auto entity) {
-					if (scene.orphan(entity)) {
-						orphans++;
+				ImGui::Text("capacity: %zu", scene.storage<::MM::Entity>().capacity());
+				ImGui::Text("size: %zu", scene.storage<::MM::Entity>().size());
+				ImGui::Text("alive: %zu", scene.storage<::MM::Entity>().in_use());
+				if (ImGui::CollapsingHeader("orphans")) {
+					// iterating all entities is expensive
+					size_t orphans = 0;
+					for (const auto it : scene.storage<MM::Entity>().each()) {
+						if (scene.orphan(std::get<0>(it))) {
+							orphans++;
+						}
 					}
-				});
-				ImGui::Text("orphans: %lu", orphans);
+					ImGui::Text("orphans: %lu", orphans);
+				}
 			}
 			ImGui::End();
 		}
