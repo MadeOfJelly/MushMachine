@@ -105,7 +105,7 @@
 
 if(NOT EMSCRIPTEN)
 
-FIND_PATH(SDL2_INCLUDE_DIR SDL.h
+FIND_PATH(SDL2_INCLUDE_DIR_TEMP SDL.h
 	HINTS
 	$ENV{SDL2}
 	PATH_SUFFIXES include/SDL2 include SDL2
@@ -153,7 +153,7 @@ ELSE(CMAKE_SIZEOF_VOID_P EQUAL 8)
 ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
 IF(NOT SDL2_BUILDING_LIBRARY)
-	IF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
+	IF(NOT "${SDL2_INCLUDE_DIR_TEMP}" MATCHES ".framework")
 		# Non-OS X framework versions expect you to also dynamically link to
 		# SDL2main. This is mainly for Windows and OS X. Other (Unix) platforms
 		# seem to provide SDL2main for compatibility even though they don't
@@ -189,7 +189,7 @@ IF(NOT SDL2_BUILDING_LIBRARY)
 				/opt
 				)
 		ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	ENDIF(NOT ${SDL2_INCLUDE_DIR} MATCHES ".framework")
+	ENDIF(NOT "${SDL2_INCLUDE_DIR_TEMP}" MATCHES ".framework")
 ENDIF(NOT SDL2_BUILDING_LIBRARY)
 
 # SDL2 may require threads on your system.
@@ -208,58 +208,67 @@ IF(MINGW)
 ENDIF(MINGW)
 
 SET(SDL2_FOUND "NO")
-	IF(SDL2_LIBRARY_TEMP)
-		# For SDL2main
-		IF(NOT SDL2_BUILDING_LIBRARY)
-			IF(SDL2MAIN_LIBRARY)
-				SET(SDL2_LIBRARY_TEMP ${SDL2MAIN_LIBRARY} ${SDL2_LIBRARY_TEMP})
-			ENDIF(SDL2MAIN_LIBRARY)
-		ENDIF(NOT SDL2_BUILDING_LIBRARY)
+IF(SDL2_LIBRARY_TEMP)
+	# For SDL2main
+	IF(NOT SDL2_BUILDING_LIBRARY)
+		IF(SDL2MAIN_LIBRARY)
+			SET(SDL2_LIBRARY_TEMP ${SDL2MAIN_LIBRARY} ${SDL2_LIBRARY_TEMP})
+		ENDIF(SDL2MAIN_LIBRARY)
+	ENDIF(NOT SDL2_BUILDING_LIBRARY)
 
-		# For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
-		# CMake doesn't display the -framework Cocoa string in the UI even
-		# though it actually is there if I modify a pre-used variable.
-		# I think it has something to do with the CACHE STRING.
-		# So I use a temporary variable until the end so I can set the
-		# "real" variable in one-shot.
-		IF(APPLE)
-			SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} "-framework Cocoa")
-		ENDIF(APPLE)
+	# For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
+	# CMake doesn't display the -framework Cocoa string in the UI even
+	# though it actually is there if I modify a pre-used variable.
+	# I think it has something to do with the CACHE STRING.
+	# So I use a temporary variable until the end so I can set the
+	# "real" variable in one-shot.
+	IF(APPLE)
+		SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} "-framework Cocoa")
+	ENDIF(APPLE)
 
-		# For threads, as mentioned Apple doesn't need this.
-		# In fact, there seems to be a problem if I used the Threads package
-		# and try using this line, so I'm just skipping it entirely for OS X.
-		IF(NOT APPLE)
-			SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
-		ENDIF(NOT APPLE)
+	# For threads, as mentioned Apple doesn't need this.
+	# In fact, there seems to be a problem if I used the Threads package
+	# and try using this line, so I'm just skipping it entirely for OS X.
+	IF(NOT APPLE)
+		SET(SDL2_LIBRARY_TEMP ${SDL2_LIBRARY_TEMP} ${CMAKE_THREAD_LIBS_INIT})
+	ENDIF(NOT APPLE)
 
-		# For MinGW library
-		IF(MINGW)
-			SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
-		ENDIF(MINGW)
+	# For MinGW library
+	IF(MINGW)
+		SET(SDL2_LIBRARY_TEMP ${MINGW32_LIBRARY} ${SDL2_LIBRARY_TEMP})
+	ENDIF(MINGW)
 
-		# Set the final string here so the GUI reflects the final state.
-		SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
-		# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
-		SET(SDL2_LIBRARY_TEMP "${SDL2_LIBRARY_TEMP}" CACHE INTERNAL "")
+	# Set the final string here so the GUI reflects the final state.
+	SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
+	# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
+	SET(SDL2_LIBRARY_TEMP "${SDL2_LIBRARY_TEMP}" CACHE INTERNAL "")
 
-		############add_library(SDL UNKNOWN IMPORTED)
-		#target_link_libraries(SDL INTERFACE ${SDL2_LIBRARY})
-		#target_include_directories(SDL INTERFACE ${SDL2_INCLUDE_DIR})
-		#set_target_properties(SDL PROPERTIES IMPORTED_LINK_INTERFACE_LIBRARIES "${SDL2_LIBRARY}")
+	set(SDL2_INCLUDE_DIR ${SDL2_INCLUDE_DIR_TEMP} CACHE STRING "Where the SDL2 Headers can be found")
+	SET(SDL2_INCLUDE_DIR_TEMP "${SDL2_INCLUDE_DIR_TEMP}" CACHE INTERNAL "")
 
-		#set_target_properties(SDL PROPERTIES
-			#INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}")
+	SET(SDL2_FOUND "YES")
+else() # SDL2_LIBRARY_TEMP
+	# try to pkg-config fallback
+	find_package(PkgConfig)
+	if (PKG_CONFIG_FOUND)
+		pkg_check_modules(PKG_C_SDL2 QUIET sdl2)
+		if (PKG_C_SDL2_FOUND)
+			SET(SDL2_LIBRARY_TEMP ${PKG_C_SDL2_LIBRARIES})
+			SET(SDL2_INCLUDE_DIR_TEMP ${PKG_C_SDL2_INCLUDE_DIRS})
 
-		#set_target_properties(SDL PROPERTIES
-			#IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-			#IMPORTED_LINK_INTERFACE_LIBRARIES "${SDL2_LIBRARY}"
-			#LINK_INTERFACE_LIBRARIES "${SDL2_LIBRARY}")
+			# Set the final string here so the GUI reflects the final state.
+			SET(SDL2_LIBRARY ${SDL2_LIBRARY_TEMP} CACHE STRING "Where the SDL2 Library can be found")
+			# Set the temp variable to INTERNAL so it is not seen in the CMake GUI
+			SET(SDL2_LIBRARY_TEMP "${SDL2_LIBRARY_TEMP}" CACHE INTERNAL "")
 
-		#IMPORTED_LOCATION "${SDL2_LIBRARY}")
+			set(SDL2_INCLUDE_DIR ${SDL2_INCLUDE_DIR_TEMP} CACHE STRING "Where the SDL2 Headers can be found")
+			SET(SDL2_INCLUDE_DIR_TEMP "${SDL2_INCLUDE_DIR_TEMP}" CACHE INTERNAL "")
 
+			#message("II set include dir to ${SDL2_INCLUDE_DIR}")
 
-		SET(SDL2_FOUND "YES")
+			SET(SDL2_FOUND "YES")
+		endif()
+	endif()
 ENDIF(SDL2_LIBRARY_TEMP)
 
 else() #emsripten
@@ -288,4 +297,11 @@ INCLUDE(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2 REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR)
 
+if (SDL2_FOUND)
+	if (NOT TARGET SDL2::SDL2)
+		add_library(SDL2::SDL2 INTERFACE IMPORTED)
+		target_include_directories(SDL2::SDL2 INTERFACE ${SDL2_INCLUDE_DIR})
+		target_link_libraries(SDL2::SDL2 INTERFACE ${SDL2_LIBRARY})
+	endif()
+endif()
 
