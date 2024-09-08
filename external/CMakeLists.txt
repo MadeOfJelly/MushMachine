@@ -21,7 +21,6 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 set(JSON_MultipleHeaders ON CACHE INTERNAL "")
 add_subdirectory("json") # link with "nlohmann_json::nlohmann_json"
 
-set(PHYSFS_BUILD_SHARED FALSE CACHE INTERNAL "")
 add_subdirectory("physfs")
 
 if(NOT MM_HEADLESS)
