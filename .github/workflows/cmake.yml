@@ -98,14 +98,17 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Setup emsdk
-      uses: mymindstorm/setup-emsdk@v11
+    - name: Setup em cache
+      id: em-cache-system-libraries
+      uses: actions/cache@v4
       with:
-        # Make sure to set a version number!
+        path: ${{env.EM_CACHE_FOLDER}}
+        key: ${{env.EM_VERSION}}-${{ runner.os }}
+
+    - name: Setup emsdk
+      uses: mymindstorm/setup-emsdk@v14
+      with:
         version: ${{env.EM_VERSION}}
-        # This is the name of the cache folder.
-        # The cache folder will be placed in the build directory,
-        #  so make sure it doesn't conflict with anything!
         actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
 
     - name: Verify
