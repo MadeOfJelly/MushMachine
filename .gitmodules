@@ -16,9 +16,6 @@
 	path = external/imgui/imgui
 	url = https://github.com/ocornut/imgui.git
 	shallow = true
-[submodule "external/ImGuiColorTextEdit"]
-	path = external/ImGuiColorTextEdit
-	url = https://github.com/BalazsJako/ImGuiColorTextEdit.git
 [submodule "external/soloud/soloud"]
 	path = external/soloud/soloud
 	url = https://github.com/jarikomppa/soloud.git

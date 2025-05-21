@@ -93,20 +93,20 @@ add_test(NAME imgui_sound_test COMMAND imgui_sound_test)
 
 ####################
 
-add_executable(imgui_text_edit_test
-	./text_edit_test.cpp
-)
+#add_executable(imgui_text_edit_test
+#    ./text_edit_test.cpp
+#)
 
-target_include_directories(imgui_text_edit_test PRIVATE ".")
+#target_include_directories(imgui_text_edit_test PRIVATE ".")
 
-target_link_libraries(imgui_text_edit_test
-	engine
-	opengl_renderer_s
-	imgui_service
-	imgui_render_task
-	imgui_tools
-	gtest_main
-)
+#target_link_libraries(imgui_text_edit_test
+#    engine
+#    opengl_renderer_s
+#    imgui_service
+#    imgui_render_task
+#    imgui_tools
+#    gtest_main
+#)
 
-add_test(NAME imgui_text_edit_test COMMAND imgui_text_edit_test)
+#add_test(NAME imgui_text_edit_test COMMAND imgui_text_edit_test)
 

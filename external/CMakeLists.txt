@@ -47,9 +47,6 @@ if(NOT MM_HEADLESS)
 	# (debug) gui
 	add_subdirectory("imgui")
 
-	# (debug) text editor
-	include("${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit.cmake")
-
 	# sound, uses sdl2-static backend
 	add_subdirectory("soloud")
 endif()

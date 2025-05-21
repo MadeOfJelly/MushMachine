@@ -93,8 +93,8 @@ add_library(imgui_tools
 	./src/mm/imgui/file_shader_editor.hpp
 
 	./src/mm/imgui/fps_overlay.cpp
-	./src/mm/imgui/file_text_editor.cpp
-	./src/mm/imgui/file_shader_editor.cpp
+	#./src/mm/imgui/file_text_editor.cpp
+	#./src/mm/imgui/file_shader_editor.cpp
 
 	./src/mm/services/scene_tools.hpp
 	./src/mm/services/scene_tools.cpp
@@ -110,7 +110,7 @@ target_include_directories(imgui_tools PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(imgui_tools
 	imgui_render_task
 	imgui_widgets
-	imgui_color_text_edit
+	#imgui_color_text_edit
 
 	screen_director
 )
