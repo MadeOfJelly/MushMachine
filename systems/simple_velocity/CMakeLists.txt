@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9...3.16 FATAL_ERROR)
 
 project(simple_velocity_system CXX)
 
