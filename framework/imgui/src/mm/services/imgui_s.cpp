@@ -29,7 +29,7 @@ bool ImGuiService::enable(Engine& engine, std::vector<UpdateStrategies::TaskInfo
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
+	io.ConfigNavCaptureKeyboard = false;
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // TODO: dont, if ingame ?
 
 	auto& sdl_ss = engine.getService<MM::Services::SDLService>();

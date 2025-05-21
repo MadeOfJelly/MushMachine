@@ -49,7 +49,7 @@ void FilePicker(const char* label, MM::Services::FilesystemService& fs, std::str
 		//ImGui::TextUnformatted(dirlist_path.c_str());
 
 		if (dirlist_path != "/") {
-			if (ImGui::Selectable(ICON_II_FOLDER " ..", false, ImGuiSelectableFlags_DontClosePopups)) {
+			if (ImGui::Selectable(ICON_II_FOLDER " ..", false, ImGuiSelectableFlags_NoAutoClosePopups)) {
 				path = internal_remove_last_folder(dirlist_path);
 			}
 		}
@@ -69,7 +69,7 @@ void FilePicker(const char* label, MM::Services::FilesystemService& fs, std::str
 
 			tmp_text += i;
 
-			if (ImGui::Selectable(tmp_text.c_str(), false, ImGuiSelectableFlags_DontClosePopups)) {
+			if (ImGui::Selectable(tmp_text.c_str(), false, ImGuiSelectableFlags_NoAutoClosePopups)) {
 				if (path.back() != '/') {
 					path = internal_remove_last_folder(path);
 				}

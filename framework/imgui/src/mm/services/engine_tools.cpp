@@ -98,7 +98,7 @@ static void renderUpdateStratGraph(
 		//ImGui::BeginChild("canvas", {0, 0}, true);
 
 		const ImVec2 cp = ImGui::GetCursorScreenPos();
-		const auto max_cont = ImGui::GetWindowContentRegionMax();
+		const auto max_cont = ImGui::GetContentRegionAvail();
 		ImGui::Dummy(max_cont);
 
 		auto* dl = ImGui::GetWindowDrawList();

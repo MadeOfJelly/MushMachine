@@ -17,7 +17,7 @@ void Texture(MM::OpenGL::Texture::handle_t& texture, bool dropTarget) {
 	ImGui::BeginGroup();
 
 	if (texture) {
-		ImGui::Image(texture->getHandle(), size, {0.f, 1.f}, {1.f, 0.f}, ImVec4(1,1,1,1), ImVec4(1,1,1,1));
+		ImGui::ImageWithBg(texture->getHandle(), size, {0.f, 1.f}, {1.f, 0.f}, ImVec4(1,1,1,1), ImVec4(1,1,1,1));
 
 		// "tooltip"
 		if (ImGui::IsItemHovered()) {
@@ -32,7 +32,7 @@ void Texture(MM::OpenGL::Texture::handle_t& texture, bool dropTarget) {
 			auto id = MM::ResourceManager<MM::OpenGL::Texture>::ref().id_from_handle(texture);
 			if (id) {
 				ImGui::SetDragDropPayload(IMGUI_PAYLOAD_TYPE_MM_REND_TEXTURE, &(id.value()), sizeof(id.value()));
-				ImGui::Image(texture->getHandle(), size, {0.f, 1.f}, {1.f, 0.f}, ImVec4(1,1,1,1), ImVec4(1,1,1,1));
+				ImGui::ImageWithBg(texture->getHandle(), size, {0.f, 1.f}, {1.f, 0.f}, ImVec4(1,1,1,1), ImVec4(1,1,1,1));
 			}
 			ImGui::EndDragDropSource();
 		}
