@@ -25,6 +25,11 @@
 #define LOG_DEBUG(...)		__LOG_DEBUG("Tilemap", __VA_ARGS__)
 #define LOG_TRACE(...)		__LOG_TRACE("Tilemap", __VA_ARGS__)
 
+// HACK: https://github.com/nlohmann/json/issues/4261
+namespace nlohmann {
+auto format_as(const json& j) { return j.dump(); }
+} // nlohmann
+
 namespace MM {
 
 Tilemap::Tilemap(void) {

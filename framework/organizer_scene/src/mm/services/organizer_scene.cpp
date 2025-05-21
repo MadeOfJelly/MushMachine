@@ -1,5 +1,4 @@
 #include "./organizer_scene.hpp"
-#include "mm/engine.hpp"
 
 #include <mm/components/time_delta.hpp>
 
@@ -34,6 +33,8 @@ static std::ostream& operator<<(std::ostream& out, const std::vector<entt::organ
 }
 
 } // entt
+
+template <> struct fmt::formatter<std::vector<entt::organizer::vertex>> : fmt::ostream_formatter {};
 
 namespace MM::Services {
 
@@ -119,7 +120,7 @@ void OrganizerSceneService::changeSceneNow(std::unique_ptr<Scene>&& new_scene) {
 }
 
 void OrganizerSceneService::updateOrganizerVertices(Scene& scene) {
-	scene.ctx().emplace<std::vector<entt::organizer::vertex>>() =
+	const auto& graph = scene.ctx().emplace<std::vector<entt::organizer::vertex>>() =
 		scene.ctx().emplace<entt::organizer>().graph();
 
 	if (!scene.ctx().contains<MM::Components::TimeDelta>()) {
@@ -127,7 +128,7 @@ void OrganizerSceneService::updateOrganizerVertices(Scene& scene) {
 	}
 
 	// TODO: use entt::dot instead
-	SPDLOG_DEBUG("graph:\n{}", scene.ctx().get<std::vector<entt::organizer::vertex>>());
+	SPDLOG_DEBUG("graph:\n{}", graph);
 }
 
 void OrganizerSceneService::resetTime(void) {
