@@ -7,6 +7,7 @@
 #include <mm/components/time_delta.hpp>
 
 #include <entt/fwd.hpp>
+#include <entt/entity/storage.hpp>
 
 namespace MM::Systems {
 

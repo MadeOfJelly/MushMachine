@@ -23,7 +23,7 @@ static std::ostream& operator<<(std::ostream& out, const std::vector<entt::organ
 	}
 
 	for (size_t i = 0; i < nodes.size(); i++) {
-		for (const size_t child : nodes[i].children()) {
+		for (const size_t child : nodes[i].in_edges()) {
 			out << "n" << child << " -> " << "n" << i << ";\n";
 		}
 	}

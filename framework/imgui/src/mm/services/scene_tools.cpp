@@ -111,7 +111,7 @@ namespace MM::Services {
 			if (ImGui::Begin("Scene Metrics##ImGuiSceneToolsService", &_show_scene_metrics)) {
 				ImGui::Text("capacity: %zu", scene.storage<::MM::Entity>().capacity());
 				ImGui::Text("size: %zu", scene.storage<::MM::Entity>().size());
-				ImGui::Text("alive: %zu", scene.storage<::MM::Entity>().in_use());
+				ImGui::Text("alive: %zu", scene.storage<::MM::Entity>().free_list());
 				if (ImGui::CollapsingHeader("orphans")) {
 					// iterating all entities is expensive
 					size_t orphans = 0;
